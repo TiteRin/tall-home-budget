@@ -1,6 +1,6 @@
 # Guide de Déploiement
 
-Ce guide explique comment configurer le déploiement automatique de l'application sur un VPS.
+Ce guide explique comment configurer le déploiement automatique de l'application sur un VPS avec deux environnements (production et staging).
 
 ## 1. Configuration du VPS
 
@@ -30,20 +30,34 @@ sudo apt install -y nginx
 sudo apt install -y mysql-server
 ```
 
-### Configuration de Nginx
+### Configuration des sous-domaines
 
-Créez un fichier de configuration pour votre site :
-
+1. Créez les répertoires pour chaque environnement :
 ```bash
-sudo nano /etc/nginx/sites-available/laravel
+sudo mkdir -p /var/www/html/home-budget.titerin.ovh
+sudo mkdir -p /var/www/html/home-budget--staging.titerin.ovh
 ```
 
-Contenu du fichier :
+2. Configurez les permissions :
+```bash
+sudo chown -R www-data:www-data /var/www/html
+sudo chmod -R 755 /var/www/html
+```
+
+### Configuration de Nginx
+
+Créez un fichier de configuration pour chaque environnement :
+
+```bash
+sudo nano /etc/nginx/sites-available/home-budget.titerin.ovh
+```
+
+Contenu pour la production :
 ```nginx
 server {
     listen 80;
-    server_name votre-domaine.com;
-    root /var/www/html/public;
+    server_name home-budget.titerin.ovh;
+    root /var/www/html/home-budget.titerin.ovh/public;
 
     add_header X-Frame-Options "SAMEORIGIN";
     add_header X-Content-Type-Options "nosniff";
@@ -73,20 +87,61 @@ server {
 }
 ```
 
-Activez la configuration :
 ```bash
-sudo ln -s /etc/nginx/sites-available/laravel /etc/nginx/sites-enabled/
+sudo nano /etc/nginx/sites-available/home-budget--staging.titerin.ovh
+```
+
+Contenu pour le staging :
+```nginx
+server {
+    listen 80;
+    server_name home-budget--staging.titerin.ovh;
+    root /var/www/html/home-budget--staging.titerin.ovh/public;
+
+    add_header X-Frame-Options "SAMEORIGIN";
+    add_header X-Content-Type-Options "nosniff";
+
+    index index.php;
+
+    charset utf-8;
+
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
+    error_page 404 /index.php;
+
+    location ~ \.php$ {
+        fastcgi_pass unix:/var/run/php/php8.4-fpm.sock;
+        fastcgi_param SCRIPT_FILENAME $realpath_root$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(?!well-known).* {
+        deny all;
+    }
+}
+```
+
+Activez les configurations :
+```bash
+sudo ln -s /etc/nginx/sites-available/home-budget.titerin.ovh /etc/nginx/sites-enabled/
+sudo ln -s /etc/nginx/sites-available/home-budget--staging.titerin.ovh /etc/nginx/sites-enabled/
 sudo nginx -t
 sudo systemctl restart nginx
 ```
 
-### Configuration des permissions
+### Configuration DNS sur OVH
 
-```bash
-sudo mkdir -p /var/www/html
-sudo chown -R www-data:www-data /var/www/html
-sudo chmod -R 755 /var/www/html
-```
+1. Connectez-vous à votre espace client OVH
+2. Allez dans la section "Domaines"
+3. Sélectionnez "titerin.ovh"
+4. Dans l'onglet "Zone DNS", ajoutez deux entrées de type A :
+   - Sous-domaine : `home-budget` -> IP de votre VPS
+   - Sous-domaine : `home-budget--staging` -> IP de votre VPS
 
 ## 2. Configuration de GitHub Actions
 
@@ -119,20 +174,14 @@ Dans les paramètres de votre dépôt GitHub (Settings > Secrets and variables >
 
 ## 3. Premier déploiement
 
-1. Clonez le dépôt sur le VPS :
+### Environnement de production
+
 ```bash
-cd /var/www/html
+cd /var/www/html/home-budget.titerin.ovh
 git clone votre-repo-github .
-```
-
-2. Configurez le fichier .env :
-```bash
+git checkout main
 cp .env.example .env
-nano .env
-```
-
-3. Installez les dépendances et configurez l'application :
-```bash
+nano .env  # Configurez les variables d'environnement
 composer install --no-dev --optimize-autoloader
 php artisan key:generate
 php artisan migrate
@@ -141,16 +190,27 @@ php artisan route:cache
 php artisan view:cache
 ```
 
-4. Configurez les permissions :
+### Environnement de staging
+
 ```bash
-sudo chown -R www-data:www-data /var/www/html
-sudo chmod -R 755 /var/www/html
-sudo chmod -R 775 /var/www/html/storage
+cd /var/www/html/home-budget--staging.titerin.ovh
+git clone votre-repo-github .
+git checkout staging
+cp .env.example .env
+nano .env  # Configurez les variables d'environnement
+composer install --no-dev --optimize-autoloader
+php artisan key:generate
+php artisan migrate
+php artisan config:cache
+php artisan route:cache
+php artisan view:cache
 ```
 
 ## 4. Déploiement automatique
 
-Le déploiement se fera automatiquement à chaque push sur la branche main grâce au workflow GitHub Actions configuré dans `.github/workflows/deploy.yml`.
+Le déploiement se fera automatiquement :
+- Sur `home-budget.titerin.ovh` à chaque push sur la branche `main`
+- Sur `home-budget--staging.titerin.ovh` à chaque push sur la branche `staging`
 
 ## Dépannage
 
@@ -160,4 +220,5 @@ Si vous rencontrez des problèmes :
 2. Vérifiez que tous les secrets sont correctement configurés
 3. Assurez-vous que la clé SSH a les bonnes permissions
 4. Vérifiez les logs Nginx : `sudo tail -f /var/log/nginx/error.log`
-5. Vérifiez les logs PHP-FPM : `sudo tail -f /var/log/php8.4-fpm.log` 
+5. Vérifiez les logs PHP-FPM : `sudo tail -f /var/log/php8.4-fpm.log`
+6. Vérifiez la propagation DNS : `dig home-budget.titerin.ovh` et `dig home-budget--staging.titerin.ovh` 
