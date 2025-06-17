@@ -11,6 +11,9 @@
 @plugin '@tailwindcss/forms';
 @plugin '@tailwindcss/typography';
 
+/* Import DaisyUI library */
+@plugin 'daisyui';
+
 /* Remove default red box-shadow on invalid form elements */
 input:invalid, textarea:invalid, select:invalid {
     box-shadow: none;
