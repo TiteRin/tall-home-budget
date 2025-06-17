@@ -4,15 +4,18 @@ Ce guide explique comment configurer le déploiement automatique de l'applicatio
 
 ## 1. Configuration du VPS
 
+### Prérequis
+- Ubuntu 25.04 (ou version plus récente)
+- Au moins 2 Go de RAM
+- Au moins 20 Go d'espace disque
+
 ### Installation des dépendances système
 
 ```bash
 # Mise à jour du système
 sudo apt update && sudo apt upgrade -y
 
-# Installation de PHP 8.4 et extensions nécessaires
-sudo add-apt-repository ppa:ondrej/php
-sudo apt update
+# Installation de PHP 8.4 et extensions nécessaires depuis les dépôts natifs
 sudo apt install -y php8.4-fpm php8.4-cli php8.4-common php8.4-mysql php8.4-zip php8.4-gd php8.4-mbstring php8.4-curl php8.4-xml php8.4-bcmath
 
 # Installation de Composer
