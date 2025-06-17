@@ -23,6 +23,14 @@ use Illuminate\Support\Facades\Route;
 
 Route::view('/', 'welcome')->name('home');
 
+Route::get('/users', function() {
+    return "Hello World !";
+});
+
+Route::get('/foyer', function() {
+    return view('household');
+});
+
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
         ->name('login');
