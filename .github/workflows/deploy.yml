@@ -31,7 +31,7 @@ jobs:
           script: |
             if [ "${{ github.ref }}" = "refs/heads/main" ]; then
               # Déploiement production
-              cd /var/www/html/home-budget.titerin.ovh
+              cd /home/webapp/sites/home-budget.titerin.ovh
               git pull origin main
               composer install --no-dev --optimize-autoloader
               php artisan migrate --force
@@ -41,7 +41,7 @@ jobs:
               sudo systemctl restart php8.4-fpm
             else
               # Déploiement staging
-              cd /var/www/html/home-budget--staging.titerin.ovh
+              cd /home/webapp/sites/home-budget--staging.titerin.ovh
               git pull origin staging
               composer install --no-dev --optimize-autoloader
               php artisan migrate --force
