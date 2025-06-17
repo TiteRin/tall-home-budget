@@ -38,7 +38,6 @@ jobs:
               php artisan config:cache
               php artisan route:cache
               php artisan view:cache
-              sudo systemctl restart php8.4-fpm
             else
               # Déploiement staging
               cd /home/webapp/sites/home-budget--staging.titerin.ovh
@@ -48,6 +47,5 @@ jobs:
               php artisan config:cache
               php artisan route:cache
               php artisan view:cache
-              sudo systemctl restart php8.4-fpm
             fi
         
