@@ -22,7 +22,7 @@ class HouseholdManager extends Component
 
     public function mount()
     {
-        $household = Household::first();
+        $household = Household::orderBy('created_at')->first();
 
         if (!$household) {
             $household = Household::create([
