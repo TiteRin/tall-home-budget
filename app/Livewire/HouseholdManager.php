@@ -79,7 +79,7 @@ class HouseholdManager extends Component
         ]);
 
         $this->newMemberFirstName = '';
-        $this->newMemberLastName = '';
+        $this->newMemberLastName = $household->name ?? '';
         
         $this->refreshMembers();
     }
