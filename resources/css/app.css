@@ -23,3 +23,38 @@ input:invalid, textarea:invalid, select:invalid {
 [x-cloak] {
     display: none;
 }
+
+/* Mobile-first responsive utilities */
+@media (max-width: 640px) {
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+}
+
+/* Ensure proper viewport behavior */
+html {
+    overflow-x: hidden;
+}
+
+body {
+    overflow-x: hidden;
+    width: 100%;
+}
+
+/* Fix for DaisyUI dropdown positioning on mobile */
+.dropdown {
+    position: relative;
+}
+
+.dropdown-content {
+    position: absolute;
+    right: 0;
+    top: 100%;
+}
+
+/* Ensure navigation doesn't overflow */
+.navigation-container {
+    max-width: 100vw;
+    overflow-x: hidden;
+}
