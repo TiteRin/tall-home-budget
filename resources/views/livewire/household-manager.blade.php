@@ -1,6 +1,6 @@
 <div class="card bg-base-100 shadow-xl w-96">
 <div class="card-body">
-<h3 class="card-title">Foyer "{{ $householdName }}" [{{ $householdId }}]</h3>
+<h3 class="card-title">Foyer "{{ $householdName }}"</h3>
 
 <div class="space-y-6">
     {{-- Message flash --}}
