@@ -27,9 +27,17 @@ Route::get('/users', function() {
     return "Hello World !";
 });
 
-Route::get('/foyer', function() {
+// Route::get('/foyer', function() {
+//     return view('household');
+// });
+
+Route::get('/household/settings', function() {
     return view('household');
-});
+})->name('household.settings');
+
+Route::get('/bills/settings', function() {
+    return "Hello World !";
+})->name('bills.settings');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
