@@ -1,5 +1,9 @@
 <div class="flex justify-between items-center w-full">
-    <h1 class="text-lg sm:text-xl md:text-2xl font-bold truncate">Home Budget</h1>
+    <h1 class="text-lg sm:text-xl md:text-2xl font-bold truncate">
+        <a href="{{ route('home') }}">
+            Home Budget
+        </a>
+    </h1>
 
     <!-- Menu déroulant -->
     <details class="dropdown dropdown-end" x-data="{ open: false }">
