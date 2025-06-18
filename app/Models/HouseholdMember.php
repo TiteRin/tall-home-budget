@@ -16,4 +16,9 @@ class HouseholdMember extends Model
     {
         return $this->belongsTo(Household::class);
     }
+
+    public function getFullNameAttribute()
+    {
+        return $this->first_name . ' ' . $this->last_name;
+    }
 }
