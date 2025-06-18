@@ -39,6 +39,16 @@
                 <option value="0">Non</option>
             </select>
         </div>
+        <div class="form-control">
+            <label class="label">
+                <span class="label-text">Méthode de distribution</span>
+            </label>
+            <select class="select select-bordered" wire:model="defaultDistributionMethod">
+                @foreach($this->distributionMethods as $value => $label) 
+                    <option value="{{ $value }}">{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
         <div class="card-actions justify-end">
             <button class="btn btn-primary" wire:click="save">Enregistrer</button>
         </div>

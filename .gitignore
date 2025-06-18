@@ -33,3 +33,6 @@ auth.json
 .idea
 .vscode
 .cursor
+
+# My own documentation
+docs/

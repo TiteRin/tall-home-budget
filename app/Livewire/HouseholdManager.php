@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use App\Models\Household;
 use App\Models\HouseholdMember;
+use App\DistributionMethod;
 use Livewire\Component;
 
 class HouseholdManager extends Component
@@ -13,6 +14,7 @@ class HouseholdManager extends Component
     public int $householdId;
     public string $householdName = '';
     public bool $hasJointAccount = false;
+    public string $defaultDistributionMethod = DistributionMethod::EQUAL->value;
 
     public array $householdMembers = [];
 
@@ -28,12 +30,14 @@ class HouseholdManager extends Component
             $household = Household::create([
                 'name' => 'Mon Foyer',
                 'has_joint_account' => false,
+                'default_distribution_method' => DistributionMethod::EQUAL,
             ]);
         }
 
         $this->householdId = $household->id;
         $this->householdName = $household->name ?? '';
         $this->hasJointAccount = $household->has_joint_account ?? false;
+        $this->defaultDistributionMethod = $household->getDefaultDistributionMethod()->value;
         $this->newMemberLastName = $household->name ?? '';
 
         $this->refreshMembers();
@@ -59,6 +63,7 @@ class HouseholdManager extends Component
         $household = $this->household;
         $household->name = $this->householdName;
         $household->has_joint_account = $this->hasJointAccount; 
+        $household->default_distribution_method = DistributionMethod::from($this->defaultDistributionMethod);
         $household->save();
 
         session()->flash('message', 'Foyer enregistré avec succès');
@@ -96,6 +101,13 @@ class HouseholdManager extends Component
         }
 
         $this->refreshMembers();
+    }
+
+    public function getDistributionMethodsProperty(): array 
+    {
+        return collect(DistributionMethod::cases())->mapWithKeys(function (DistributionMethod $method) {
+            return [$method->value => $method->label()];
+        })->toArray();
     }
 
     public function render()
