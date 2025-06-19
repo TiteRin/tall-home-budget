@@ -1,8 +1,13 @@
 name: Tests
 
 on:
+  # On ne déclenche sur push que pour les branches qui ne sont pas main ou staging
   push:
-    branches-ignore: []  # All branches
+    branches:
+      - '**'
+      - '!main'
+      - '!staging'
+  # On déclenche sur les PR vers main et staging
   pull_request:
     branches:
       - main
@@ -10,6 +15,7 @@ on:
 
 jobs:
   test:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     
     services:
