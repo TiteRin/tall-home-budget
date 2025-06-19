@@ -39,7 +39,7 @@
                 </div>
                 <div class="form-control">
                     <label class="label">
-                        <span class="label-text">Méthode de distribution</span>
+                        <span class="label-text">Méthode de distribution par défaut</span>
                     </label>
                     <select class="select select-bordered" wire:model="defaultDistributionMethod">
                         @foreach ($this->distributionMethods as $value => $label)
