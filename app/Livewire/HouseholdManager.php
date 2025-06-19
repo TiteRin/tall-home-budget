@@ -36,7 +36,7 @@ class HouseholdManager extends Component
 
         $this->householdId = $household->id;
         $this->householdName = $household->name ?? '';
-        $this->hasJointAccount = $household->has_joint_account ?? false;
+        $this->hasJointAccount = $household->has_joint_account;
         $this->defaultDistributionMethod = $household->getDefaultDistributionMethod()->value;
         $this->newMemberLastName = $household->name ?? '';
 
@@ -62,8 +62,9 @@ class HouseholdManager extends Component
 
         $household = $this->household;
         $household->name = $this->householdName;
-        $household->has_joint_account = $this->hasJointAccount; 
+        $household->has_joint_account = filter_var($this->hasJointAccount, FILTER_VALIDATE_BOOLEAN);
         $household->default_distribution_method = DistributionMethod::from($this->defaultDistributionMethod);
+
         $household->save();
 
         session()->flash('message', 'Foyer enregistré avec succès');
