@@ -22,12 +22,18 @@ class BillFactory extends Factory
      */
     public function definition(): array
     {
+
+        $household = Household::factory()->create();
+        $member = Member::factory()->create([
+            'household_id' => $household->id,
+        ]);
+
         return [
             'name' => $this->faker->words(3, true),
             'amount' => $this->faker->numberBetween(1000, 20000),
             'distribution_method' => DistributionMethod::EQUAL,
-            'household_id' => Household::factory(),
-            'member_id' => Member::factory(),
+            'household_id' => $household->id,
+            'member_id' => $member->id,
         ];
     }
 }

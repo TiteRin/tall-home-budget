@@ -8,6 +8,8 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+use App\Exceptions\MismatchedHouseholdException;
+
 class Bill extends Model
 {
     /** @use HasFactory<\Database\Factories\BillFactory> */
@@ -24,6 +26,22 @@ class Bill extends Model
     protected $casts = [
         'distribution_method' => DistributionMethod::class,
     ];
+
+    protected static function booted(): void 
+    {
+        static::creating(function (Bill $bill) {
+
+            if (is_null($bill->member_id) || is_null($bill->household_id)) {
+                return;
+            }
+
+            $member = Member::find($bill->member_id);
+
+            if ($member->household_id !== $bill->household_id) {
+                throw new MismatchedHouseholdException();
+            }
+        });
+    }
 
     public function household(): BelongsTo
     {
