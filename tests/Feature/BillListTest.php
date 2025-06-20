@@ -15,3 +15,10 @@ test('user can view bills list page', function() {
     $response->assertStatus(200);
     $response->assertSeeText("Les dépenses du foyer");
 });
+
+test('user should see "Aucune dépense" if there are no bills', function() {
+    $response = $this->get("/bills");
+
+    $response->assertStatus(200);
+    $response->assertSeeText("Aucune dépense");
+});

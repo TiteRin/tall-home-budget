@@ -27,6 +27,10 @@ Route::get('/users', function() {
     return "Hello World !";
 });
 
+Route::controller(App\Http\Controllers\BillsController::class)->group(function() {
+    Route::get('/bills', 'index')->name('bills');
+});
+
 // Route::get('/foyer', function() {
 //     return view('household');
 // });
@@ -34,10 +38,6 @@ Route::get('/users', function() {
 Route::get('/household/settings', function() {
     return view('household');
 })->name('household.settings');
-
-Route::get('/bills', function() {
-    return "Les dépenses du foyer";
-})->name('bills');
 
 Route::get('/bills/settings', function() {
     return "Hello World !";
