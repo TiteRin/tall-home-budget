@@ -35,6 +35,10 @@ Route::get('/household/settings', function() {
     return view('household');
 })->name('household.settings');
 
+Route::get('/bills', function() {
+    return "Les dépenses du foyer";
+})->name('bills');
+
 Route::get('/bills/settings', function() {
     return "Hello World !";
 })->name('bills.settings');

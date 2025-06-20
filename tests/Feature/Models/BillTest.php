@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Feature\Models;
+
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
