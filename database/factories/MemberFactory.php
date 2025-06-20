@@ -3,12 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Household;
-use App\Models\HouseholdMember;
+use App\Models\Member;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class HouseholdMemberFactory extends Factory
+class MemberFactory extends Factory
 {
-    protected $model = HouseholdMember::class;
+    protected $model = Member::class;
 
     public function definition(): array
     {

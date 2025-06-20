@@ -3,7 +3,7 @@
 namespace App\Livewire;
 
 use App\Models\Household;
-use App\Models\HouseholdMember;
+use App\Models\Member;
 use App\DistributionMethod;
 use Livewire\Component;
 

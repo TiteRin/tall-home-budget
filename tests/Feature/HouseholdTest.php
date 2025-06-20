@@ -70,7 +70,7 @@ class HouseholdTest extends TestCase
             'last_name' => 'Doe',
         ]);
 
-        $this->assertDatabaseHas('household_members', [
+        $this->assertDatabaseHas('members', [
             'household_id' => $household->id,
             'first_name' => 'John',
             'last_name' => 'Doe',
@@ -92,7 +92,7 @@ class HouseholdTest extends TestCase
 
         $household->members()->where('first_name', 'John')->delete();
 
-        $this->assertDatabaseMissing('household_members', [
+        $this->assertDatabaseMissing('members', [
             'household_id' => $household->id,
             'first_name' => 'John',
         ]);

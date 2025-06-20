@@ -5,6 +5,7 @@ namespace App\Models;
 use App\DistributionMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Household extends Model
 {
@@ -17,9 +18,9 @@ class Household extends Model
         'default_distribution_method' => DistributionMethod::class,
     ];
 
-    public function members()
+    public function members(): HasMany
     {
-        return $this->hasMany(HouseholdMember::class);
+        return $this->hasMany(Member::class);
     }
 
     public function getDefaultDistributionMethod(): DistributionMethod

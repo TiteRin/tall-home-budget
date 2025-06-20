@@ -6,6 +6,7 @@ use App\DistributionMethod;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Bill extends Model
 {
@@ -17,21 +18,21 @@ class Bill extends Model
         'amount',
         'distribution_method',
         'household_id',
-        'household_member_id',
+        'member_id',
     ];
 
     protected $casts = [
         'distribution_method' => DistributionMethod::class,
     ];
 
-    public function household()
+    public function household(): BelongsTo
     {
         return $this->belongsTo(Household::class);
     }
 
-    public function householdMember()
+    public function member(): BelongsTo
     {
-        return $this->belongsTo(HouseholdMember::class);
+        return $this->belongsTo(Member::class);
     }
 }
 
