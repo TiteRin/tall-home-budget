@@ -3,10 +3,13 @@
 namespace App\Models;
 
 use App\DistributionMethod;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Household extends Model
 {
+    use HasFactory;
+
     protected $fillable = ['name', 'has_joint_account', 'default_distribution_method'];
 
     protected $casts = [
