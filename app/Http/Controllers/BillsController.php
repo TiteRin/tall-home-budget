@@ -11,12 +11,6 @@ class BillsController extends Controller
     {
         $bills = Bill::all();
 
-        $view = "Les dépenses du foyer";
-
-        if ($bills->isEmpty()) {
-            $view .= "Aucune dépense";
-        }
-
-        return $view;
+        return view('bills.index', compact('bills'));
     }
 }

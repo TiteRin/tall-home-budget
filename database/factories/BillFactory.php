@@ -4,10 +4,8 @@ namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+use App\Enums\DistributionMethod;
 use App\Models\Household;
-use App\Models\HouseholdMember;
-use App\DistributionMethod;
-use App\Models\Bill;
 use App\Models\Member;
 
 /**

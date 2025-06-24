@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\DistributionMethod;
+use App\Enums\DistributionMethod;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

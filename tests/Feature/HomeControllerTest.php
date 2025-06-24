@@ -3,7 +3,7 @@
 namespace App\Tests\Feature;
 
 use App\Models\Household;
-use App\DistributionMethod;
+use App\Enums\DistributionMethod;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

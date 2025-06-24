@@ -3,7 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Household;
-use App\DistributionMethod;
+use App\Enums\DistributionMethod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 class HouseholdFactory extends Factory
