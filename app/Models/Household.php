@@ -23,6 +23,11 @@ class Household extends Model
         return $this->hasMany(Member::class);
     }
 
+    public function bills(): HasMany
+    {
+        return $this->hasMany(Bill::class);
+    }
+
     public function getDefaultDistributionMethod(): DistributionMethod
     {
         return $this->default_distribution_method ?? DistributionMethod::EQUAL;
