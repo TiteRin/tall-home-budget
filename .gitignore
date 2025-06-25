@@ -36,3 +36,6 @@ auth.json
 
 # My own documentation
 docs/
+
+# Sail
+sail-phpunit.sh

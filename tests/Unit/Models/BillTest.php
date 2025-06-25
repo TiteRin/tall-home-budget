@@ -1,5 +1,7 @@
 <?php
 
+namespace App\Tests\Unit\Models;
+
 use App\Models\Bill;
 
 test('can create a bill model instance', function () {

@@ -20,6 +20,32 @@ const DEFAULT_BILL_AMOUNT = 17900;
 const DEFAULT_BILL_AMOUNT_FORMATTED = "179,00 €";
 const DEFAULT_BILL_DISTRIBUTION_METHOD = DistributionMethod::PRORATA;
 
+function createDefaultHousehold(): Household
+{
+    return Household::factory()->create();
+}
+
+function createDefaultMember(): Member
+{
+    $household = createDefaultHousehold();
+    return Member::factory()->create([
+        'household_id' => $household->id,
+    ]);    
+}
+
+function createDefaultBill(array $overrides = []): Bill
+{
+    $member = createDefaultMember();
+    return Bill::factory()->create([
+        'member_id' => $member->id,
+        'household_id' => $member->household_id,
+        'name' => DEFAULT_BILL_NAME,
+        'amount' => DEFAULT_BILL_AMOUNT,
+        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
+        ...$overrides,
+    ]);
+}
+
 test('user can view bills list page', function() {
     $response = get("/bills");
 
@@ -37,101 +63,33 @@ test('user should see "Aucune dépense" if there are no bills', function() {
 test('user should see the bills list if there are bills', function() {
 
 
-    $household = Household::factory()->create();
-    $member = Member::factory()->create([
-        'household_id' => $household->id,
-    ]);
-    $bill = Bill::factory()->create([
-        'household_id' => $household->id,
-        'member_id' => $member->id,
-        'name' => DEFAULT_BILL_NAME,
-        'amount' => DEFAULT_BILL_AMOUNT,
-        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
-    ]);
+    $bill = createDefaultBill();
 
     $response = get("/bills");
 
-    $response->assertSeeText(DEFAULT_BILL_NAME);
-});
-
-test('user should see its household’s bills list', function() {
-    $household = Household::factory()->create();
-    $member = Member::factory()->create([
-        'household_id' => $household->id,
-    ]);
-    $bill = Bill::factory()->create([
-        'household_id' => $household->id,
-        'member_id' => $member->id,
-        'name' => DEFAULT_BILL_NAME,   
-        'amount' => DEFAULT_BILL_AMOUNT,
-        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
-    ]);
-
-    $response = get("/bills");
-
-    $response->assertSeeText(DEFAULT_BILL_NAME);
+    $response->assertSeeText($bill->name);
 });
 
 test('user shouldn’t see other household’s bills', function() {
-    $household1 = Household::factory()->create();
-    $household2 = Household::factory()->create();
-    $member1 = Member::factory()->create([
-        'household_id' => $household1->id,
-    ]);
-    $member2 = Member::factory()->create([
-        'household_id' => $household2->id,
-    ]);
-    $bill1 = Bill::factory()->create([
-        'household_id' => $household1->id,
-        'member_id' => $member1->id,
-        'name' => DEFAULT_BILL_NAME,
-        'amount' => DEFAULT_BILL_AMOUNT,
-        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
-    ]);
-    $bill2 = Bill::factory()->create([
-        'household_id' => $household2->id,
-        'member_id' => $member2->id,
-        'name' => "Phone Bill",
-        'amount' => 10000,
-        'distribution_method' => DistributionMethod::PRORATA,
-    ]);
+    $bill1 = createDefaultBill();
+    $bill2 = createDefaultBill(['name' => 'Phone Bill']);
 
     $response = get("/bills");
 
-    $response->assertSeeText(DEFAULT_BILL_NAME);
-    $response->assertDontSeeText("Phone Bill");
+    $response->assertSeeText($bill1->name);
+    $response->assertDontSeeText($bill2->name);
 });
 
 test('amount should be formatted as a currency', function() {
-    $household = Household::factory()->create();
-    $member = Member::factory()->create([
-        'household_id' => $household->id,
-    ]);
-    $bill = Bill::factory()->create([
-        'household_id' => $household->id,
-        'member_id' => $member->id,
-        'name' => DEFAULT_BILL_NAME,
-        'amount' => DEFAULT_BILL_AMOUNT,
-        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
-    ]);
+    $bill = createDefaultBill(['amount' => 179000]);
 
     $response = get("/bills");
 
-    $response->assertSeeText(DEFAULT_BILL_AMOUNT_FORMATTED);
+    $response->assertSeeText('1 790,00 €');
 });
 
 test('user should be able to edit a bill', function() {
-    $household = Household::factory()->create();
-    $member = Member::factory()->create([
-        'household_id' => $household->id,
-    ]);
-    $bill = Bill::factory()->create([
-        'household_id' => $household->id,
-        'member_id' => $member->id,
-        'name' => DEFAULT_BILL_NAME,
-        'amount' => DEFAULT_BILL_AMOUNT,
-        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
-    ]); 
+    $bill = createDefaultBill();
 
     $response = get("/bills");
 
@@ -139,17 +97,7 @@ test('user should be able to edit a bill', function() {
 });
 
 test('user should be able to delete a bill', function() {
-    $household = Household::factory()->create();
-    $member = Member::factory()->create([
-        'household_id' => $household->id,
-    ]);
-    $bill = Bill::factory()->create([
-        'household_id' => $household->id,
-        'member_id' => $member->id,
-        'name' => DEFAULT_BILL_NAME,
-        'amount' => DEFAULT_BILL_AMOUNT,
-        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
-    ]);
+    $bill = createDefaultBill();
 
     $response = get("/bills");
 
