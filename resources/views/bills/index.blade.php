@@ -5,7 +5,7 @@
     @else
         <ul>
             @foreach ($bills as $bill)
-                <li>{{ $bill->name }}</li>
+                <li>{{ $bill->name }} : {{ $bill->amount_formatted }}</li>
             @endforeach
         </ul>
     @endif

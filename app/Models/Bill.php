@@ -9,11 +9,12 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use App\Exceptions\MismatchedHouseholdException;
+use App\Traits\HasCurrencyFormatting;
 
 class Bill extends Model
 {
     /** @use HasFactory<\Database\Factories\BillFactory> */
-    use HasFactory;
+    use HasFactory, HasCurrencyFormatting;
 
     protected $fillable = [
         'name',
@@ -51,6 +52,11 @@ class Bill extends Model
     public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
+    }
+
+    public function getAmountFormattedAttribute(): string
+    {
+        return $this->formatCurrency($this->amount);
     }
 }
 
