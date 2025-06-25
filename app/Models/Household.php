@@ -7,9 +7,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+use App\Traits\HasCurrencyFormatting;
+
 class Household extends Model
 {
-    use HasFactory;
+    use HasFactory, HasCurrencyFormatting;
 
     protected $fillable = ['name', 'has_joint_account', 'default_distribution_method'];
 
@@ -26,6 +28,16 @@ class Household extends Model
     public function bills(): HasMany
     {
         return $this->hasMany(Bill::class);
+    }
+
+    public function getTotalAmountAttribute(): int
+    {
+        return $this->bills->sum('amount') ?? 0;
+    }
+
+    public function getTotalAmountFormattedAttribute(): string
+    {
+        return $this->formatCurrency($this->total_amount);
     }
 
     public function getDefaultDistributionMethod(): DistributionMethod

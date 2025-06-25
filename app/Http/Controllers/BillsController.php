@@ -13,6 +13,6 @@ class BillsController extends Controller
         $household = Household::orderBy('created_at')->first();
         $bills = $household->bills ?? collect([]);
 
-        return view('bills.index', compact('bills'));
+        return view('bills.index', compact('bills', 'household'));
     }
 }

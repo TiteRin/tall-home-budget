@@ -13,6 +13,9 @@
                     </li>
                 @endforeach
             </ul>
+            <p>
+                <strong>Total : {{ $household->total_amount_formatted }}</strong>
+            </p>
         @endif
         <a href="" class="btn btn-primary">Ajouter une dépense</a>
     </section>

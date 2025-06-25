@@ -25,17 +25,18 @@ function createDefaultHousehold(): Household
     return Household::factory()->create();
 }
 
-function createDefaultMember(): Member
+function createDefaultMember(array $overrides = [], Household $household = null): Member
 {
-    $household = createDefaultHousehold();
+    $household = $household ?? createDefaultHousehold();
     return Member::factory()->create([
         'household_id' => $household->id,
+        ...$overrides,
     ]);    
 }
 
-function createDefaultBill(array $overrides = []): Bill
+function createDefaultBill(array $overrides = [], Member $member = null): Bill
 {
-    $member = createDefaultMember();
+    $member = $member ?? createDefaultMember();
     return Bill::factory()->create([
         'member_id' => $member->id,
         'household_id' => $member->household_id,
@@ -108,4 +109,15 @@ test('user should see a button to add a bill', function() {
     $response = get("/bills");
 
     $response->assertSeeText("Ajouter une dépense");
+});
+
+test('user should see the total amount of bills', function() {
+    $bill1 = createDefaultBill(['amount' => 10000]);
+    $bill2 = createDefaultBill(['amount' => 20000], $bill1->member);
+    $bill3 = createDefaultBill(['amount' => 7000], $bill1->member);
+    $anotherMemberBill = createDefaultBill(['amount' => 10000]);
+
+    $response = get("/bills");
+
+    $response->assertSeeText('370,00 €');
 });
