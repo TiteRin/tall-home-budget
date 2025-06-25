@@ -3,6 +3,7 @@ namespace App\Tests\Feature;
 
 use App\Models\Household;
 use App\Enums\DistributionMethod;
+use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
@@ -137,5 +138,47 @@ class HouseholdTest extends TestCase
         ]);
 
         $this->assertEquals(DistributionMethod::EQUAL, $household->getDefaultDistributionMethod());
+    }
+
+    public function test_household_has_total_amount_zero_by_default(): void
+    {
+        $household = Household::create([
+            'name' => 'Test Household',
+            'has_joint_account' => false,
+        ]);
+
+        $this->assertEquals(0, $household->total_amount);
+    }
+
+    public function test_household_has_total_amount_after_adding_bill(): void
+    {
+        $household = Household::create([
+            'name' => 'Test Household',
+            'has_joint_account' => false,
+        ]);
+
+        $member = Member::create([
+            'household_id' => $household->id,
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+        ]);
+
+        $household->bills()->create([
+            'name' => 'Test Bill',
+            'amount' => 10000,
+            'member_id' => $member->id,
+            'household_id' => $household->id,
+            'distribution_method' => DistributionMethod::EQUAL,
+        ]); 
+
+        $household->bills()->create([
+            'name' => 'Test Bill 2',
+            'amount' => 20000,
+            'member_id' => $member->id,
+            'household_id' => $household->id,
+            'distribution_method' => DistributionMethod::EQUAL,
+        ]);
+
+        $this->assertEquals(30000, $household->total_amount);
     }
 }
