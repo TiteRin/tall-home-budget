@@ -9,6 +9,7 @@
                     <li>
                         {{ $bill->name }} : {{ $bill->amount_formatted }}
                         <a href="" class="btn btn-primary">Modifier</a>
+                        <a href="" class="btn btn-danger">Supprimer</a>
                     </li>
                 @endforeach
             </ul>

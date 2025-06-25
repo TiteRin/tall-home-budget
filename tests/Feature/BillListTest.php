@@ -138,6 +138,24 @@ test('user should be able to edit a bill', function() {
     $response->assertSeeText("Modifier");
 });
 
+test('user should be able to delete a bill', function() {
+    $household = Household::factory()->create();
+    $member = Member::factory()->create([
+        'household_id' => $household->id,
+    ]);
+    $bill = Bill::factory()->create([
+        'household_id' => $household->id,
+        'member_id' => $member->id,
+        'name' => DEFAULT_BILL_NAME,
+        'amount' => DEFAULT_BILL_AMOUNT,
+        'distribution_method' => DEFAULT_BILL_DISTRIBUTION_METHOD,
+    ]);
+
+    $response = get("/bills");
+
+    $response->assertSeeText("Supprimer");
+}); 
+
 test('user should see a button to add a bill', function() {
     $response = get("/bills");
 
