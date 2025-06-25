@@ -6,7 +6,10 @@
         @else
             <ul>
                 @foreach ($bills as $bill)
-                    <li>{{ $bill->name }} : {{ $bill->amount_formatted }}</li>
+                    <li>
+                        {{ $bill->name }} : {{ $bill->amount_formatted }}
+                        <a href="" class="btn btn-primary">Modifier</a>
+                    </li>
                 @endforeach
             </ul>
         @endif
