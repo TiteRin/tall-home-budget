@@ -119,3 +119,9 @@ test('amount should be formatted as a currency', function() {
 
     $response->assertSeeText(DEFAULT_BILL_AMOUNT_FORMATTED);
 });
+
+test('user should see a button to add a bill', function() {
+    $response = get("/bills");
+
+    $response->assertSeeText("Ajouter une dépense");
+});
