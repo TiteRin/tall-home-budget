@@ -3,16 +3,23 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Bill;
-use App\Models\Household;
+use App\Services\BillService;
+use App\ViewModels\BillsIndexViewModel;
 
 class BillsController extends Controller
 {
+    public function __construct(
+        private BillService $billService
+    ) {}
+
     public function index()
     {
-        $household = Household::orderBy('created_at')->first();
-        $bills = $household->bills ?? collect([]);
-
-        return view('bills.index', compact('bills', 'household'));
+        $data = $this->billService->getBillsForHousehold();
+        
+        return view('bills.index', [
+            'bills' => $data['bills']->getData(),
+            'total_amount' => $data['bills']->getMeta()['total_amount'] ?? 0,
+            'total_amount_formatted' => $data['bills']->getMeta()['total_amount_formatted'] ?? '0,00 €',
+        ]);
     }
 }
