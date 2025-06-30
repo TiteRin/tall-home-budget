@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Unit\Models;
+namespace Tests\Unit\Models;
 
 use App\Models\Bill;
 

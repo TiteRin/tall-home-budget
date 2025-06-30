@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Tests\Feature;
+namespace Tests\Feature;
 
 use App\Models\Household;
 use App\Enums\DistributionMethod;
