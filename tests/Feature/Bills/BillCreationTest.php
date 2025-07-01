@@ -2,12 +2,10 @@
 
 namespace Tests\Feature\Models;
 
-use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Database\QueryException;
 use App\Exceptions\MismatchedHouseholdException;
 use ValueError;
 
@@ -30,23 +28,29 @@ test('a bill can be created and associated with a household and a member', funct
     ]);
 });
 
+test('an exception is thrown when saving an empty bill', function()
+{
+    $bill = new Bill();
+    $bill->save();
+})->throws(\InvalidArgumentException::class);
+
 test("an exception is thrown if the bill has no name", function () {
     $bill = Bill::factory()->create([
         'name' => null,
     ]);
-})->throws(QueryException::class);
+})->throws(\InvalidArgumentException::class);
 
 test("an exception is thrown if the bill has no amount", function () {
     $bill = Bill::factory()->create([
         'amount' => null,
     ]);
-})->throws(QueryException::class);
+})->throws(\InvalidArgumentException::class);
 
 test("an exception is thrown if the bill has no distribution method", function () {
     $bill = Bill::factory()->create([
         'distribution_method' => null,
     ]);
-})->throws(QueryException::class);
+})->throws(\InvalidArgumentException::class);
 
 test("an exception is thrown if the distribution method is not valid", function () {
     $bill = Bill::factory()->create([
@@ -58,10 +62,14 @@ test("an exception is thrown if the bill has no household", function () {
     $bill = Bill::factory()->create([
         'household_id' => null,
     ]);
-})->throws(QueryException::class);
+})->throws(\InvalidArgumentException::class);
 
 test("an exception is thrown if the bill has a member not associated with the household", function () {
-    $bill = Bill::factory()->create([
-        'member_id' => Member::factory(),
+    $member = Member::factory()->create();
+    $houseHoldB = Household::factory()->create([]);
+
+    Bill::factory()->create([
+        'member_id' => $member->id,
+        'household_id' => $houseHoldB->id,
     ]);
 })->throws(MismatchedHouseholdException::class);

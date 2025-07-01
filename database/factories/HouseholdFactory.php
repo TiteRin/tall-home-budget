@@ -12,10 +12,12 @@ class HouseholdFactory extends Factory
 
     public function definition(): array
     {
+        $faker = \Faker\Factory::create();
+
         return [
-            'name' => $this->faker->company(),
-            'has_joint_account' => $this->faker->boolean(),
-            'default_distribution_method' => $this->faker->randomElement(DistributionMethod::cases()),
+            'name' => $faker->company(),
+            'has_joint_account' => $faker->boolean(),
+            'default_distribution_method' => $faker->randomElement(DistributionMethod::cases()),
         ];
     }
-} 
+}

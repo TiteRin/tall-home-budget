@@ -22,10 +22,13 @@ test('should display an empty table if no bills', function() {
         ->assertSeeText('Aucune dépense');
 });
 
-test('it displays existing bills in a table', function() {
+test('should displays existing bills in a table', function()
+{
     $household = Household::factory()->create();
     $member = Member::factory()->create([
         'household_id' => $household->id,
+        'first_name' => 'Test',
+        'last_name' => 'Member',
     ]);
 
     $bill = Bill::factory()->create([
@@ -39,8 +42,25 @@ test('it displays existing bills in a table', function() {
     Livewire::test(BillsManager::class)
         ->assertSeeText('Test dépense')
         ->assertSee($bill->amount_formatted)
-        ->assertSee($bill->member->full_name)
+        ->assertSee('Test Member')
         ->assertSee($bill->distribution_method->label());
+});
+
+test('when a bill is not affected to a member, should display the bill without member', function()
+{
+   $household = Household::factory()->create();
+   $member = Member::factory()->create(['household_id' => $household->id]);
+   $bill = Bill::factory()->create([
+       'household_id' => $household->id,
+       'member_id' => null,
+       'name' => 'Test dépense',
+       'amount' => 1000,
+       'distribution_method' => DistributionMethod::EQUAL
+   ]);
+
+   Livewire::test(BillsManager::class)
+       ->assertSeeText('Test dépense')
+       ->assertSeeText('Compte joint');
 });
 
 

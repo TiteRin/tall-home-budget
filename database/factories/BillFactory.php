@@ -20,7 +20,6 @@ class BillFactory extends Factory
      */
     public function definition(): array
     {
-
         $household = Household::factory()->create();
         $member = Member::factory()->create([
             'household_id' => $household->id,

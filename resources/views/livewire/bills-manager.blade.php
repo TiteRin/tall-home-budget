@@ -16,7 +16,7 @@
                 <td>{{ $bill->name ?? '' }}</td>
                 <td>{{ $bill->formatted_amount ?? '-' }}</td>
                 <td>{{ $bill->distribution_method->label() ?? '' }}</td>
-                <td>{{ $bill->member ? $bill->member->fullname : '-' }}</td>
+                <td>{{ $bill->member ? $bill->member->fullname : '<em>Compte joint</em>' }}</td>
                 <td>Actions</td>
             </tr>
         @empty

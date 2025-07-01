@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 use App\Exceptions\MismatchedHouseholdException;
 use App\Traits\HasCurrencyFormatting;
+use InvalidArgumentException;
 
 class Bill extends Model
 {
@@ -32,7 +33,16 @@ class Bill extends Model
     {
         static::creating(function (Bill $bill) {
 
-            if (is_null($bill->member_id) || is_null($bill->household_id)) {
+            if (
+                is_null($bill->name) ||
+                is_null($bill->amount) ||
+                is_null($bill->household_id) ||
+                is_null($bill->distribution_method)
+            ) {
+                throw new InvalidArgumentException();
+            }
+
+            if (is_null($bill->member_id)) {
                 return;
             }
 
