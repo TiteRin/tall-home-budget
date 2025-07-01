@@ -27,5 +27,14 @@
             </tr>
         @endforelse
         </tbody>
+        <tfoot>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td><button class="btn btn-primary w-full">Ajouter</button></td>
+        </tr>
+        </tfoot>
     </table>
 </div>
