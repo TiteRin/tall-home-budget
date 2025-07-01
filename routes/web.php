@@ -29,19 +29,12 @@ Route::get('/users', function() {
 
 Route::controller(App\Http\Controllers\BillsController::class)->group(function() {
     Route::get('/bills', 'index')->name('bills');
+    Route::get('/bills/settings', 'settings')->name('bills.settings');
 });
-
-// Route::get('/foyer', function() {
-//     return view('household');
-// });
 
 Route::get('/household/settings', function() {
     return view('household');
 })->name('household.settings');
-
-Route::get('/bills/settings', function() {
-    return "Hello World !";
-})->name('bills.settings');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
