@@ -15,7 +15,15 @@ test('it displays "Les dépenses" as a title', function() {
         ->assertSeeText('Dépenses du foyer');
 });
 
-/*test('it displays existing bills in a table', function() {
+
+test('should display an empty table if no bills', function() {
+
+    Livewire::test(BillsManager::class)
+        ->assertSeeText('Aucune dépense');
+});
+
+/*
+test('it displays existing bills in a table', function() {
     $household = Household::factory()->create();
     $member = Member::factory()->create([
         'household_id' => $household->id,
