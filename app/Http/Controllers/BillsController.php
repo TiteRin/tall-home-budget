@@ -23,7 +23,6 @@ class BillsController extends Controller
     }
 
     public function settings(): View {
-
         return view('bills.settings');
     }
 }

@@ -28,7 +28,7 @@ class Bill extends Model
         'distribution_method' => DistributionMethod::class,
     ];
 
-    protected static function booted(): void 
+    protected static function booted(): void
     {
         static::creating(function (Bill $bill) {
 
@@ -54,7 +54,7 @@ class Bill extends Model
         return $this->belongsTo(Member::class);
     }
 
-    public function getAmountFormattedAttribute(): string
+    public function getFormattedAmountAttribute(): string
     {
         return $this->formatCurrency($this->amount);
     }

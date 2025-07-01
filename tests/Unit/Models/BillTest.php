@@ -12,5 +12,5 @@ test('can create a bill model instance', function () {
 test('can get the formatted amount', function () {
     $bill = new Bill();
     $bill->amount = 17900;
-    expect($bill->amount_formatted)->toBe('179,00 €');
+    expect($bill->formatted_amount)->toBe('179,00 €');
 });

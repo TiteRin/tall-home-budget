@@ -4,7 +4,6 @@
         <thead>
         <tr>
             <td>Nom</td>
-            <td>Description</td>
             <td>Montant</td>
             <td>Méthode de distribution</td>
             <td>Qui paie ?</td>
@@ -12,11 +11,21 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
-            <td colspan="6">
-                Aucune dépense
-            </td>
-        </tr>
+        @forelse($bills as $index => $bill)
+            <tr>
+                <td>{{ $bill->name ?? '' }}</td>
+                <td>{{ $bill->formatted_amount ?? '-' }}</td>
+                <td>{{ $bill->distribution_method->label() ?? '' }}</td>
+                <td>{{ $bill->member ? $bill->member->fullname : '-' }}</td>
+                <td>Actions</td>
+            </tr>
+        @empty
+            <tr>
+                <td colspan="6">
+                    Aucune dépense
+                </td>
+            </tr>
+        @endforelse
         </tbody>
     </table>
 </div>
