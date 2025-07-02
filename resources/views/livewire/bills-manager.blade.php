@@ -51,11 +51,11 @@
                 </select>
             </td>
             <td>
-                <input type="text"
-                       wire:model="newMemberId"
-                       placeholder="Qui ?"
-                       class="input input-bordered input-sm w-full"
-                />
+                <select class="select select-bordered" wire:model="newMemberId">
+                    @foreach ($this->householdMembers as $value => $label)
+                        <option value="{{ $value }}">{{ $label }}</option>
+                    @endforeach
+                </select>
             </td>
             <td><button class="btn btn-primary w-full">Ajouter</button></td>
         </tr>

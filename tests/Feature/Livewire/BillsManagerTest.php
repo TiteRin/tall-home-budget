@@ -91,4 +91,30 @@ test('should offer distribution methods as options', function()
         );
 });
 
+test('should offer household members as options', function()
+{
+    $memberHuey = Member::factory()->create([
+        'first_name' => 'Huey',
+        'last_name' => 'Duck',
+    ]);
+    $memberDewey = Member::factory()->create([
+        'first_name' => 'Dewey',
+        'last_name' => 'Duck',
+        'household_id' => $memberHuey->household_id,
+    ]);
+    $memberLouis = Member::factory()->create([
+        'first_name' => 'Louis',
+        'last_name' => 'Duck',
+        'household_id' => $memberHuey->household_id,
+    ]);
+
+    $householdMembers = [$memberHuey, $memberDewey, $memberLouis];
+
+    Livewire::test(BillsManager::class)
+        ->assertSeeHtmlInOrder(
+            array_map(function(Member $member) {
+                return $member->full_name;
+            }, $householdMembers)
+        );
+});
 

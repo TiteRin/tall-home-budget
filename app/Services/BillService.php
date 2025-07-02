@@ -3,18 +3,22 @@
 namespace App\Services;
 
 use App\Models\Household;
-use App\Models\Bill;
 use App\Http\Resources\BillResource;
 use App\Http\Resources\BillCollection;
 use App\Http\Resources\HouseholdSummaryResource;
 use Illuminate\Support\Collection;
 
-class BillService
+readonly class BillService
 {
+    public function __construct(
+        protected readonly HouseholdService $householdService
+    ) {}
+
+
     public function getBillsForHousehold(int $householdId = null): array
     {
         $household = $this->getHousehold($householdId);
-        
+
         if (!$household) {
             return [
                 'bills' => new BillCollection(collect([])),
@@ -34,7 +38,7 @@ class BillService
     public function getBillsCollection(int $householdId = null): Collection
     {
         $household = $this->getHousehold($householdId);
-        
+
         if (!$household) {
             return collect([]);
         }
@@ -44,21 +48,15 @@ class BillService
 
     public function getHouseholdSummary(int $householdId = null): ?array
     {
-        $household = $this->getHousehold($householdId);
-        
-        if (!$household) {
-            return null;
-        }
-
-        return (new HouseholdSummaryResource($household))->toArray(request());
+        return $this->householdService->getSummary($householdId);
     }
 
     private function getHousehold(int $householdId = null): ?Household
     {
         if ($householdId) {
-            return Household::find($householdId);
+            return $this->householdService->getHousehold($householdId);
         }
 
-        return Household::orderBy('created_at')->first();
+        return $this->householdService->getCurrentHousehold();
     }
-} 
+}
