@@ -55,6 +55,7 @@
                     @foreach ($this->householdMembers as $value => $label)
                         <option value="{{ $value }}">{{ $label }}</option>
                     @endforeach
+                    <option value="">Compte joint</option>
                 </select>
             </td>
             <td><button class="btn btn-primary w-full">Ajouter</button></td>

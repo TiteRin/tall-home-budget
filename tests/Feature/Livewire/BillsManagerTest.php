@@ -118,3 +118,9 @@ test('should offer household members as options', function()
         );
 });
 
+test('should offer "compte joint" as an option', function()
+{
+    Livewire::test(BillsManager::class)
+        ->assertSeeText('Compte joint');
+});
+
