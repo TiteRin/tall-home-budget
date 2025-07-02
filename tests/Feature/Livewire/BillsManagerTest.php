@@ -69,4 +69,26 @@ test('should display a clickable button to add a bill', function()
         ->assertSeeText('Ajouter');
 });
 
+test('should have form input to create a new bill', function()
+{
+    Livewire::test(BillsManager::class)
+        ->assertSeeHtmlInOrder([
+            'wire:model="newName"',
+            'wire:model="newAmount"',
+            'wire:model="newDistributionMethod"',
+            'wire:model="newMemberId"'
+        ]);
+});
+
+test('should offer distribution methods as options', function()
+{
+   Livewire::test(BillsManager::class)
+        ->assertSeeHtmlInOrder(
+            collect(DistributionMethod::cases())->map(function(DistributionMethod $distributionMethod)
+            {
+                return $distributionMethod->label();
+            })
+        );
+});
+
 
