@@ -63,6 +63,11 @@ test('should offer household members as options', function () {
         );
 });
 
+test('should display placeholder if no amount given', function() {
+    Livewire::test(BillForm::class)
+        ->assertSee('Montant');
+});
+
 test('should offer "compte joint" as an option', function () {
 
     Livewire::test(BillForm::class, [

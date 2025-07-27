@@ -3,20 +3,22 @@
 namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
-use App\Models\Household;
-use App\Models\Member;
-use App\Services\BillService;
 use Illuminate\View\View;
 use Livewire\Component;
 
+use App\Traits\HasCurrencyFormatting;
+
 class BillForm extends Component
 {
+
+    use HasCurrencyFormatting;
+
     public array $distributionMethods = [];
     public array $householdMembers = [];
     public bool $hasJointAccount = true;
 
     public string $newName = '';
-    public float $newAmount = 0;
+    public int|null $newAmount = null;
     public DistributionMethod $newDistributionMethod = DistributionMethod::EQUAL;
     public int|null $newMemberId = null;
 
@@ -24,5 +26,9 @@ class BillForm extends Component
     public function render(): View
     {
         return view('livewire.bill-form');
+    }
+
+    public function getFormattedNewAmount(): string {
+        return $this->formatCurrency($this->newAmount);
     }
 }

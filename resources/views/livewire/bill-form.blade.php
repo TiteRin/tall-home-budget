@@ -7,10 +7,12 @@
         />
     </td>
     <td>
-        <input type="text"
-               wire:model="newAmount"
+        <input type="number"
+               wire:model.number="newAmount"
                placeholder="Montant"
                class="input input-bordered input-sm w-full"
+               min="0.00"
+               step="0.01"
         />
     </td>
     <td>
