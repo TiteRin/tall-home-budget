@@ -68,6 +68,14 @@ test('should display placeholder if no amount given', function() {
         ->assertSee('Montant');
 });
 
+test('should display formatted value if amount given', function() {
+   Livewire::test(BillForm::class)
+       ->set('formattedNewAmount', '20')
+       ->assertSet('newAmount', 2000)
+       ->assertSet('formattedNewAmount', '20,00 €')
+       ->assertSeeHtml('value="20,00 €"');
+});
+
 test('should offer "compte joint" as an option', function () {
 
     Livewire::test(BillForm::class, [

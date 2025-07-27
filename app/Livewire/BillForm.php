@@ -18,17 +18,19 @@ class BillForm extends Component
     public bool $hasJointAccount = true;
 
     public string $newName = '';
-    public int|null $newAmount = null;
-    public DistributionMethod $newDistributionMethod = DistributionMethod::EQUAL;
-    public int|null $newMemberId = null;
-
+    public int $newAmount;
+    public string $formattedNewAmount;
+    public DistributionMethod $newDistributionMethod;
+    public int|null $newMemberId;
 
     public function render(): View
     {
         return view('livewire.bill-form');
     }
 
-    public function getFormattedNewAmount(): string {
-        return $this->formatCurrency($this->newAmount);
+    public function updatedFormattedNewAmount($newAmount): void
+    {
+        $this->newAmount = (int)round((float)$newAmount * 100);
+        $this->formattedNewAmount = $this->formatCurrency($this->newAmount);
     }
 }
