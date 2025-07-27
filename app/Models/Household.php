@@ -44,4 +44,9 @@ class Household extends Model
     {
         return $this->default_distribution_method ?? DistributionMethod::EQUAL;
     }
+
+    public function hasJointAccount(): bool
+    {
+        return $this->has_joint_account;
+    }
 }

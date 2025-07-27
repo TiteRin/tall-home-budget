@@ -13,11 +13,13 @@ class BillForm extends Component
 {
     public array $distributionMethods = [];
     public array $householdMembers = [];
+    public bool $hasJointAccount = true;
 
     public string $newName = '';
     public float $newAmount = 0;
     public DistributionMethod $newDistributionMethod = DistributionMethod::EQUAL;
     public int|null $newMemberId = null;
+
 
     public function render(): View
     {

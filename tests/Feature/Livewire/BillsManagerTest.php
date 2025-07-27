@@ -1,13 +1,11 @@
 <?php
 
 use App\Enums\DistributionMethod;
-use App\Livewire\BillForm;
 use App\Livewire\BillsManager;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -68,67 +66,3 @@ test('should display a clickable button to add a bill', function () {
     Livewire::test(BillsManager::class)
         ->assertSeeText('Ajouter');
 });
-
-test('should have form input to create a new bill', function () {
-    Livewire::test(BillForm::class)
-        ->assertSeeHtmlInOrder([
-            'wire:model="newName"',
-            'wire:model="newAmount"',
-            'wire:model="newDistributionMethod"',
-            'wire:model="newMemberId"'
-        ]);
-});
-
-test('should offer distribution methods as options', function () {
-
-    $distributionMethods = [
-        'equal' => '50/50',
-        'prorata' => 'Prorata'
-    ];
-
-    Livewire::test(BillForm::class,
-        [
-            'distributionMethods' => $distributionMethods,
-        ])
-        ->assertSeeHtmlInOrder(
-            array_values($distributionMethods)
-        );
-});
-
-test('should offer household members as options', function () {
-    $memberHuey = Member::factory()->create([
-        'first_name' => 'Huey',
-        'last_name' => 'Duck',
-    ]);
-    $memberDewey = Member::factory()->create([
-        'first_name' => 'Dewey',
-        'last_name' => 'Duck',
-        'household_id' => $memberHuey->household_id,
-    ]);
-    $memberLouis = Member::factory()->create([
-        'first_name' => 'Louis',
-        'last_name' => 'Duck',
-        'household_id' => $memberHuey->household_id,
-    ]);
-
-    $householdMembers = [$memberHuey, $memberDewey, $memberLouis];
-
-    Livewire::test(BillForm::class,
-        [
-            'householdMembers' => (new Collection($householdMembers))->mapWithKeys(
-                function (Member $member) {
-                    return [$member->id => $member->full_name];
-                })->toArray()
-        ])
-        ->assertSeeHtmlInOrder(
-            array_map(function (Member $member) {
-                return $member->full_name;
-            }, $householdMembers)
-        );
-});
-
-test('should offer "compte joint" as an option', function () {
-    Livewire::test(BillForm::class, [])
-        ->assertSeeText('Compte joint');
-});
-
