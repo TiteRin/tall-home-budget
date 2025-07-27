@@ -62,7 +62,7 @@ test('when a bill is not affected to a member, should display the bill without m
         ->assertSeeText('Compte joint');
 });
 
-test('should display a clickable button to add a bill', function () {
+test('should use the BillForm component to add a bill', function () {
     Livewire::test(BillsManager::class)
-        ->assertSeeText('Ajouter');
+        ->assertSeeLivewire('bill-form');
 });
