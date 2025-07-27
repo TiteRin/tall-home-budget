@@ -8,6 +8,7 @@ use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 

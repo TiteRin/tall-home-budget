@@ -1,13 +1,13 @@
 <?php
 
-namespace Tests\Feature;
+namespace Tests\Feature\Http\Controllers\Home;
 
-use App\Models\Household;
 use App\Enums\DistributionMethod;
+use App\Models\Household;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class HomeControllerTest extends TestCase
+class HomeIndexTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -37,4 +37,4 @@ class HomeControllerTest extends TestCase
         $response->assertSee('50/50'); // Label pour EQUAL
         $response->assertSee('Non'); // Compte joint
     }
-} 
+}
