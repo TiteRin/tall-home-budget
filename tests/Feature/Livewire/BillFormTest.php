@@ -76,14 +76,12 @@ test('should display formatted value if amount given', function() {
        ->assertSeeHtml('value="1 000,00 €"');
 });
 
-test('should offer "compte joint" as an option', function () {
+test('should offer "compte joint" as an option by default', function () {
 
-    Livewire::test(BillForm::class, [
-        'hasJointAccount' => true
-    ])->assertSeeText('Compte joint');
+    Livewire::test(BillForm::class)->assertSeeText('Compte joint');
 });
 
-test('should not offer "compte joint" as as option if the household does not possess one’', function () {
+test('should not offer "compte joint" as as option otherwise', function () {
 
     Livewire::test(BillForm::class, [
         'hasJointAccount' => false
