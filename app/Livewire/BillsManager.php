@@ -53,4 +53,9 @@ class BillsManager extends Component
             }
         )->toArray();
     }
+
+    public function getDefaultDistributionMethodProperty(): DistributionMethod
+    {
+        return $this->householdService->getCurrentHousehold()?->getDefaultDistributionMethod() ?? DistributionMethod::EQUAL;
+    }
 }

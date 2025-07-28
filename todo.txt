@@ -1,0 +1,5 @@
+Add a bill
+[x] The preferred distribution method should be selected by default
+[ ] Validations
+[ ] Error messages
+[ ] Form should empty when it’s saved

@@ -13,14 +13,19 @@ class BillForm extends Component
 
     use HasCurrencyFormatting;
 
+    public DistributionMethod $defaultDistributionMethod;
     public array $householdMembers = [];
     public bool $hasJointAccount = true;
 
     public string $newName = '';
     public int $newAmount;
     public string $formattedNewAmount;
-    public DistributionMethod $newDistributionMethod;
+    public string $newDistributionMethod;
     public int|null $newMemberId;
+
+    public function mount(): void {
+        $this->newDistributionMethod = ($this->defaultDistributionMethod ?? DistributionMethod::EQUAL)->value;
+    }
 
     public function render(): View
     {

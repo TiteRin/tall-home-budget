@@ -11,7 +11,6 @@ uses(RefreshDatabase::class);
 
 test('should have form input to create a new bill', function () {
 
-
     Livewire::test(BillForm::class)
         ->assertSeeHtmlInOrder([
             'wire:model="newName"',
@@ -88,8 +87,7 @@ test('should not offer "compte joint" as as option otherwise', function () {
     ])->assertDontSeeText('Compte joint');
 });
 
-// Validation
-test('should not be possible to submit if the form has any field empty', function() {
-
+test('should offer the preferred distribution method by default', function () {
+    Livewire::test(BillForm::class, ['defaultDistributionMethod' => DistributionMethod::PRORATA])
+        ->assertSet('newDistributionMethod', DistributionMethod::PRORATA->value);
 });
-
