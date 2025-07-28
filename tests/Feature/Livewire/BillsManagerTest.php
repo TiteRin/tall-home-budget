@@ -23,7 +23,7 @@ test('should display an empty table if no bills', function () {
         ->assertSeeText('Aucune dépense');
 });
 
-test('should displays existing bills in a table', function () {
+test('should display existing bills in a table', function () {
     $household = Household::factory()->create();
     $member = Member::factory()->create([
         'household_id' => $household->id,

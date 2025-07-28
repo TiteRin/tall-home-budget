@@ -1,7 +1,7 @@
 <tr>
     <td>
         <input type="text"
-               wire:model.live="newName"
+               wire:model="newName"
                placeholder="Nouvelle dépense"
                class="input input-bordered input-sm w-full"
         />
@@ -15,14 +15,14 @@
        />
     </td>
     <td>
-        <select class="select select-bordered" wire:model.live="newDistributionMethod">
-            @foreach ($this->distributionMethods as $value => $label)
+        <select class="select select-bordered" wire:model="newDistributionMethod">
+            @foreach ($this->distributionMethodOptions as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
         </select>
     </td>
     <td>
-        <select class="select select-bordered" wire:model.live="newMemberId">
+        <select class="select select-bordered" wire:model="newMemberId">
             @foreach ($this->householdMembers as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach

@@ -42,7 +42,7 @@
                         <span class="label-text">Méthode de distribution par défaut</span>
                     </label>
                     <select class="select select-bordered" wire:model="defaultDistributionMethod">
-                        @foreach ($this->distributionMethods as $value => $label)
+                        @foreach ($this->distributionMethodOptions as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>

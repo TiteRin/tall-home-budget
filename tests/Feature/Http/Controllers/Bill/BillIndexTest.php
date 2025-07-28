@@ -31,7 +31,7 @@ function createDefaultMember(array $overrides = [], Household $household = null)
     return Member::factory()->create([
         'household_id' => $household->id,
         ...$overrides,
-    ]);    
+    ]);
 }
 
 function createDefaultBill(array $overrides = [], Member $member = null): Bill
@@ -103,7 +103,7 @@ test('user should be able to delete a bill', function() {
     $response = get("/bills");
 
     $response->assertSeeText("Supprimer");
-}); 
+});
 
 test('user should see a button to add a bill', function() {
     $response = get("/bills");

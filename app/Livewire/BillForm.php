@@ -13,7 +13,6 @@ class BillForm extends Component
 
     use HasCurrencyFormatting;
 
-    public array $distributionMethods = [];
     public array $householdMembers = [];
     public bool $hasJointAccount = true;
 
@@ -32,5 +31,10 @@ class BillForm extends Component
     {
         $this->newAmount = (int)round((float)$newAmount * 100);
         $this->formattedNewAmount = $this->formatCurrency($this->newAmount);
+    }
+
+    public function getDistributionMethodOptionsProperty(): array
+    {
+        return DistributionMethod::options();
     }
 }

@@ -3,6 +3,9 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Bill;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+
+uses(RefreshDatabase::class);
 
 test('can get the formatted amount', function () {
     $bill = new Bill();

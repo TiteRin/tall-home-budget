@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums;    
+namespace App\Enums;
 
 enum DistributionMethod: string
 {
@@ -21,5 +21,13 @@ enum DistributionMethod: string
             self::EQUAL => 'Les membres du foyer paient chacun la moitié du montant total.',
             self::PRORATA => 'Les membres du foyer paient proportionnellement à leur consommation.',
         };
+    }
+
+    public static function options(): array
+    {
+        return collect(self::cases())->mapWithKeys(
+            function(DistributionMethod $method) {
+                return [$method->value => $method->label()];
+            })->toArray();
     }
 }

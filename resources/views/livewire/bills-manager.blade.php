@@ -29,7 +29,6 @@
         </tbody>
         <tfoot>
         @livewire('bill-form', [
-            'distributionMethods' => $this->distributionMethods,
             'householdMembers' => $this->householdMembers,
             'hasJointAccount' => false
         ])

@@ -1,15 +1,21 @@
 <?php
 
+use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
 use App\Models\Member;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Livewire\Livewire;
 
+uses(RefreshDatabase::class);
+
 test('should have form input to create a new bill', function () {
+
+
     Livewire::test(BillForm::class)
         ->assertSeeHtmlInOrder([
             'wire:model="newName"',
-            'wire:model="newAmount"',
+            'wire:model.blur="formattedNewAmount"',
             'wire:model="newDistributionMethod"',
             'wire:model="newMemberId"'
         ]);
@@ -17,15 +23,9 @@ test('should have form input to create a new bill', function () {
 
 test('should offer distribution methods as options', function () {
 
-    $distributionMethods = [
-        'equal' => '50/50',
-        'prorata' => 'Prorata'
-    ];
+    $distributionMethods = DistributionMethod::options();
 
-    Livewire::test(BillForm::class,
-        [
-            'distributionMethods' => $distributionMethods,
-        ])
+    Livewire::test(BillForm::class)
         ->assertSeeHtmlInOrder(
             array_values($distributionMethods)
         );
@@ -86,5 +86,10 @@ test('should not offer "compte joint" as as option otherwise', function () {
     Livewire::test(BillForm::class, [
         'hasJointAccount' => false
     ])->assertDontSeeText('Compte joint');
+});
+
+// Validation
+test('should not be possible to submit if the form has any field empty', function() {
+
 });
 

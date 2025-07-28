@@ -39,14 +39,6 @@ class BillsManager extends Component
         );
     }
 
-    public function getDistributionMethodsProperty(): array
-    {
-        return collect(DistributionMethod::cases())->mapWithKeys(
-            function(DistributionMethod $method) {
-                return [$method->value => $method->label()];
-            })->toArray();
-    }
-
     public function getHouseholdMembersProperty(): array
     {
         $household = Household::orderBy('created_at')->first();
