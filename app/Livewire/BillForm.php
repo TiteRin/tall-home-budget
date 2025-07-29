@@ -6,6 +6,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Member;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\Attributes\Validate;
 use Livewire\Component;
 
 use App\Traits\HasCurrencyFormatting;
@@ -19,20 +20,32 @@ class BillForm extends Component
     public Collection $householdMembers;
     public bool $hasJointAccount = true;
 
+
+    #[Validate('required|string|min:1')]
     public string $newName = '';
+    #[Validate('required|numeric|min:0')]
     public int $newAmount;
+    #[Validate('required|string|min:1')]
     public string $formattedNewAmount;
+    #[Validate('required|string|min:1')]
     public string $newDistributionMethod;
+    #[Validate('nullable|exists:members,id')]
     public int|null $newMemberId;
 
     public function mount(): void
     {
         $this->newDistributionMethod = ($this->defaultDistributionMethod ?? DistributionMethod::EQUAL)->value;
+        $this->householdMembers = $this->householdMembers ?? collect();
     }
 
     public function render(): View
     {
         return view('livewire.bill-form');
+    }
+
+    public function submit(): void
+    {
+        $this->validate();
     }
 
     public function updatedFormattedNewAmount($newAmount): void

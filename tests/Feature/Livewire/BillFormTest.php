@@ -88,3 +88,13 @@ test('should offer the preferred distribution method by default', function () {
     Livewire::test(BillForm::class, ['defaultDistributionMethod' => DistributionMethod::PRORATA])
         ->assertSet('newDistributionMethod', DistributionMethod::PRORATA->value);
 });
+
+test('should validate required fields', function() {
+    Livewire::test(BillForm::class)
+        ->call('submit')
+        ->assertHasErrors([
+            'newName' => 'required',
+            'formattedNewAmount' => 'required',
+            'newAmount' => 'required'
+        ]);
+});

@@ -1,6 +1,8 @@
 Add a bill
 [x] The preferred distribution method should be selected by default
-[ ] Validations
+[-] Validations
 [ ] Error messages
 [ ] Form should empty when it’s saved
 [x] Refactorisation BillsManager sur getHouseholdMembersProperty
+[x] Fix householdMembers must not be accessed before initialization
+[ ] La validation doit vérifier que newAmount et formattedNewAmount correspondent
