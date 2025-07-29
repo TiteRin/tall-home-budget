@@ -26,8 +26,16 @@ enum DistributionMethod: string
     public static function options(): array
     {
         return collect(self::cases())->mapWithKeys(
-            function(DistributionMethod $method) {
+            function (DistributionMethod $method) {
                 return [$method->value => $method->label()];
             })->toArray();
+    }
+
+    public static function labels(): array
+    {
+        return array_map(
+            function(DistributionMethod $method) { return $method->label(); },
+            self::cases()
+        );
     }
 }
