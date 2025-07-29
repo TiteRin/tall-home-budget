@@ -6,6 +6,8 @@ Add a bill
 [x] Refactorisation BillsManager sur getHouseholdMembersProperty
 [x] Fix householdMembers must not be accessed before initialization
 [ ] La validation doit vérifier que newAmount et formattedNewAmount correspondent
-[ ] Ajouter des labels pour l’accessibilité
+[/] Ajouter des labels pour l’accessibilité
+[ ] Utiliser [aria-labelledby] pour référencer les entêtes du tableau ?
 [ ] Modifier l’apparence du formulaire
 [ ] Accepter les chaînes de caractères monétaires pour la création d’une dépense
+[x] Ajouter méthodes statiques DistributionMethods

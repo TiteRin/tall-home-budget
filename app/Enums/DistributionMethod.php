@@ -38,4 +38,12 @@ enum DistributionMethod: string
             self::cases()
         );
     }
+
+    public static function descriptions(): array
+    {
+        return array_map(
+            function(DistributionMethod $method) { return $method->description(); },
+            self::cases()
+        );
+    }
 }
