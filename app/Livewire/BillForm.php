@@ -21,10 +21,12 @@ class BillForm extends Component
     public bool $hasJointAccount = true;
 
 
-    #[Validate('required', message: 'Le champ "Nouvelle dépense" est requis.')]
-    #[Validate('string|min:1', message: 'La valeur du champ "Nouvelle dépense" est trop courte.')]
+    #[Validate('required', as: "Nouvelle dépense", message: 'Le champ "Nouvelle dépense" est requis.')]
+    #[Validate('string|min:1', as: "Nouvelle dépense", message: 'La valeur du champ "Nouvelle dépense" est trop courte.')]
     public string $newName = '';
-    #[Validate('required|numeric|min:0')]
+
+    #[Validate('required', as: "Montant", message: 'Le montant est requis.')]
+    #[Validate('gt:0', as: "Montant", message: "Le montant doit être supérieur à zéro.")]
     public int $newAmount;
     #[Validate('required|string|min:1')]
     public string $formattedNewAmount;
@@ -49,8 +51,12 @@ class BillForm extends Component
         $this->validate();
     }
 
-    public function updatedFormattedNewAmount($newAmount): void
+    public function updatedFormattedNewAmount(string $newAmount): void
     {
+        if (!is_numeric($newAmount)) {
+            $this->newAmount = -1;
+            return;
+        }
         $this->newAmount = (int)round((float)$newAmount * 100);
         $this->formattedNewAmount = $this->formatCurrency($this->newAmount);
     }

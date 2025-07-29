@@ -108,3 +108,13 @@ test('newName should be a string with at least 1 character', function() {
         ])
         ->assertSee('Le champ "Nouvelle dépense" est requis.');
 });
+
+test('newAmount and formattedAmount should be numerical representation', function() {
+    Livewire::test(BillForm::class)
+        ->set('formattedNewAmount', 'toto')
+        ->call('submit')
+        ->assertHasErrors([
+            'newAmount' => 'gt:0',
+        ])
+        ->assertSee('Le montant doit être supérieur à zéro.');
+});
