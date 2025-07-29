@@ -6,6 +6,12 @@
                    placeholder="Nouvelle dépense"
                    class="input input-bordered input-sm w-full"
             />
+            @error('newName')
+                <br />
+                <span class="text-error text-sm">
+                    {{ $message  }}
+                </span>
+            @enderror
         </td>
         <td class="relative">
             <input type="text"

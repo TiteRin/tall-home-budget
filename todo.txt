@@ -6,3 +6,4 @@ Add a bill
 [x] Refactorisation BillsManager sur getHouseholdMembersProperty
 [x] Fix householdMembers must not be accessed before initialization
 [ ] La validation doit vérifier que newAmount et formattedNewAmount correspondent
+[ ] Ajouter des labels pour l’accessibilité

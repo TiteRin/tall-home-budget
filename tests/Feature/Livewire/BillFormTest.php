@@ -4,7 +4,6 @@ use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
 use App\Models\Member;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
@@ -97,4 +96,15 @@ test('should validate required fields', function() {
             'formattedNewAmount' => 'required',
             'newAmount' => 'required'
         ]);
+});
+
+
+test('newName should be a string with at least 1 character', function() {
+    Livewire::test(BillForm::class)
+        ->set('newName', '')
+        ->call('submit')
+        ->assertHasErrors([
+            'newName' => 'required'
+        ])
+        ->assertSee('Le champ "Nouvelle dépense" est requis.');
 });

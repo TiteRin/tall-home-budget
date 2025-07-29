@@ -21,7 +21,8 @@ class BillForm extends Component
     public bool $hasJointAccount = true;
 
 
-    #[Validate('required|string|min:1')]
+    #[Validate('required', message: 'Le champ "Nouvelle dépense" est requis.')]
+    #[Validate('string|min:1', message: 'La valeur du champ "Nouvelle dépense" est trop courte.')]
     public string $newName = '';
     #[Validate('required|numeric|min:0')]
     public int $newAmount;
