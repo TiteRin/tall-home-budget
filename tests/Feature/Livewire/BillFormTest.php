@@ -116,5 +116,16 @@ test('newAmount and formattedAmount should be numerical representation', functio
         ->assertHasErrors([
             'newAmount' => 'gt:0',
         ])
-        ->assertSee('Le montant doit être supérieur à zéro.');
+        ->assertSee('Le champ "Montant" doit être supérieur à zéro.');
+});
+
+test('newDistributionMethod should be included in existing Distribution Method', function() {
+    Livewire::test(BillForm::class)
+        ->set('newDistributionMethod', 'invalid-distribution-method')
+        ->call('submit')
+        ->assertHasErrors([
+            'newDistributionMethod' => 'in'
+        ])
+        ->assertSet('newDistributionMethod', 'invalid-distribution-method')
+        ->assertSee('Le champ "Méthode de distribution" n\'est pas valide.');
 });

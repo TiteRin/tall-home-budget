@@ -21,24 +21,49 @@ class BillForm extends Component
     public bool $hasJointAccount = true;
 
 
-    #[Validate('required', as: "Nouvelle dépense", message: 'Le champ "Nouvelle dépense" est requis.')]
-    #[Validate('string|min:1', as: "Nouvelle dépense", message: 'La valeur du champ "Nouvelle dépense" est trop courte.')]
     public string $newName = '';
-
-    #[Validate('required', as: "Montant", message: 'Le montant est requis.')]
-    #[Validate('gt:0', as: "Montant", message: "Le montant doit être supérieur à zéro.")]
     public int $newAmount;
-    #[Validate('required|string|min:1')]
     public string $formattedNewAmount;
-    #[Validate('required|string|min:1')]
     public string $newDistributionMethod;
-    #[Validate('nullable|exists:members,id')]
     public int|null $newMemberId;
 
     public function mount(): void
     {
         $this->newDistributionMethod = ($this->defaultDistributionMethod ?? DistributionMethod::EQUAL)->value;
         $this->householdMembers = $this->householdMembers ?? collect();
+    }
+
+    protected function rules(): array
+    {
+        return [
+            'newName' => 'required|string|min:1',
+            'newAmount' => 'required|gt:0',
+            'formattedNewAmount' => 'required|string|min:1',
+            'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::labels()),
+            'newMemberId' => 'nullable|integer|exists:members,id'
+        ];
+    }
+
+    protected function messages(): array
+    {
+        return [
+            'newName.required' => 'Le champ ":attribute" est requis.',
+            'newName.min' => 'Le champ ":attribute" ne peut pas être vide',
+            'newAmount.required' => 'Le champ ":attribute" est requis.',
+            'newAmount.gt' => 'Le champ ":attribute" doit être supérieur à zéro.',
+            'newDistributionMethod.required' => 'Le champ ":attribute" est requis.',
+            'newDistributionMethod.in' => 'Le champ ":attribute" n\'est pas valide.'
+        ];
+    }
+
+    protected function validationAttributes(): array
+    {
+        return [
+            'newName' => 'Nouvelle dépense',
+            'newAmount' => 'Montant',
+            'newDistributionMethod' => 'Méthode de distribution',
+            'newMemberId' => 'Membre du foyer'
+        ];
     }
 
     public function render(): View

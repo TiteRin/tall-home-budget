@@ -11,3 +11,4 @@ Add a bill
 [ ] Modifier l’apparence du formulaire
 [ ] Accepter les chaînes de caractères monétaires pour la création d’une dépense
 [x] Ajouter méthodes statiques DistributionMethods
+[ ] Tester l’écriture public ?DistributionMethod $defaultDistributionMethod

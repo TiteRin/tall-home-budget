@@ -20,9 +20,6 @@
                    placeholder="Montant"
                    class="input input-bordered input-sm"
             />
-            <br/>
-            {{ $newAmount }}
-
             @error('newAmount')
             <br/>
             <span class="text-error text-sm">
@@ -36,6 +33,13 @@
                     <option value="{{ $value }}">{{ $label }}</option>
                 @endforeach
             </select>
+            @error('newDistributionMethod')
+            <br/>
+            <span class="text-error text-sm">
+                    {{ $message  }}
+                </span>
+            @enderror
+
         </td>
         <td>
             <select class="select select-bordered" wire:model="newMemberId">
