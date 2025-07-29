@@ -3,3 +3,4 @@ Add a bill
 [ ] Validations
 [ ] Error messages
 [ ] Form should empty when it’s saved
+[x] Refactorisation BillsManager sur getHouseholdMembersProperty

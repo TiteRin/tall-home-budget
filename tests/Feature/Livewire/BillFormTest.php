@@ -50,10 +50,7 @@ test('should offer household members as options', function () {
 
     Livewire::test(BillForm::class,
         [
-            'householdMembers' => (new Collection($householdMembers))->mapWithKeys(
-                function (Member $member) {
-                    return [$member->id => $member->full_name];
-                })->toArray()
+            'householdMembers' => collect($householdMembers)
         ])
         ->assertSeeHtmlInOrder(
             array_map(function (Member $member) {

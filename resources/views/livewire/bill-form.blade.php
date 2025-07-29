@@ -23,7 +23,7 @@
     </td>
     <td>
         <select class="select select-bordered" wire:model="newMemberId">
-            @foreach ($this->householdMembers as $value => $label)
+            @foreach ($this->householdMemberOptions as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
             @if ($this->hasJointAccount)
