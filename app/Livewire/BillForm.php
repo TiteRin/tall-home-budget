@@ -4,12 +4,10 @@ namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
 use App\Models\Member;
+use App\Traits\HasCurrencyFormatting;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
-use Livewire\Attributes\Validate;
 use Livewire\Component;
-
-use App\Traits\HasCurrencyFormatting;
 
 class BillForm extends Component
 {
@@ -52,7 +50,8 @@ class BillForm extends Component
             'newAmount.required' => 'Le champ ":attribute" est requis.',
             'newAmount.gt' => 'Le champ ":attribute" doit être supérieur à zéro.',
             'newDistributionMethod.required' => 'Le champ ":attribute" est requis.',
-            'newDistributionMethod.in' => 'Le champ ":attribute" n\'est pas valide.'
+            'newDistributionMethod.in' => 'Le champ ":attribute" n\'est pas valide.',
+            'newMemberId.exists' => 'Le champ ":attribute" n\'est pas valide.',
         ];
     }
 

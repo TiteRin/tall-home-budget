@@ -129,3 +129,17 @@ test('newDistributionMethod should be included in existing Distribution Method',
         ->assertSet('newDistributionMethod', 'invalid-distribution-method')
         ->assertSee('Le champ "Méthode de distribution" n\'est pas valide.');
 });
+
+test('newMemberId should be included in existing House members', function () {
+    Livewire::test(BillForm::class)
+        ->set('newMemberId', 1000)
+        ->call('submit')
+        ->assertHasErrors([
+            'newMemberId' => 'exists'
+        ])
+        ->assertSet('newMemberId', 1000)
+        ->assertSee('Le champ "Membre du foyer" n\'est pas valide.');
+});
+
+
+// TODO : Form should be empty after saving

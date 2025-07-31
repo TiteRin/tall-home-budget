@@ -50,6 +50,13 @@
                     <option value="">Compte joint</option>
                 @endif
             </select>
+
+            @error('newMemberId')
+            <br/>
+            <span class="text-error text-sm">
+                    {{ $message  }}
+                </span>
+            @enderror
         </td>
         <td>
             <button class="btn btn-primary w-full" wire:click="submit">Ajouter</button>

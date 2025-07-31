@@ -1,14 +1,7 @@
-Add a bill
-[x] The preferred distribution method should be selected by default
-[-] Validations
-[ ] Error messages
-[ ] Form should empty when it’s saved
-[x] Refactorisation BillsManager sur getHouseholdMembersProperty
-[x] Fix householdMembers must not be accessed before initialization
-[ ] La validation doit vérifier que newAmount et formattedNewAmount correspondent
-[/] Ajouter des labels pour l’accessibilité
-[ ] Utiliser [aria-labelledby] pour référencer les entêtes du tableau ?
-[ ] Modifier l’apparence du formulaire
-[ ] Accepter les chaînes de caractères monétaires pour la création d’une dépense
-[x] Ajouter méthodes statiques DistributionMethods
-[ ] Tester l’écriture public ?DistributionMethod $defaultDistributionMethod
+// TODO : Validation should check that newAmount and formattedNewAmount are similar
+// TODO : accessibilité de BillForm (aria-labelledby entête du tableau ?)
+// TODO : Apparence du formulaire
+// TODO : Chaîne de caractères monétaires dans formattedNewAmount
+// TODO : transformer montant(int) en Montant
+// TODO : tester l’écriture "public ?DistributionMethod $defaultDistributionMethod"
+
