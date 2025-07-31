@@ -38,7 +38,7 @@ class BillForm extends Component
             'newAmount' => 'required|gt:0',
             'formattedNewAmount' => 'required|string|min:1',
             'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::labels()),
-            'newMemberId' => 'nullable|integer|in' . implode(",", $this->householdMembers->pluck('id')->toArray()),
+            'newMemberId' => 'required|integer|in' . implode(",", $this->householdMembers->pluck('id')->toArray()),
         ];
     }
 
