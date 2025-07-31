@@ -33,13 +33,20 @@ class BillForm extends Component
 
     protected function rules(): array
     {
-        return [
+        $rules = [
             'newName' => 'required|string|min:1',
             'newAmount' => 'required|gt:0',
             'formattedNewAmount' => 'required|string|min:1',
             'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::labels()),
-            'newMemberId' => 'required|integer|in' . implode(",", $this->householdMembers->pluck('id')->toArray()),
+            'newMemberId' => [
+                $this->hasJointAccount ? 'nullable' : 'required',
+                'integer',
+                'in' . implode(",", $this->householdMembers->pluck('id')->toArray()),
+
+            ]
         ];
+
+        return $rules;
     }
 
     protected function messages(): array

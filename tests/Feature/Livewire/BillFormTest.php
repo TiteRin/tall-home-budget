@@ -185,17 +185,26 @@ test('newMemberId should be included in the current household members', function
         ]);
 });
 
-test('newMemberId shouldn’t be null', function () {
-    Livewire::test(BillForm::class)
+test('when there is a joint account, should accept a null value', function () {
+    Livewire::test(BillForm::class, [
+        'hasJointAccount' => true
+    ])
+        ->set('newMemberId', null)
+        ->call('submit')
+        ->assertHasNoErrors([
+            'newMemberId'
+        ]);
+});
+
+test('where there is no joint account, newMemberId shouldn’t be null', function () {
+    Livewire::test(BillForm::class, [
+        'hasJointAccount' => false
+    ])
         ->set('newMemberId', null)
         ->call('submit')
         ->assertHasErrors([
             'newMemberId' => 'required'
         ]);
 });
-
-//test('when there is a joint account, should accept a null value', function () {
-//
-//});
 
 // TODO : Form should be empty after saving
