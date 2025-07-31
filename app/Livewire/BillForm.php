@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
 use App\Traits\HasCurrencyFormatting;
+use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Component;
@@ -33,9 +34,16 @@ class BillForm extends Component
 
     protected function rules(): array
     {
-        $rules = [
+        return [
             'newName' => 'required|string|min:1',
-            'newAmount' => 'required|gt:0',
+            'newAmount' => [
+                'required',
+                'gt:0',
+                function (string $attribute, string $value, Closure $fail) {
+                    if ($this->formatCurrency($value) === $this->formattedNewAmount) return;
+                    $fail("Le champ $attribute n'est pas valide.");
+                }
+            ],
             'formattedNewAmount' => 'required|string|min:1',
             'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::labels()),
             'newMemberId' => [
@@ -45,8 +53,6 @@ class BillForm extends Component
 
             ]
         ];
-
-        return $rules;
     }
 
     protected function messages(): array

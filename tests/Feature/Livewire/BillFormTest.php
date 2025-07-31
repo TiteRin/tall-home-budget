@@ -100,7 +100,6 @@ test('should validate required fields', function () {
         ]);
 });
 
-
 test('newName should be a string with at least 1 character', function () {
     Livewire::test(BillForm::class)
         ->set('newName', '')
@@ -130,6 +129,14 @@ test('newDistributionMethod should be included in existing Distribution Method',
         ])
         ->assertSet('newDistributionMethod', 'invalid-distribution-method')
         ->assertSee('Le champ "Méthode de distribution" n\'est pas valide.');
+});
+
+test('newAmount and formattedNewAmount should represent the same value', function () {
+    Livewire::test(BillForm::class)
+        ->set('formattedNewAmount', '1000')
+        ->set('newAmount', 200)
+        ->call('submit')
+        ->assertHasErrors(['newAmount']);
 });
 
 test('newMemberId should be included in existing House members', function () {
