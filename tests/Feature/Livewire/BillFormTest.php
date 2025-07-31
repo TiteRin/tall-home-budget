@@ -2,7 +2,9 @@
 
 use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
+use App\Models\Household;
 use App\Models\Member;
+use App\Services\HouseholdService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -58,17 +60,17 @@ test('should offer household members as options', function () {
         );
 });
 
-test('should display placeholder if no amount given', function() {
+test('should display placeholder if no amount given', function () {
     Livewire::test(BillForm::class)
         ->assertSee('Montant');
 });
 
-test('should display formatted value if amount given', function() {
-   Livewire::test(BillForm::class)
-       ->set('formattedNewAmount', '1000')
-       ->assertSet('newAmount', 100000)
-       ->assertSet('formattedNewAmount', '1 000,00 €')
-       ->assertSeeHtml('value="1 000,00 €"');
+test('should display formatted value if amount given', function () {
+    Livewire::test(BillForm::class)
+        ->set('formattedNewAmount', '1000')
+        ->assertSet('newAmount', 100000)
+        ->assertSet('formattedNewAmount', '1 000,00 €')
+        ->assertSeeHtml('value="1 000,00 €"');
 });
 
 test('should offer "compte joint" as an option by default', function () {
@@ -88,7 +90,7 @@ test('should offer the preferred distribution method by default', function () {
         ->assertSet('newDistributionMethod', DistributionMethod::PRORATA->value);
 });
 
-test('should validate required fields', function() {
+test('should validate required fields', function () {
     Livewire::test(BillForm::class)
         ->call('submit')
         ->assertHasErrors([
@@ -99,7 +101,7 @@ test('should validate required fields', function() {
 });
 
 
-test('newName should be a string with at least 1 character', function() {
+test('newName should be a string with at least 1 character', function () {
     Livewire::test(BillForm::class)
         ->set('newName', '')
         ->call('submit')
@@ -109,7 +111,7 @@ test('newName should be a string with at least 1 character', function() {
         ->assertSee('Le champ "Nouvelle dépense" est requis.');
 });
 
-test('newAmount and formattedAmount should be numerical representation', function() {
+test('newAmount and formattedAmount should be numerical representation', function () {
     Livewire::test(BillForm::class)
         ->set('formattedNewAmount', 'toto')
         ->call('submit')
@@ -119,7 +121,7 @@ test('newAmount and formattedAmount should be numerical representation', functio
         ->assertSee('Le champ "Montant" doit être supérieur à zéro.');
 });
 
-test('newDistributionMethod should be included in existing Distribution Method', function() {
+test('newDistributionMethod should be included in existing Distribution Method', function () {
     Livewire::test(BillForm::class)
         ->set('newDistributionMethod', 'invalid-distribution-method')
         ->call('submit')
@@ -135,10 +137,52 @@ test('newMemberId should be included in existing House members', function () {
         ->set('newMemberId', 1000)
         ->call('submit')
         ->assertHasErrors([
-            'newMemberId' => 'exists'
+            'newMemberId' => 'in'
         ])
         ->assertSet('newMemberId', 1000)
         ->assertSee('Le champ "Membre du foyer" n\'est pas valide.');
+});
+
+test('newMemberId should be included in the current household members', function () {
+
+    $householdService = new HouseholdService();
+    Household::create([
+        'name' => 'Test Current Household',
+        'has_joint_account' => false,
+        'default_distribution_method' => DistributionMethod::EQUAL,
+    ]);
+    $currentHousehold = $householdService->getCurrentHousehold();
+    $anotherHousehold = Household::create([
+        'name' => 'Test Another Household',
+        'has_joint_account' => true,
+        'default_distribution_method' => DistributionMethod::EQUAL,
+    ]);
+
+    assert($currentHousehold !== null);
+
+    $memberAFromCurrentHousehold = Member::create([
+        'household_id' => $currentHousehold->id,
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+    ]);
+    $memberBFromCurrentHousehold = Member::create([
+        'household_id' => $currentHousehold->id,
+        'first_name' => 'Jane',
+        'last_name' => 'Doe',
+    ]);
+
+    $memberAFromAnotherHousehold = Member::create([
+        'household_id' => $anotherHousehold->id,
+        'first_name' => 'Dewey',
+        'last_name' => 'Duck',
+    ]);
+
+    Livewire::test(BillForm::class)
+        ->set('newMemberId', $memberAFromAnotherHousehold->id)
+        ->call('submit')
+        ->assertHasErrors([
+            'newMemberId' => 'in'
+        ]);
 });
 
 

@@ -38,7 +38,7 @@ class BillForm extends Component
             'newAmount' => 'required|gt:0',
             'formattedNewAmount' => 'required|string|min:1',
             'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::labels()),
-            'newMemberId' => 'nullable|integer|exists:members,id'
+            'newMemberId' => 'nullable|integer|in' . implode(",", $this->householdMembers->pluck('id')->toArray()),
         ];
     }
 
@@ -51,7 +51,7 @@ class BillForm extends Component
             'newAmount.gt' => 'Le champ ":attribute" doit être supérieur à zéro.',
             'newDistributionMethod.required' => 'Le champ ":attribute" est requis.',
             'newDistributionMethod.in' => 'Le champ ":attribute" n\'est pas valide.',
-            'newMemberId.exists' => 'Le champ ":attribute" n\'est pas valide.',
+            'newMemberId.in' => 'Le champ ":attribute" n\'est pas valide.',
         ];
     }
 
