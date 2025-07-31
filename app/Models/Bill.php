@@ -3,18 +3,17 @@
 namespace App\Models;
 
 use App\Enums\DistributionMethod;
-
+use App\Exceptions\MismatchedHouseholdException;
+use App\Traits\HasCurrencyFormatting;
+use Database\Factories\BillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-use App\Exceptions\MismatchedHouseholdException;
-use App\Traits\HasCurrencyFormatting;
 use InvalidArgumentException;
 
 class Bill extends Model
 {
-    /** @use HasFactory<\Database\Factories\BillFactory> */
+    /** @use HasFactory<BillFactory> */
     use HasFactory, HasCurrencyFormatting;
 
     protected $fillable = [
