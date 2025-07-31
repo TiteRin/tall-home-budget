@@ -2,6 +2,8 @@
 
 namespace App\Domains\ValueObjects;
 
+use InvalidArgumentException;
+
 class Amount
 {
 
@@ -9,6 +11,10 @@ class Amount
 
     public function __construct(int $amount)
     {
+        if ($amount < 0) {
+            throw new InvalidArgumentException('Amount must be a positive integer');
+        }
+
         $this->amount = $amount;
     }
 
