@@ -2,10 +2,13 @@
 
 namespace App\Domains\ValueObjects;
 
+use App\Traits\HasCurrencyFormatting;
 use InvalidArgumentException;
 
 class Amount
 {
+
+    use HasCurrencyFormatting;
 
     private int $amount;
 
@@ -21,5 +24,11 @@ class Amount
     public function value(): int
     {
         return $this->amount;
+    }
+
+
+    public function __toString(): string
+    {
+        return $this->formatCurrency($this->amount);
     }
 }
