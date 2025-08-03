@@ -2,24 +2,25 @@
 
 namespace Tests\Unit\Models;
 
+use App\Domains\ValueObjects\Amount;
 use App\Models\Bill;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
-test('can get the formatted amount', function () {
+uses(RefreshDatabase::class);
+
+test('bill amount is an Amount object', function () {
     $bill = new Bill();
     $bill->amount = 17900;
-    expect($bill->formatted_amount)->toBe('179,00 €');
+    expect($bill->amount)
+        ->toBeInstanceOf(Amount::class)
+        ->and($bill->amount->value())
+        ->toBe(17900);
 });
 
-test('returns formatted amount for zero value', function()
-{
+
+test('bill amount is always positive', function () {
     $bill = new Bill();
-    $bill->amount = 0;
-    expect($bill->formatted_amount)->toBe('0,00 €');
-});
+    $bill->amount = -17900;
 
-test('returns formatted amount for negative value', function()
-{
-   $bill = new Bill();
-   $bill->amount = -10000;
-   expect($bill->formatted_amount)->toBe('-100,00 €');
-});
+    $amount = $bill->amount;
+})->throws(\InvalidArgumentException::class);

@@ -7,6 +7,7 @@ use App\Models\Household;
 use App\Models\Member;
 use App\Services\BillService;
 use App\Services\HouseholdService;
+use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -34,31 +35,24 @@ class BillsManager extends Component
         return view(
             'livewire.bills-manager',
             compact(
-                'bills', 'household'
+                'bills',
             )
         );
     }
 
-    public function getDistributionMethodsProperty(): array
+    public function getHouseholdMembersProperty(): Collection
     {
-        return collect(DistributionMethod::cases())->mapWithKeys(
-            function(DistributionMethod $method) {
-                return [$method->value => $method->label()];
-            })->toArray();
-    }
-
-    public function getHouseholdMembersProperty(): array
-    {
-        $household = Household::orderBy('created_at')->first();
+        $household = $this->householdService->getCurrentHousehold();
 
         if ($household === null) {
-            return [];
+            return collect();
         }
 
-        return $household->members->mapWithKeys(
-            function(Member $member) {
-                return [$member->id => $member->full_name];
-            }
-        )->toArray();
+        return $household->members;
+    }
+
+    public function getDefaultDistributionMethodProperty(): DistributionMethod
+    {
+        return $this->householdService->getCurrentHousehold()?->getDefaultDistributionMethod() ?? DistributionMethod::EQUAL;
     }
 }

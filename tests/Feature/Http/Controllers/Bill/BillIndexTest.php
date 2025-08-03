@@ -2,12 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use App\Enums\DistributionMethod;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-
 use function Pest\Laravel\get;
 
 uses(RefreshDatabase::class);
@@ -31,7 +30,7 @@ function createDefaultMember(array $overrides = [], Household $household = null)
     return Member::factory()->create([
         'household_id' => $household->id,
         ...$overrides,
-    ]);    
+    ]);
 }
 
 function createDefaultBill(array $overrides = [], Member $member = null): Bill
@@ -72,13 +71,27 @@ test('user should see the bills list if there are bills', function() {
 });
 
 test('user shouldn’t see other household’s bills', function() {
-    $bill1 = createDefaultBill();
-    $bill2 = createDefaultBill(['name' => 'Phone Bill']);
+
+    $defaultHousehold = createDefaultHousehold();
+    $anotherHousehold = Household::factory()->create();
+
+    $bill1 = $defaultHousehold->bills()->create([
+        'name' => 'Test Bill 1',
+        'amount' => 10000,
+        'member_id' => null,
+        'distribution_method' => DistributionMethod::EQUAL,
+    ]);;
+    $bill2 = $anotherHousehold->bills()->create([
+        'name' => 'Test Bill 2',
+        'amount' => 10000,
+        'member_id' => null,
+        'distribution_method' => DistributionMethod::EQUAL,
+    ]);
 
     $response = get("/bills");
 
-    $response->assertSeeText($bill1->name);
-    $response->assertDontSeeText($bill2->name);
+    $response->assertSeeText('Test Bill 1');;
+    $response->assertDontSeeText('Test Bill 2');;
 });
 
 test('amount should be formatted as a currency', function() {
@@ -103,7 +116,7 @@ test('user should be able to delete a bill', function() {
     $response = get("/bills");
 
     $response->assertSeeText("Supprimer");
-}); 
+});
 
 test('user should see a button to add a bill', function() {
     $response = get("/bills");

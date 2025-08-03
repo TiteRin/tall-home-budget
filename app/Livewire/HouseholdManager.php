@@ -43,12 +43,12 @@ class HouseholdManager extends Component
         $this->refreshMembers();
     }
 
-    public function getHouseholdProperty(): ?Household 
+    public function getHouseholdProperty(): ?Household
     {
         return Household::find($this->householdId);
     }
 
-    public function refreshMembers() 
+    public function refreshMembers()
     {
         $household = $this->household;
         $this->householdMembers = $household ? $household->members->toArray() : [];
@@ -70,14 +70,14 @@ class HouseholdManager extends Component
         session()->flash('message', 'Foyer enregistré avec succès');
     }
 
-    public function addMember() 
+    public function addMember()
     {
         if (trim($this->newMemberFirstName) === '' || trim($this->newMemberLastName) === '') {
             session()->flash('error', 'Le prénom et le nom sont requis');
             return;
         }
 
-        $household = $this->household;  
+        $household = $this->household;
 
         $household->members()->create([
             'first_name' => $this->newMemberFirstName,
@@ -86,7 +86,7 @@ class HouseholdManager extends Component
 
         $this->newMemberFirstName = '';
         $this->newMemberLastName = $household->name ?? '';
-        
+
         $this->refreshMembers();
     }
 
@@ -104,11 +104,9 @@ class HouseholdManager extends Component
         $this->refreshMembers();
     }
 
-    public function getDistributionMethodsProperty(): array 
+    public function getDistributionMethodOptionsProperty(): array
     {
-        return collect(DistributionMethod::cases())->mapWithKeys(function (DistributionMethod $method) {
-            return [$method->value => $method->label()];
-        })->toArray();
+        return DistributionMethod::options();
     }
 
     public function render()

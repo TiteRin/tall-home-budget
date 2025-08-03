@@ -2,20 +2,19 @@
 
 namespace App\Models;
 
+use App\Casts\AmountCast;
 use App\Enums\DistributionMethod;
-
+use App\Exceptions\MismatchedHouseholdException;
+use Database\Factories\BillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-use App\Exceptions\MismatchedHouseholdException;
-use App\Traits\HasCurrencyFormatting;
 use InvalidArgumentException;
 
 class Bill extends Model
 {
-    /** @use HasFactory<\Database\Factories\BillFactory> */
-    use HasFactory, HasCurrencyFormatting;
+    /** @use HasFactory<BillFactory> */
+    use HasFactory;
 
     protected $fillable = [
         'name',
@@ -27,6 +26,7 @@ class Bill extends Model
 
     protected $casts = [
         'distribution_method' => DistributionMethod::class,
+        'amount' => AmountCast::class
     ];
 
     protected static function booted(): void
@@ -62,11 +62,6 @@ class Bill extends Model
     public function member(): BelongsTo
     {
         return $this->belongsTo(Member::class);
-    }
-
-    public function getFormattedAmountAttribute(): string
-    {
-        return $this->formatCurrency($this->amount);
     }
 }
 

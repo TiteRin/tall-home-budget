@@ -1,0 +1,7 @@
+// TODO : Validation should check that newAmount and formattedNewAmount are similar
+// TODO : accessibilité de BillForm (aria-labelledby entête du tableau ?)
+// TODO : Apparence du formulaire
+// TODO : Chaîne de caractères monétaires dans formattedNewAmount
+// TODO : transformer montant(int) en Montant
+// TODO : tester l’écriture "public ?DistributionMethod $defaultDistributionMethod"
+

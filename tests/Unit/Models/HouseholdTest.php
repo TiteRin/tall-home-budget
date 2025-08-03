@@ -1,6 +1,7 @@
 <?php
 namespace Tests\Unit\Models;
 
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Household;
 use App\Models\Member;
@@ -146,7 +147,7 @@ class HouseholdTest extends TestCase
             'has_joint_account' => false,
         ]);
 
-        $this->assertEquals(0, $household->total_amount);
+        $this->assertEquals(new Amount(0), $household->total_amount);
     }
 
     public function test_household_has_total_amount_after_adding_bill(): void
@@ -178,6 +179,6 @@ class HouseholdTest extends TestCase
             'distribution_method' => DistributionMethod::EQUAL,
         ]);
 
-        $this->assertEquals(30000, $household->total_amount);
+        $this->assertEquals(new Amount(30000), $household->total_amount);
     }
 }
