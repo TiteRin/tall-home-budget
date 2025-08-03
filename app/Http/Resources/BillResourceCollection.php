@@ -3,13 +3,12 @@
 namespace App\Http\Resources;
 
 use App\Domains\ValueObjects\Amount;
+use App\Traits\HasCurrencyFormatting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
-
-use App\Traits\HasCurrencyFormatting;
 use Illuminate\Support\Collection;
 
-class BillCollection extends ResourceCollection
+class BillResourceCollection extends ResourceCollection
 {
     use HasCurrencyFormatting;
 

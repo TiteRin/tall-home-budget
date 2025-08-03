@@ -4,8 +4,8 @@ namespace Tests\Unit\Http\Resources;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Http\Resources\BillCollection;
 use App\Http\Resources\BillResource;
+use App\Http\Resources\BillResourceCollection;
 use App\Models\Bill;
 use App\Models\Member;
 use Illuminate\Http\Request;
@@ -60,7 +60,7 @@ test('it transforms collection to array with data and meta', function () {
     });
 
     // Create collection with mocked resources
-    $billCollection = new BillCollection(collect([$billResource1, $billResource2]));
+    $billCollection = new BillResourceCollection(collect([$billResource1, $billResource2]));
 
     // Act
     $result = $billCollection->toArray(new Request());
@@ -94,7 +94,7 @@ test('it returns correct data', function () {
     });
 
     $billResource = new BillResource($bill);
-    $billCollection = new BillCollection(collect([$billResource]));
+    $billCollection = new BillResourceCollection(collect([$billResource]));
 
     // Act
     $result = $billCollection->getData();
@@ -151,7 +151,7 @@ test('it returns correct meta information', function () {
     });
 
     // Create collection with mocked resources
-    $billCollection = new BillCollection(collect([$billResource1, $billResource2]));
+    $billCollection = new BillResourceCollection(collect([$billResource1, $billResource2]));
 
     // Act
     $meta = $billCollection->getMeta();
@@ -208,7 +208,7 @@ test('it calculates correct length', function () {
     $billResource3 = new BillResource($bill3);
 
     // Create collection with mocked resources
-    $billCollection = new BillCollection(collect([$billResource1, $billResource2, $billResource3]));
+    $billCollection = new BillResourceCollection(collect([$billResource1, $billResource2, $billResource3]));
 
     // Use reflection to access protected method
     $reflection = new ReflectionClass($billCollection);
@@ -269,7 +269,7 @@ test('it calculates correct total amount', function () {
     });
 
     // Create collection with mocked resources
-    $billCollection = new BillCollection(collect([$billResource1, $billResource2]));
+    $billCollection = new BillResourceCollection(collect([$billResource1, $billResource2]));
 
     // Use reflection to access protected method
     $reflection = new ReflectionClass($billCollection);
@@ -287,7 +287,7 @@ test('it calculates correct total amount', function () {
 
 test('it handles empty collection', function () {
     // Arrange - Create an empty collection
-    $billCollection = new BillCollection(collect([]));
+    $billCollection = new BillResourceCollection(collect([]));
 
     // Act
     $result = $billCollection->toArray(new Request());

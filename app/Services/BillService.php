@@ -2,10 +2,10 @@
 
 namespace App\Services;
 
-use App\Models\Household;
 use App\Http\Resources\BillResource;
-use App\Http\Resources\BillCollection;
+use App\Http\Resources\BillResourceCollection;
 use App\Http\Resources\HouseholdSummaryResource;
+use App\Models\Household;
 use Illuminate\Support\Collection;
 
 readonly class BillService
@@ -21,13 +21,13 @@ readonly class BillService
 
         if (!$household) {
             return [
-                'bills' => new BillCollection(collect()),
+                'bills' => new BillResourceCollection(collect()),
                 'household_summary' => null,
             ];
         }
 
         $bills = $household->bills()->with('member')->get();
-        $billCollection = new BillCollection(BillResource::collection($bills));
+        $billCollection = new BillResourceCollection(BillResource::collection($bills));
 
         return [
             'bills' => $billCollection,
