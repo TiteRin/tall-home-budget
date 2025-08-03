@@ -9,7 +9,9 @@
                     <li>
                         {{ $bill['name'] }} : {{ $bill['amount_formatted'] }}
                         <span class="text-sm text-gray-500">
-                            ({{ $bill['member']['full_name'] }} - {{ $bill['distribution_method_label'] }})
+                            ({{ $bill['member']['full_name'] }}
+                            -
+                            {{ $bill['distribution_method_label'] }})
                         </span>
                         <a href="" class="btn btn-primary">Modifier</a>
                         <a href="" class="btn btn-danger">Supprimer</a>

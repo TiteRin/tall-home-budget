@@ -8,7 +8,7 @@ use Illuminate\Contracts\View\View;
 class BillsController extends Controller
 {
     public function __construct(
-        private BillService $billService
+        private readonly BillService $billService
     ) {}
 
     public function index(): View

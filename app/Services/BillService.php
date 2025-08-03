@@ -11,7 +11,7 @@ use Illuminate\Support\Collection;
 readonly class BillService
 {
     public function __construct(
-        protected readonly HouseholdService $householdService
+        protected HouseholdService $householdService
     ) {}
 
 
@@ -21,7 +21,7 @@ readonly class BillService
 
         if (!$household) {
             return [
-                'bills' => new BillCollection(collect([])),
+                'bills' => new BillCollection(collect()),
                 'household_summary' => null,
             ];
         }
@@ -40,7 +40,7 @@ readonly class BillService
         $household = $this->getHousehold($householdId);
 
         if (!$household) {
-            return collect([]);
+            return collect();
         }
 
         return $household->bills()->with('member')->get();

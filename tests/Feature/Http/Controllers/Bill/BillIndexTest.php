@@ -6,6 +6,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
+use Database\Factories\MemberFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\get;
 
@@ -78,20 +79,20 @@ test('user shouldn’t see other household’s bills', function() {
     $bill1 = $defaultHousehold->bills()->create([
         'name' => 'Test Bill 1',
         'amount' => 10000,
-        'member_id' => null,
+        'member_id' => Member::factory()->create(['first_name' => 'John', 'last_name' => 'Doe', 'household_id' => $defaultHousehold->id])->id,
         'distribution_method' => DistributionMethod::EQUAL,
-    ]);;
+    ]);
     $bill2 = $anotherHousehold->bills()->create([
         'name' => 'Test Bill 2',
         'amount' => 10000,
-        'member_id' => null,
+        'member_id' => Member::factory()->create(['first_name' => 'Dewey', 'last_name' => 'Duck', 'household_id' => $anotherHousehold->id])->id,
         'distribution_method' => DistributionMethod::EQUAL,
     ]);
 
     $response = get("/bills");
 
-    $response->assertSeeText('Test Bill 1');;
-    $response->assertDontSeeText('Test Bill 2');;
+    $response->assertSeeText('Test Bill 1');
+    $response->assertDontSeeText('Test Bill 2');
 });
 
 test('amount should be formatted as a currency', function() {

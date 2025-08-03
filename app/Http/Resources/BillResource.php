@@ -13,7 +13,7 @@ class BillResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'amount' => $this->amount,
-            'amount_formatted' => $this->amount_formatted,
+            'amount_formatted' => $this->amount->__tostring(),
             'distribution_method' => $this->distribution_method->value,
             'distribution_method_label' => $this->distribution_method->label(),
             'member' => [
@@ -24,4 +24,4 @@ class BillResource extends JsonResource
             'updated_at' => $this->updated_at,
         ];
     }
-} 
+}
