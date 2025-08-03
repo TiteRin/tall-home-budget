@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Traits\HasCurrencyFormatting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-
-use App\Traits\HasCurrencyFormatting;
 
 class Household extends Model
 {
@@ -30,9 +30,9 @@ class Household extends Model
         return $this->hasMany(Bill::class);
     }
 
-    public function getTotalAmountAttribute(): int
+    public function getTotalAmountAttribute(): Amount
     {
-        return $this->bills->sum('amount') ?? 0;
+        return new Amount($this->bills->sum(fn($bill) => $bill->amount->value()) ?? 0);
     }
 
     public function getTotalAmountFormattedAttribute(): string
