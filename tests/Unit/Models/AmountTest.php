@@ -12,7 +12,7 @@ test('should represent an amount', function () {
 
 test('should always be positive', function () {
     $amount = new Amount(-1);
-})->throws(InvalidArgumentException::class, 'Amount must be a positive integer');
+})->throws(InvalidArgumentException::class, 'Amount [-1] must be a positive integer');
 
 test('should format the amount for lisibility purposes', function () {
     $amount = new Amount(100000);

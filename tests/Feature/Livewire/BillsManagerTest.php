@@ -5,10 +5,17 @@ use App\Livewire\BillsManager;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
+use App\Services\HouseholdService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
+
+
+beforeEach(function () {
+    Household::factory()->create();
+    $this->householdService = new HouseholdService();
+});
 
 test('it displays "Les dépenses" as a title', function () {
 
@@ -24,7 +31,7 @@ test('should display an empty table if no bills', function () {
 });
 
 test('should display existing bills in a table', function () {
-    $household = Household::factory()->create();
+    $household = $this->householdService->getCurrentHousehold();
     $member = Member::factory()->create([
         'household_id' => $household->id,
         'first_name' => 'Test',
@@ -47,7 +54,7 @@ test('should display existing bills in a table', function () {
 });
 
 test('when a bill is not affected to a member, should display the bill without member', function () {
-    $household = Household::factory()->create();
+    $household = $this->householdService->getCurrentHousehold();
     $member = Member::factory()->create(['household_id' => $household->id]);
     $bill = Bill::factory()->create([
         'household_id' => $household->id,

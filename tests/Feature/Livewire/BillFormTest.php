@@ -63,6 +63,14 @@ test('should offer household members as options', function () {
         );
 });
 
+test('when household has a joint account, it should display "Compte joint" as an option', function () {
+    Livewire::test(BillForm::class, [
+        'householdMembers' => collect(),
+        'hasJointAccount' => true
+    ])
+        ->assertSeeHtml("Compte joint");
+});
+
 test('should display placeholder if no amount given', function () {
     Livewire::test(BillForm::class)
         ->assertSee('Montant');

@@ -3,8 +3,6 @@
 namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
-use App\Models\Household;
-use App\Models\Member;
 use App\Services\BillService;
 use App\Services\HouseholdService;
 use Illuminate\Support\Collection;
@@ -30,7 +28,6 @@ class BillsManager extends Component
     public function render(): View
     {
         $bills = $this->billService->getBillsCollection();
-        $household = $this->householdService->getCurrentHousehold();
 
         return view(
             'livewire.bills-manager',
@@ -54,5 +51,10 @@ class BillsManager extends Component
     public function getDefaultDistributionMethodProperty(): DistributionMethod
     {
         return $this->householdService->getCurrentHousehold()?->getDefaultDistributionMethod() ?? DistributionMethod::EQUAL;
+    }
+
+    public function getHasHouseholdJointAccountProperty(): bool
+    {
+        return $this->householdService->getCurrentHousehold()->hasJointAccount();
     }
 }

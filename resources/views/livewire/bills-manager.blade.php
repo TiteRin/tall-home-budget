@@ -30,7 +30,7 @@
         <tfoot>
         @livewire('bill-form', [
             'householdMembers' => $this->householdMembers,
-            'hasJointAccount' => false,
+        'hasJointAccount' => $this->hasHouseholdJointAccount,
             'defaultDistributionMethod' => $this->defaultDistributionMethod
         ])
         </tfoot>

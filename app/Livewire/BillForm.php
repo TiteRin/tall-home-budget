@@ -7,7 +7,6 @@ use App\Enums\DistributionMethod;
 use App\Models\Member;
 use App\Repositories\BillRepository;
 use App\Services\HouseholdService;
-use App\Traits\HasCurrencyFormatting;
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -16,9 +15,6 @@ use Livewire\Component;
 
 class BillForm extends Component
 {
-
-    use HasCurrencyFormatting;
-
     #[Prop]
     public DistributionMethod $defaultDistributionMethod;
     #[Prop]
@@ -31,9 +27,9 @@ class BillForm extends Component
 
     public string $newName = '';
     public int $newAmount;
-    public string $formattedNewAmount;
+    public string $formattedNewAmount = "";
     public string $newDistributionMethod;
-    public int|null $newMemberId;
+    public int|null $newMemberId = null;
 
     public function boot(BillRepository $billRepository, HouseholdService $householdService): void
     {
@@ -55,7 +51,9 @@ class BillForm extends Component
                 'required',
                 'gt:0',
                 function (string $attribute, string $value, Closure $fail) {
-                    if ($this->formatCurrency($value) === $this->formattedNewAmount) return;
+                    $amount = new Amount($value);
+                    if ($amount->__toString() === $this->formattedNewAmount) return;
+
                     $fail("Le champ $attribute n'est pas valide.");
                 }
             ],
@@ -125,11 +123,14 @@ class BillForm extends Component
     public function updatedFormattedNewAmount(string $newAmount): void
     {
         if (!is_numeric($newAmount)) {
-            $this->newAmount = -1;
+            $this->newAmount = 0;
             return;
         }
-        $this->newAmount = (int)round((float)$newAmount * 100);
-        $this->formattedNewAmount = $this->formatCurrency($this->newAmount);
+
+        $amount = new Amount((int)round($newAmount * 100.00));
+
+        $this->newAmount = $amount->value();
+        $this->formattedNewAmount = $amount->__toString();
     }
 
     public function getDistributionMethodOptionsProperty(): array
