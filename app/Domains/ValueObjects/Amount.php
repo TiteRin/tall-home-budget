@@ -31,4 +31,18 @@ class Amount
     {
         return $this->formatCurrency($this->amount);
     }
+
+    public function __equals(Amount $amount): bool
+    {
+        return $this->value() === $amount->value();
+    }
+
+    public static function from(string $amount): self
+    {
+        if (!is_numeric($amount)) {
+            throw new InvalidArgumentException("Amount [$amount] must be a number");
+        }
+
+        return new Amount((int)round((float)$amount * 100));
+    }
 }

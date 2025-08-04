@@ -18,3 +18,8 @@ test('should format the amount for lisibility purposes', function () {
     $amount = new Amount(100000);
     expect($amount->__toString())->toBe('1 000,00 €');
 });
+
+test('should create an Amount from a string', function () {
+    $amount = Amount::from('100.00');
+    expect($amount)->toEqual(new Amount('10000'));
+});
