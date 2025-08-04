@@ -127,7 +127,7 @@ class BillForm extends Component
             return;
         }
 
-        $amount = new Amount((int)round($newAmount * 100.00));
+        $amount = Amount::from($newAmount);
 
         $this->newAmount = $amount->value();
         $this->formattedNewAmount = $amount->__toString();
