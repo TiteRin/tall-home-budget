@@ -31,6 +31,16 @@ enum DistributionMethod: string
             })->toArray();
     }
 
+    public static function values(): array
+    {
+        return array_map(
+            function (DistributionMethod $method) {
+                return $method->value;
+            },
+            self::cases()
+        );
+    }
+
     public static function labels(): array
     {
         return array_map(

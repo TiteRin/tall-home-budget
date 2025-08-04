@@ -2,12 +2,16 @@
 
 namespace App\Livewire;
 
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
+use App\Repositories\BillRepository;
+use App\Services\HouseholdService;
 use App\Traits\HasCurrencyFormatting;
 use Closure;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\Attributes\Prop;
 use Livewire\Component;
 
 class BillForm extends Component
@@ -15,16 +19,27 @@ class BillForm extends Component
 
     use HasCurrencyFormatting;
 
+    #[Prop]
     public DistributionMethod $defaultDistributionMethod;
+    #[Prop]
     public Collection $householdMembers;
+    #[Prop]
     public bool $hasJointAccount = true;
 
+    private BillRepository $billRepository;
+    private HouseholdService $householdService;
 
     public string $newName = '';
     public int $newAmount;
     public string $formattedNewAmount;
     public string $newDistributionMethod;
     public int|null $newMemberId;
+
+    public function boot(BillRepository $billRepository, HouseholdService $householdService): void
+    {
+        $this->billRepository = $billRepository;
+        $this->householdService = $householdService;
+    }
 
     public function mount(): void
     {
@@ -45,12 +60,11 @@ class BillForm extends Component
                 }
             ],
             'formattedNewAmount' => 'required|string|min:1',
-            'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::labels()),
+            'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::values()),
             'newMemberId' => [
                 $this->hasJointAccount ? 'nullable' : 'required',
                 'integer',
-                'in' . implode(",", $this->householdMembers->pluck('id')->toArray()),
-
+                'in:' . implode(",", $this->householdMembers->pluck('id')->toArray()),
             ]
         ];
     }
@@ -86,6 +100,26 @@ class BillForm extends Component
     public function submit(): void
     {
         $this->validate();
+
+        $household = $this->householdService->getCurrentHousehold();
+        if (!$household) {
+            return;
+        }
+
+        $distributionMethod = DistributionMethod::from($this->newDistributionMethod);
+        $amount = new Amount($this->newAmount);
+
+        $this->billRepository->create(
+            $this->newName,
+            $amount,
+            $distributionMethod,
+            $household->id,
+            $this->newMemberId
+        );
+
+        // Reset form fields after successful submission
+        $this->reset(['newName', 'formattedNewAmount']);
+        $this->newAmount = 0;
     }
 
     public function updatedFormattedNewAmount(string $newAmount): void
