@@ -122,6 +122,11 @@ class BillForm extends Component
 
     public function updatedFormattedNewAmount(string $newAmount): void
     {
+        if (!Amount::isValid($newAmount)) {
+
+            $this->newAmount = $this->newAmount ?? 0;
+            return;
+        }
 
         $amount = Amount::from($newAmount);
 
