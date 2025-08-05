@@ -14,9 +14,14 @@
         @forelse($bills as $index => $bill)
             <tr>
                 <td>{{ $bill->name ?? '' }}</td>
-                <td>{{ $bill->formatted_amount ?? '-' }}</td>
+                <td>{{ $bill->amount->toCurrency() ?? '-' }}</td>
                 <td>{{ $bill->distribution_method->label() ?? '' }}</td>
-                <td>{{ $bill->member ? $bill->member->fullname : '<em>Compte joint</em>' }}</td>
+                <td>
+                    @if ($bill->member)
+                        {{ $bill->member->fullname }}
+                    @else
+                        <em>Compte joint</em>
+                @endif
                 <td>Actions</td>
             </tr>
         @empty
@@ -30,7 +35,7 @@
         <tfoot>
         @livewire('bill-form', [
             'householdMembers' => $this->householdMembers,
-        'hasJointAccount' => $this->hasHouseholdJointAccount,
+            'hasJointAccount' => $this->hasHouseholdJointAccount,
             'defaultDistributionMethod' => $this->defaultDistributionMethod
         ])
         </tfoot>

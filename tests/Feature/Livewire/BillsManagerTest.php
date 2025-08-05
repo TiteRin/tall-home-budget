@@ -1,5 +1,6 @@
 <?php
 
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillsManager;
 use App\Models\Bill;
@@ -38,17 +39,19 @@ test('should display existing bills in a table', function () {
         'last_name' => 'Member',
     ]);
 
+    $amount = new Amount(1000);
+
     $bill = Bill::factory()->create([
         'household_id' => $household->id,
         'member_id' => $member->id,
         'name' => 'Test dépense',
-        'amount' => 1000,
+        'amount' => $amount,
         'distribution_method' => DistributionMethod::EQUAL
     ]);
 
     Livewire::test(BillsManager::class)
         ->assertSeeText('Test dépense')
-        ->assertSee($bill->amount_formatted)
+        ->assertSee($amount->toCurrency())
         ->assertSee('Test Member')
         ->assertSee($bill->distribution_method->label());
 });
