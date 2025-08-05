@@ -52,7 +52,7 @@ class BillForm extends Component
                 'gt:0',
                 function (string $attribute, string $value, Closure $fail) {
                     $amount = new Amount($value);
-                    if ($amount->__toString() === $this->formattedNewAmount) return;
+                    if ($amount->toCurrency() === $this->formattedNewAmount) return;
 
                     $fail("Le champ $attribute n'est pas valide.");
                 }
@@ -122,15 +122,11 @@ class BillForm extends Component
 
     public function updatedFormattedNewAmount(string $newAmount): void
     {
-        if (!is_numeric($newAmount)) {
-            $this->newAmount = 0;
-            return;
-        }
 
         $amount = Amount::from($newAmount);
 
         $this->newAmount = $amount->value();
-        $this->formattedNewAmount = $amount->__toString();
+        $this->formattedNewAmount = $amount->toCurrency();
     }
 
     public function getDistributionMethodOptionsProperty(): array

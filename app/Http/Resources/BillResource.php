@@ -13,7 +13,7 @@ class BillResource extends JsonResource
             'id' => $this->id,
             'name' => $this->name,
             'amount' => $this->amount,
-            'amount_formatted' => $this->amount->__tostring(),
+            'amount_formatted' => $this->amount->toCurrency(),
             'distribution_method' => $this->distribution_method->value,
             'distribution_method_label' => $this->distribution_method->label(),
             'member' => [

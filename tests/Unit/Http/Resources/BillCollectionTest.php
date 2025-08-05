@@ -282,7 +282,7 @@ test('it calculates correct total amount', function () {
     // Assert
     expect($result)->toBeInstanceOf(Amount::class)
         ->and($result->value())->toBe(25000)
-        ->and($result->__toString())->toBe('250,00 €');
+        ->and($result->toCurrency())->toBe('250,00 €');
 });
 
 test('it handles empty collection', function () {

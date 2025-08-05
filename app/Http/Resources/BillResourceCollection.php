@@ -32,7 +32,7 @@ class BillResourceCollection extends ResourceCollection
         return [
             'total_count' => $this->length(),
             'total_amount' => $this->totalAmount()->value(),
-            'total_amount_formatted' => $this->totalAmount()->__tostring(),
+            'total_amount_formatted' => $this->totalAmount()->toCurrency(),
         ];
     }
 

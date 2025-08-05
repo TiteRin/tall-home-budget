@@ -3,6 +3,7 @@
 namespace App\Domains\ValueObjects;
 
 use App\Traits\HasCurrencyFormatting;
+use Illuminate\Support\Number;
 use InvalidArgumentException;
 
 class Amount
@@ -21,15 +22,55 @@ class Amount
         $this->amount = $amount;
     }
 
+    /**
+     * @param string $amount
+     * @return string
+     */
+    public static function extractCurrencySymbols(string $amount): string
+    {
+        return preg_replace('/[€$£¥]/u', '', $amount); // currency symbol
+    }
+
+    /**
+     * @param string $amount
+     * @return string
+     */
+    public static function extractWhiteSpaces(string $amount): string
+    {
+        return preg_replace("/\s/u", '', $amount); // any white space
+    }
+
+    public static function extractThousandsSeparator(string $amount): string
+    {
+        $thousandsSeparator = [".", ",", "'", "_", " ", " ", " "];
+        $decimalSeparator = [".", ","];
+
+        if (!preg_match("/(([" . implode('', $thousandsSeparator) . "])\d{3})+([" . implode("", $decimalSeparator) . "]\d+)?$/u", $amount, $matches)) {
+            return $amount;
+        }
+
+        $separator = $matches[2];
+        return str_replace($separator, "", $amount);
+    }
+
+    /**
+     * @param string $amount
+     * @return array|string|string[]
+     */
+    private static function normalizeNumericString(string $amount): string|array
+    {
+        return str_replace(",", ".", $amount);
+    }
+
     public function value(): int
     {
         return $this->amount;
     }
 
 
-    public function __toString(): string
+    public function toCurrency(): string
     {
-        return $this->formatCurrency($this->amount);
+        return Number::currency($this->amount / 100.0, in: 'EUR', locale: 'fr_FR');
     }
 
     public function __equals(Amount $amount): bool
@@ -37,12 +78,24 @@ class Amount
         return $this->value() === $amount->value();
     }
 
-    public static function from(string $amount): self
+    public static function from(string $amount): Amount
     {
+        $amount = str_replace(',', '.', $amount);
+
         if (!is_numeric($amount)) {
-            throw new InvalidArgumentException("Amount [$amount] must be a number");
+            throw new InvalidArgumentException("Amount [$amount] must be a numeric value.");
         }
 
-        return new Amount((int)round((float)$amount * 100));
+        return new Amount((int)round(floatval($amount) * 100));
+    }
+
+    public static function isValid(string $amount): bool
+    {
+        $amount = self::extractCurrencySymbols($amount);
+        $amount = self::extractWhiteSpaces($amount);
+        $amount = self::extractThousandsSeparator($amount);
+        $amount = self::normalizeNumericString($amount);
+
+        return is_numeric($amount);
     }
 }
