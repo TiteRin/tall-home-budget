@@ -115,6 +115,8 @@ class BillForm extends Component
             $this->newMemberId
         );
 
+        session()->flash('message', 'Nouvelle dépense ajoutée avec succès.');
+
         // Reset form fields after successful submission
         $this->reset(['newName', 'formattedNewAmount']);
         $this->newAmount = 0;
