@@ -5,10 +5,10 @@ namespace App\Livewire;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
-use App\Repositories\BillRepository;
-use App\Services\HouseholdService;
 use Closure;
+use Exception;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Http;
 use Illuminate\View\View;
 use Livewire\Attributes\Prop;
 use Livewire\Component;
@@ -22,20 +22,11 @@ class BillForm extends Component
     #[Prop]
     public bool $hasJointAccount = true;
 
-    private BillRepository $billRepository;
-    private HouseholdService $householdService;
-
     public string $newName = '';
     public int $newAmount;
     public string $formattedNewAmount = "";
     public string $newDistributionMethod;
     public int|null $newMemberId = null;
-
-    public function boot(BillRepository $billRepository, HouseholdService $householdService): void
-    {
-        $this->billRepository = $billRepository;
-        $this->householdService = $householdService;
-    }
 
     public function mount(): void
     {
@@ -99,27 +90,42 @@ class BillForm extends Component
     {
         $this->validate();
 
-        $household = $this->householdService->getCurrentHousehold();
-        if (!$household) {
-            return;
+        try {
+            // Use HTTP client to call the controller endpoint
+            $response = Http::post(route('bills.store'), [
+                'name' => $this->newName,
+                'amount' => $this->newAmount,
+                'distribution_method' => $this->newDistributionMethod,
+                'member_id' => $this->newMemberId,
+            ]);
+
+            if ($response->successful()) {
+                // Reset form fields after successful submission
+                $this->reset(['newName', 'formattedNewAmount']);
+                $this->newAmount = 0;
+                $this->resetValidation();
+
+                // Dispatch events to refresh the bills table and show notification
+                $this->dispatch('refreshBills');
+                $this->dispatch('notify', [
+                    'message' => 'Dépense ajoutée avec succès',
+                    'type' => 'success'
+                ]);
+            } else {
+                // Handle error response and show notification
+                $errorMessage = $response->json('message', 'Une erreur inconnue est survenue');
+                $this->dispatch('notify', [
+                    'message' => 'Échec de création de la dépense: ' . $errorMessage,
+                    'type' => 'error'
+                ]);
+            }
+        } catch (Exception $e) {
+            // Handle exception and show notification
+            $this->dispatch('notify', [
+                'message' => 'Une erreur est survenue: ' . $e->getMessage(),
+                'type' => 'error'
+            ]);
         }
-
-        $distributionMethod = DistributionMethod::from($this->newDistributionMethod);
-        $amount = new Amount($this->newAmount);
-
-        $this->billRepository->create(
-            $this->newName,
-            $amount,
-            $distributionMethod,
-            $household->id,
-            $this->newMemberId
-        );
-
-        session()->flash('message', 'Nouvelle dépense ajoutée avec succès.');
-
-        // Reset form fields after successful submission
-        $this->reset(['newName', 'formattedNewAmount']);
-        $this->newAmount = 0;
     }
 
     public function updatedFormattedNewAmount(string $newAmount): void

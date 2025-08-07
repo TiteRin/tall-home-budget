@@ -228,6 +228,29 @@ test('where there is no joint account, newMemberId shouldn’t be null', functio
         ]);
 });
 
+//describe("create a new bill", function() {
+//
+//    beforeEach(function() {
+//
+//    });
+//
+//    test("form should validate without errors", function() {
+//
+//    });
+//
+//    test("a new bill should have been persisted", function() {
+//
+//    });
+//
+//    test("form should have been reset", function() {
+//
+//    });
+//
+//    test("a success message should be visible", function() {
+//
+//    });
+//});
+
 
 test('should create a new bill', function () {
     // Create a fake repository to avoid database dependency

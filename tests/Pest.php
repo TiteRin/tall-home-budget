@@ -11,6 +11,9 @@
 |
 */
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
 pest()->extend(Tests\TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
     ->in('Feature');
@@ -29,6 +32,24 @@ pest()->extend(Tests\TestCase::class)
 expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Base TestCase
+|--------------------------------------------------------------------------
+| Permet à Pest d’utiliser la classe de test Laravel comme base, ce qui
+| donne accès à toutes les méthodes utiles ($this->postJson, assert*, etc.)
+*/
+uses(TestCase::class)->in('Feature', 'Http', 'Unit');
+
+/*
+|--------------------------------------------------------------------------
+| Traits Globaux (facultatifs mais utiles)
+|--------------------------------------------------------------------------
+| Par exemple : appliquer RefreshDatabase automatiquement dans certains dossiers.
+| Cela évite d’avoir à faire "uses(RefreshDatabase::class);" dans chaque fichier.
+*/
+uses(RefreshDatabase::class)->in('Feature', 'Http');
 
 /*
 |--------------------------------------------------------------------------

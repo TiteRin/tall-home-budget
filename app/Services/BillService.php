@@ -2,16 +2,21 @@
 
 namespace App\Services;
 
+use App\Domains\ValueObjects\Amount;
+use App\Enums\DistributionMethod;
 use App\Http\Resources\BillResource;
 use App\Http\Resources\BillResourceCollection;
 use App\Http\Resources\HouseholdSummaryResource;
+use App\Models\Bill;
 use App\Models\Household;
+use App\Repositories\BillRepository;
 use Illuminate\Support\Collection;
 
 readonly class BillService
 {
     public function __construct(
-        protected HouseholdService $householdService
+        protected HouseholdService $householdService,
+        protected BillRepository   $billRepository
     ) {}
 
 
@@ -58,5 +63,38 @@ readonly class BillService
         }
 
         return $this->householdService->getCurrentHousehold();
+    }
+
+    /**
+     * Create a new bill
+     *
+     * @param string $name
+     * @param Amount $amount
+     * @param DistributionMethod $distributionMethod
+     * @param int|null $householdId
+     * @param int|null $memberId
+     * @return Bill
+     */
+    public function createBill(
+        string             $name,
+        Amount             $amount,
+        DistributionMethod $distributionMethod,
+        ?int               $householdId = null,
+        ?int               $memberId = null
+    ): Bill
+    {
+        $household = $this->getHousehold($householdId);
+
+        if (!$household) {
+            throw new \InvalidArgumentException('Household not found');
+        }
+
+        return $this->billRepository->create(
+            $name,
+            $amount,
+            $distributionMethod,
+            $household->id,
+            $memberId
+        );
     }
 }

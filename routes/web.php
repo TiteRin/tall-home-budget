@@ -30,6 +30,7 @@ Route::get('/users', function() {
 Route::controller(App\Http\Controllers\BillsController::class)->group(function() {
     Route::get('/bills', 'index')->name('bills');
     Route::get('/bills/settings', 'settings')->name('bills.settings');
+    Route::post('/bills', 'store')->name('bills.store');
 });
 
 Route::get('/household/settings', function() {

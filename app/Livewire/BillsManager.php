@@ -14,20 +14,31 @@ class BillsManager extends Component
     protected HouseholdService $householdService;
     protected BillService $billService;
 
+    protected Collection $bills;
+
     public string $newName = '';
     public float $newAmount = 0;
     public DistributionMethod $newDistributionMethod = DistributionMethod::EQUAL;
     public int|null $newMemberId = null;
 
+    protected $listeners = [
+        'refreshBills' => 'refreshBills'
+    ];
+
     public function mount(HouseholdService $householdService, BillService $billService): void
     {
-        $this->billService = $billService;
         $this->householdService = $householdService;
+        $this->billService = $billService;
     }
 
     public function render(): View
     {
-        $bills = $this->billService->getBillsCollection();
+        // Only refresh bills if they haven't been loaded yet
+        if (!isset($this->bills)) {
+            $this->bills = $this->billService->getBillsCollection();
+        }
+
+        $bills = $this->bills;
 
         return view(
             'livewire.bills-manager',
@@ -56,5 +67,18 @@ class BillsManager extends Component
     public function getHasHouseholdJointAccountProperty(): bool
     {
         return $this->householdService->getCurrentHousehold()->hasJointAccount();
+    }
+
+    /**
+     * Refresh the bills collection
+     * This method is called when the 'refreshBills' event is dispatched
+     */
+    public function refreshBills(): void
+    {
+        $this->bills = $this->billService->getBillsCollection();
+        $this->dispatch('notify', [
+            'message' => 'Bills refreshed successfully',
+            'type' => 'success'
+        ]);
     }
 }
