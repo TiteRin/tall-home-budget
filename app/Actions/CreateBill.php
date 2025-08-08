@@ -7,7 +7,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Repositories\BillRepository;
 
-readonly class CreateBill
+class CreateBill
 {
     public function __construct(
         private BillRepository $billRepository,

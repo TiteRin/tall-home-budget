@@ -4,9 +4,6 @@ namespace Tests\Unit\Models;
 
 use App\Domains\ValueObjects\Amount;
 use App\Models\Bill;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 test('bill amount is an Amount object', function () {
     $bill = new Bill();

@@ -7,11 +7,7 @@ use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
 use App\Services\HouseholdService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-
-uses(RefreshDatabase::class);
-
 
 beforeEach(function () {
     Household::factory()->create();

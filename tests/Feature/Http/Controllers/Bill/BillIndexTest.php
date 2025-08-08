@@ -6,11 +6,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use Database\Factories\MemberFactory;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use function Pest\Laravel\get;
-
-uses(RefreshDatabase::class);
 
 const CURRENCY = "EUR";
 const TITLE = "Les dépenses du foyer";

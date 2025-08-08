@@ -41,7 +41,6 @@ test('CreateBill should create a new bill with the correct value', function () {
         $household->id,
         null
     );
-
     expect($bill)->toBeInstanceOf(Bill::class)
         ->and($bill->name)->toBe('Internet')
         ->and($bill->amount)->toEqual(new Amount(4200))

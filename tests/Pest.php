@@ -12,11 +12,10 @@
 */
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
 pest()->extend(Tests\TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+ ->in('Feature', 'Http', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -33,14 +32,6 @@ expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
-/*
-|--------------------------------------------------------------------------
-| Base TestCase
-|--------------------------------------------------------------------------
-| Permet à Pest d’utiliser la classe de test Laravel comme base, ce qui
-| donne accès à toutes les méthodes utiles ($this->postJson, assert*, etc.)
-*/
-uses(TestCase::class)->in('Feature', 'Http', 'Unit');
 
 /*
 |--------------------------------------------------------------------------

@@ -1,17 +1,15 @@
 <?php
 
+use App\Actions\CreateBill;
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use App\Repositories\BillRepository;
-use App\Repositories\FakeBillRepository;
 use App\Services\HouseholdService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
-uses(RefreshDatabase::class);
 
 test('should have form input to create a new bill', function () {
 
@@ -228,69 +226,106 @@ test('where there is no joint account, newMemberId shouldn’t be null', functio
         ]);
 });
 
-//describe("create a new bill", function() {
-//
-//    beforeEach(function() {
-//
-//    });
-//
-//    test("form should validate without errors", function() {
-//
-//    });
-//
-//    test("a new bill should have been persisted", function() {
-//
-//    });
-//
-//    test("form should have been reset", function() {
-//
-//    });
-//
-//    test("a success message should be visible", function() {
-//
-//    });
-//});
+describe("create a new bill from the form", function () {
 
+    beforeEach(function () {
+        $this->household = Household::create(['name' => 'Test Household']);
+        $this->member = Member::create(['household_id' => $this->household->id, 'first_name' => 'John', 'last_name' => 'Doe']);
 
-test('should create a new bill', function () {
-    // Create a fake repository to avoid database dependency
-    $fakeBillRepository = new FakeBillRepository();
+        $this->called = false;
+        $this->fakeAction = new class($this->household, $this->member) extends CreateBill {
+            public function __construct(private Household $household, private Member $member)
+            {
+            }
 
-    // Bind the fake repository to the container for this test
-    app()->instance(BillRepository::class, $fakeBillRepository);
+            public function handle(string $billName, Amount $amount, DistributionMethod $distributionMethod, int $householdId, ?int $memberId = null): Bill
+            {
+                expect($billName)->toBe('Internet')
+                    ->and($amount)->toEqual(new Amount(4200))
+                    ->and($distributionMethod)->toBe(DistributionMethod::EQUAL)
+                    ->and($householdId)->toEqual($this->household->id)
+                    ->and($memberId)->toBe($this->member->id);
 
-    $currentHousehold = Household::create([
-        'name' => 'Test Current Household',
-        'has_joint_account' => false,
-        'default_distribution_method' => DistributionMethod::EQUAL,
-    ]);
+                return new Bill([
+                    'name' => $billName
+                ]);
+            }
+        };
 
-    $memberJohnDoe = Member::create([
-        'household_id' => $currentHousehold->id,
-        'first_name' => 'John',
-        'last_name' => 'Doe',
-    ]);
+        app()->instance(CreateBill::class, $this->fakeAction);
 
-    Livewire::test(BillForm::class, [
-        'householdMembers' => $currentHousehold->members()->get(),
-        'defaultDistributionMethod' => $currentHousehold->getDefaultDistributionMethod(),
-    ])
-        // Fill all fields
-        ->set('newName', 'Électricité')
-        ->set('newMemberId', $memberJohnDoe->id)
-        ->set('formattedNewAmount', '179')
-        ->assertSet('newDistributionMethod', $currentHousehold->getDefaultDistributionMethod()->value)
-        ->call('submit')
-        ->assertHasNoErrors();
+        $this->livewireTest = Livewire::test(BillForm::class, [
+            'householdMembers' => $this->household->members()->get(),
+            'defaultDistributionMethod' => $this->household->getDefaultDistributionMethod(),
+        ])
+            // Fill all fields
+            ->set('newName', 'Internet')
+            ->set('newMemberId', $this->member->id)
+            ->set('formattedNewAmount', '42')
+            ->assertSet('newDistributionMethod', $this->household->getDefaultDistributionMethod()->value)
+            ->call('submit');
+    });
 
-    // Verify a new bill has been saved in the fake repository
-    $bill = $fakeBillRepository->getLastCreatedBill();
-    expect($bill)
-        ->toBeInstanceOf(Bill::class)
-        ->and($bill->household_id)->toBe($currentHousehold->id)
-        ->and($bill->member_id)->toBe($memberJohnDoe->id)
-        ->and($bill->amount->value())->toBe(17900)
-        ->and($bill->distribution_method)->toBe(DistributionMethod::EQUAL);
+    test("form should validate without errors", function () {
+        $this->livewireTest->assertHasNoErrors();
+    });
+
+    test("a new bill should have been persisted", function () {
+
+    });
+
+    test("form should have been reset", function () {
+        $this->livewireTest->assertSet('newName', '')
+            ->assertSet('newMemberId', null)
+            ->assertSet('newDistributionMethod', $this->household->getDefaultDistributionMethod()->value)
+            ->assertSet('formattedNewAmount', '');
+    });
+
+    test("a success message should be visible", function () {
+
+    });
 });
+
+//
+//test('should create a new bill', function () {
+//    // Create a fake repository to avoid database dependency
+//    $fakeBillRepository = new FakeBillRepository();
+//
+//    // Bind the fake repository to the container for this test
+//    app()->instance(BillRepository::class, $fakeBillRepository);
+//
+//    $currentHousehold = Household::create([
+//        'name' => 'Test Current Household',
+//        'has_joint_account' => false,
+//        'default_distribution_method' => DistributionMethod::EQUAL,
+//    ]);
+//
+//    $memberJohnDoe = Member::create([
+//        'household_id' => $currentHousehold->id,
+//        'first_name' => 'John',
+//        'last_name' => 'Doe',
+//    ]);
+//
+//    Livewire::test(BillForm::class, [
+//        'householdMembers' => $currentHousehold->members()->get(),
+//        'defaultDistributionMethod' => $currentHousehold->getDefaultDistributionMethod(),
+//    ])
+//        // Fill all fields
+//        ->set('newName', 'Électricité')
+//        ->set('newMemberId', $memberJohnDoe->id)
+//        ->set('formattedNewAmount', '179')
+//        ->assertSet('newDistributionMethod', $currentHousehold->getDefaultDistributionMethod()->value)
+//        ->call('submit')
+//        ->assertHasNoErrors();
+//
+//    // Verify a new bill has been saved in the fake repository
+//    $bill = $fakeBillRepository->getLastCreatedBill();
+//    expect($bill)
+//        ->toBeInstanceOf(Bill::class)
+//        ->and($bill->household_id)->toBe($currentHousehold->id)
+//        ->and($bill->member_id)->toBe($memberJohnDoe->id)
+//        ->and($bill->amount->value())->toBe(17900)
+//        ->and($bill->distribution_method)->toBe(DistributionMethod::EQUAL);
+//});
 
 // TODO : Form should be empty after saving

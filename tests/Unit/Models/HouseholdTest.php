@@ -5,12 +5,10 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Household;
 use App\Models\Member;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class HouseholdTest extends TestCase
 {
-    use RefreshDatabase;
 
     public function test_can_create_household(): void
     {

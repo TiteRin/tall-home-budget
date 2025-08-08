@@ -2,14 +2,11 @@
 
 namespace Tests\Feature\Models;
 
+use App\Exceptions\MismatchedHouseholdException;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use App\Exceptions\MismatchedHouseholdException;
 use ValueError;
-
-uses(RefreshDatabase::class);
 
 test('a bill can be created and associated with a household and a member', function () {
     // Arrange: Créez une facture et toutes ses dépendances en une seule ligne !

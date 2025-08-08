@@ -5,9 +5,6 @@ namespace Tests\Http\Controllers;
 use App\Enums\DistributionMethod;
 use App\Models\Household;
 use App\Models\Member;
-use Illuminate\Foundation\Testing\RefreshDatabase;
-
-uses(RefreshDatabase::class);
 
 describe("when valid data are sent to the store API", function () {
 
