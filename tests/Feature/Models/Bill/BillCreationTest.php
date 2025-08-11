@@ -9,8 +9,9 @@ use App\Models\Member;
 use ValueError;
 
 test('a bill can be created and associated with a household and a member', function () {
-    // Arrange: Créez une facture et toutes ses dépendances en une seule ligne !
-    $bill = Bill::factory()->create();
+    $household = Household::factory()->create();
+    $member = Member::factory()->create(['household_id' => $household->id]);
+    $bill = Bill::factory()->create(['household_id' => $household->id, 'member_id' => $member->id]);
 
     // Assert: Vérifiez que les relations sont correctes et que les données existent.
     expect($bill)->toBeInstanceOf(Bill::class)

@@ -59,7 +59,6 @@ test('user should see "Aucune dépense" if there are no bills', function() {
 
 test('user should see the bills list if there are bills', function() {
 
-
     $bill = createDefaultBill();
 
     $response = get("/bills");

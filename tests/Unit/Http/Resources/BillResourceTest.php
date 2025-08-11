@@ -8,27 +8,24 @@ use App\Http\Resources\BillResource;
 use App\Models\Bill;
 use App\Models\Member;
 use Illuminate\Http\Request;
-use Mockery;
-use Mockery\MockInterface;
 
 test('it transforms bill to array with correct structure', function () {
     // Arrange
-    $member = Mockery::mock(Member::class, function (MockInterface $mock) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('full_name')->andReturn('John Doe');
-    });
+    $member = new Member([
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+    ]);
+    $member->id = 1;
 
-    $amount = new Amount(10000);
-
-    $bill = Mockery::mock(Bill::class, function (MockInterface $mock) use ($member, $amount) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('name')->andReturn('Electricity');
-        $mock->shouldReceive('getAttribute')->with('amount')->andReturn($amount);
-        $mock->shouldReceive('getAttribute')->with('distribution_method')->andReturn(DistributionMethod::EQUAL);
-        $mock->shouldReceive('getAttribute')->with('member')->andReturn($member);
-        $mock->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
-        $mock->shouldReceive('getAttribute')->with('updated_at')->andReturn(now());
-    });
+    $bill = new Bill([
+        'id' => 1,
+        'name' => 'Electricity',
+        'amount' => 10000, // cents; cast returns Amount
+        'distribution_method' => DistributionMethod::EQUAL,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $bill->setRelation('member', $member);
 
     $resource = new BillResource($bill);
 
@@ -51,22 +48,21 @@ test('it transforms bill to array with correct structure', function () {
 
 test('it formats amount correctly', function () {
     // Arrange
-    $member = Mockery::mock(Member::class, function (MockInterface $mock) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('full_name')->andReturn('John Doe');
-    });
+    $member = new Member([
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+    ]);
+    $member->id = 1;
 
-    $amount = new Amount(12345);
-
-    $bill = Mockery::mock(Bill::class, function (MockInterface $mock) use ($member, $amount) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('name')->andReturn('Electricity');
-        $mock->shouldReceive('getAttribute')->with('amount')->andReturn($amount);
-        $mock->shouldReceive('getAttribute')->with('distribution_method')->andReturn(DistributionMethod::EQUAL);
-        $mock->shouldReceive('getAttribute')->with('member')->andReturn($member);
-        $mock->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
-        $mock->shouldReceive('getAttribute')->with('updated_at')->andReturn(now());
-    });
+    $bill = new Bill([
+        'id' => 1,
+        'name' => 'Electricity',
+        'amount' => 12345,
+        'distribution_method' => DistributionMethod::EQUAL,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $bill->setRelation('member', $member);
 
     $resource = new BillResource($bill);
 
@@ -80,22 +76,21 @@ test('it formats amount correctly', function () {
 
 test('it handles different distribution methods', function () {
     // Arrange - Test with PRORATA distribution method
-    $member = Mockery::mock(Member::class, function (MockInterface $mock) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('full_name')->andReturn('John Doe');
-    });
+    $member = new Member([
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+    ]);
+    $member->id = 1;
 
-    $amount = new Amount(10000);
-
-    $bill = Mockery::mock(Bill::class, function (MockInterface $mock) use ($member, $amount) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('name')->andReturn('Electricity');
-        $mock->shouldReceive('getAttribute')->with('amount')->andReturn($amount);
-        $mock->shouldReceive('getAttribute')->with('distribution_method')->andReturn(DistributionMethod::PRORATA);
-        $mock->shouldReceive('getAttribute')->with('member')->andReturn($member);
-        $mock->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
-        $mock->shouldReceive('getAttribute')->with('updated_at')->andReturn(now());
-    });
+    $bill = new Bill([
+        'id' => 1,
+        'name' => 'Electricity',
+        'amount' => 10000,
+        'distribution_method' => DistributionMethod::PRORATA,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $bill->setRelation('member', $member);
 
     $resource = new BillResource($bill);
 
@@ -107,15 +102,15 @@ test('it handles different distribution methods', function () {
         ->and($result['distribution_method_label'])->toBe(DistributionMethod::PRORATA->label());
 
     // Arrange - Test with EQUAL distribution method
-    $bill = Mockery::mock(Bill::class, function (MockInterface $mock) use ($member, $amount) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(2);
-        $mock->shouldReceive('getAttribute')->with('name')->andReturn('Water');
-        $mock->shouldReceive('getAttribute')->with('amount')->andReturn($amount);
-        $mock->shouldReceive('getAttribute')->with('distribution_method')->andReturn(DistributionMethod::EQUAL);
-        $mock->shouldReceive('getAttribute')->with('member')->andReturn($member);
-        $mock->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
-        $mock->shouldReceive('getAttribute')->with('updated_at')->andReturn(now());
-    });
+    $bill = new Bill([
+        'id' => 2,
+        'name' => 'Water',
+        'amount' => 10000,
+        'distribution_method' => DistributionMethod::EQUAL,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $bill->setRelation('member', $member);
 
     $resource = new BillResource($bill);
 
@@ -129,22 +124,21 @@ test('it handles different distribution methods', function () {
 
 test('it includes member information', function () {
     // Arrange
-    $member = Mockery::mock(Member::class, function (MockInterface $mock) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('full_name')->andReturn('Jane Smith');
-    });
+    $member = new Member([
+        'first_name' => 'Jane',
+        'last_name' => 'Smith',
+    ]);
+    $member->id = 1;
 
-    $amount = new Amount(10000);
-
-    $bill = Mockery::mock(Bill::class, function (MockInterface $mock) use ($member, $amount) {
-        $mock->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $mock->shouldReceive('getAttribute')->with('name')->andReturn('Electricity');
-        $mock->shouldReceive('getAttribute')->with('amount')->andReturn($amount);
-        $mock->shouldReceive('getAttribute')->with('distribution_method')->andReturn(DistributionMethod::EQUAL);
-        $mock->shouldReceive('getAttribute')->with('member')->andReturn($member);
-        $mock->shouldReceive('getAttribute')->with('created_at')->andReturn(now());
-        $mock->shouldReceive('getAttribute')->with('updated_at')->andReturn(now());
-    });
+    $bill = new Bill([
+        'id' => 1,
+        'name' => 'Electricity',
+        'amount' => 10000,
+        'distribution_method' => DistributionMethod::EQUAL,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+    $bill->setRelation('member', $member);
 
     $resource = new BillResource($bill);
 

@@ -2,11 +2,10 @@
 
 namespace Database\Factories;
 
-use Illuminate\Database\Eloquent\Factories\Factory;
-
 use App\Enums\DistributionMethod;
 use App\Models\Household;
 use App\Models\Member;
+use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Bill>
@@ -20,8 +19,8 @@ class BillFactory extends Factory
      */
     public function definition(): array
     {
-        $household = Household::factory()->create();
-        $member = Member::factory()->create([
+        $household = Household::factory()->make();
+        $member = Member::factory()->make([
             'household_id' => $household->id,
         ]);
 
