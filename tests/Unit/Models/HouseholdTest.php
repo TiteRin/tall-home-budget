@@ -1,17 +1,16 @@
 <?php
+
 namespace Tests\Unit\Models;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use Tests\TestCase;
 
-class HouseholdTest extends TestCase
-{
+describe('Household', function () {
 
-    public function test_can_create_household(): void
-    {
+    test('can create household', function () {
         $household = Household::create([
             'name' => 'Test Household',
             'has_joint_account' => false,
@@ -19,10 +18,9 @@ class HouseholdTest extends TestCase
         ]);
 
         $this->assertDatabaseHas('households', $household->toArray());
-    }
+    });
 
-    public function test_can_update_household(): void
-    {
+    test('can update household', function () {
         $household = Household::create([
             'name' => 'Test Household',
             'has_joint_account' => false,
@@ -41,10 +39,9 @@ class HouseholdTest extends TestCase
             'has_joint_account' => true,
             'default_distribution_method' => DistributionMethod::PRORATA->value,
         ]);
-    }
+    });
 
-    public function test_can_delete_household(): void
-    {
+    test('can delete household', function () {
         $household = Household::create([
             'name' => 'Test Household',
             'has_joint_account' => false,
@@ -54,129 +51,87 @@ class HouseholdTest extends TestCase
         $household->delete();
 
         $this->assertDatabaseMissing('households', $household->toArray());
-    }
+    });
+});
 
-    public function test_can_add_household_member(): void
-    {
-        $household = Household::create([
+describe('Household members', function () {
+
+    beforeEach(function () {
+        $this->household = Household::factory()->create([
             'name' => 'Test Household',
-            'has_joint_account' => false,
             'default_distribution_method' => DistributionMethod::EQUAL,
         ]);
+    });
 
-        $household->members()->create([
+    test('can add household member', function () {
+        $this->household->members()->create([
             'first_name' => 'John',
             'last_name' => 'Doe',
         ]);
 
         $this->assertDatabaseHas('members', [
-            'household_id' => $household->id,
+            'household_id' => $this->household->id,
             'first_name' => 'John',
             'last_name' => 'Doe',
         ]);
-    }
+    });
 
-    public function test_can_remove_household_member(): void
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-            'default_distribution_method' => DistributionMethod::EQUAL,
+    test('can get household members', function () {
+        Member::factory()->count(3)->create([
+            'household_id' => $this->household->id,
         ]);
 
-        $household->members()->create([
+        expect($this->household->members()->count())->toBe(3);
+    });
+
+    test('can get household\’s default distribution method', function () {
+        expect($this->household->getDefaultDistributionMethod())->toEqual(DistributionMethod::EQUAL);
+    });
+
+    test('can delete household member', function () {
+        $this->household->members()->create([
             'first_name' => 'John',
             'last_name' => 'Doe',
         ]);
 
-        $household->members()->where('first_name', 'John')->delete();
+        $this->household->members()->where('first_name', 'John')->delete();
 
         $this->assertDatabaseMissing('members', [
-            'household_id' => $household->id,
+            'household_id' => $this->household->id,
             'first_name' => 'John',
         ]);
-    }
+    });
 
-    public function test_can_get_household_members(): void
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-            'default_distribution_method' => DistributionMethod::EQUAL,
-        ]);
+    describe('Household with members', function () {
 
-        $household->members()->create([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-        ]);
+        beforeEach(function () {
+            Member::factory()->count(3)->create([
+                'household_id' => $this->household->id,
+            ]);
+        });
 
-        $members = $household->members;
+        test('household start with 0 amount', function () {
+            expect($this->household->total_amount)->toEqual(new Amount(0));
+        });
 
-        $this->assertCount(1, $members);
-        $this->assertEquals('John', $members->first()->first_name);
-        $this->assertEquals('Doe', $members->first()->last_name);
-    }
+        test('household start with 0 bills', function () {
+            expect($this->household->bills()->count())->toBe(0);
+        });
 
-    public function test_can_get_household_default_distribution_method(): void
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-            'default_distribution_method' => DistributionMethod::EQUAL,
-        ]);
+        test('when household has bill, total amount should be the sum of the bills', function () {
+            Bill::factory()->create([
+                'member_id' => $this->household->members()->first()->id,
+                'household_id' => $this->household->id,
+                'amount' => new Amount(10000),
+            ]);
 
-        $this->assertEquals(DistributionMethod::EQUAL, $household->default_distribution_method);
-    }
+            Bill::factory()->create([
+                'member_id' => $this->household->members()->first()->id,
+                'household_id' => $this->household->id,
+                'amount' => new Amount(3000),
+            ]);
 
-    public function test_household_has_equal_distribution_method_by_default(): void
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-        ]);
-
-        $this->assertEquals(DistributionMethod::EQUAL, $household->getDefaultDistributionMethod());
-    }
-
-    public function test_household_has_total_amount_zero_by_default(): void
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-        ]);
-
-        $this->assertEquals(new Amount(0), $household->total_amount);
-    }
-
-    public function test_household_has_total_amount_after_adding_bill(): void
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-        ]);
-
-        $member = Member::create([
-            'household_id' => $household->id,
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-        ]);
-
-        $household->bills()->create([
-            'name' => 'Test Bill',
-            'amount' => 10000,
-            'member_id' => $member->id,
-            'household_id' => $household->id,
-            'distribution_method' => DistributionMethod::EQUAL,
-        ]);
-
-        $household->bills()->create([
-            'name' => 'Test Bill 2',
-            'amount' => 20000,
-            'member_id' => $member->id,
-            'household_id' => $household->id,
-            'distribution_method' => DistributionMethod::EQUAL,
-        ]);
-
-        $this->assertEquals(new Amount(30000), $household->total_amount);
-    }
-}
+            expect($this->household->total_amount)->toEqual(new Amount(13000));
+        });
+    });
+});
