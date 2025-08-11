@@ -3,8 +3,8 @@
 namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
-use App\Services\BillService;
-use App\Services\HouseholdService;
+use App\Services\Bill\BillService;
+use App\Services\Household\HouseholdService;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Component;

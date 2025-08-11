@@ -7,7 +7,7 @@ use App\Livewire\BillForm;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use App\Services\HouseholdService;
+use App\Services\Household\HouseholdService;
 use Livewire\Livewire;
 
 

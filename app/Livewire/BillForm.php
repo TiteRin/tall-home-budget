@@ -6,7 +6,7 @@ use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
-use App\Services\HouseholdService;
+use App\Services\Household\HouseholdService;
 use Closure;
 use Exception;
 use Illuminate\Support\Collection;

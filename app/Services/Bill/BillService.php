@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Bill;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
@@ -10,6 +10,7 @@ use App\Http\Resources\HouseholdSummaryResource;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Repositories\BillRepository;
+use App\Services\Household\HouseholdService;
 use Illuminate\Support\Collection;
 
 readonly class BillService

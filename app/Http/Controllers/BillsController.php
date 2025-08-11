@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Services\BillService;
+use App\Services\Bill\BillService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;

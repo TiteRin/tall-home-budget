@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Household;
 
 use App\Http\Resources\HouseholdSummaryResource;
 use App\Models\Household;
