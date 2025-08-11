@@ -132,6 +132,7 @@ describe('Household members', function () {
             ]);
 
             expect($this->household->total_amount)->toEqual(new Amount(13000));
+            expect($this->household->total_amount_formatted)->toBe((new Amount(13000))->toCurrency());
         });
     });
 });

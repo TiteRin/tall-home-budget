@@ -4,14 +4,13 @@ namespace App\Models;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Traits\HasCurrencyFormatting;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Household extends Model
 {
-    use HasFactory, HasCurrencyFormatting;
+    use HasFactory;
 
     protected $fillable = ['name', 'has_joint_account', 'default_distribution_method'];
 
@@ -37,7 +36,7 @@ class Household extends Model
 
     public function getTotalAmountFormattedAttribute(): string
     {
-        return $this->formatCurrency($this->total_amount);
+        return $this->total_amount->toCurrency();
     }
 
     public function getDefaultDistributionMethod(): DistributionMethod
