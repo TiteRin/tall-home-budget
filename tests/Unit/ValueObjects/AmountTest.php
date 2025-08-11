@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Models;
+namespace Tests\Unit\ValueObjects;
 
 use App\Domains\ValueObjects\Amount;
 use InvalidArgumentException;

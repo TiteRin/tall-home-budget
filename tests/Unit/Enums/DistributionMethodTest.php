@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Unit\Enums;
+
 use App\Enums\DistributionMethod;
 
 test('should obtain an array of values with the same number of cases', function () {
