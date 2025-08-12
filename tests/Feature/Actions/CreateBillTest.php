@@ -4,7 +4,6 @@ use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
-use App\Models\Household;
 use App\Repositories\BillRepository;
 
 test('CreateBill should create a new bill with the correct value', function () {
@@ -32,7 +31,7 @@ test('CreateBill should create a new bill with the correct value', function () {
         }
     };
 
-    $household = Household::factory()->create();
+    $household = bill_factory()->household();
     $action = new CreateBill($fakeRepository);
     $bill = $action->handle(
         'Internet',

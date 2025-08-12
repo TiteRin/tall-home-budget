@@ -7,7 +7,6 @@ use App\Livewire\BillForm;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
-use App\Services\Household\HouseholdService;
 use Livewire\Livewire;
 
 
@@ -33,20 +32,20 @@ test('should offer distribution methods as options', function () {
 });
 
 test('should offer household members as options', function () {
-    $memberHuey = Member::factory()->create([
+
+    $household = bill_factory()->household();
+    $memberHuey = bill_factory()->member([
         'first_name' => 'Huey',
         'last_name' => 'Duck',
-    ]);
-    $memberDewey = Member::factory()->create([
+    ], $household);
+    $memberDewey = bill_factory()->member([
         'first_name' => 'Dewey',
         'last_name' => 'Duck',
-        'household_id' => $memberHuey->household_id,
-    ]);
-    $memberLouis = Member::factory()->create([
+    ], $household);
+    $memberLouis = bill_factory()->member([
         'first_name' => 'Louis',
         'last_name' => 'Duck',
-        'household_id' => $memberHuey->household_id,
-    ]);
+    ], $household);;
 
     $householdMembers = [$memberHuey, $memberDewey, $memberLouis];
 
@@ -55,9 +54,7 @@ test('should offer household members as options', function () {
             'householdMembers' => collect($householdMembers)
         ])
         ->assertSeeHtmlInOrder(
-            array_map(function (Member $member) {
-                return $member->full_name;
-            }, $householdMembers)
+            ['Huey Duck', 'Dewey Duck', 'Louis Duck']
         );
 });
 
@@ -159,39 +156,14 @@ test('newMemberId should be included in existing House members', function () {
         ->assertSee('Le champ "Membre du foyer" n\'est pas valide.');
 });
 
-test('newMemberId should be included in the current household members', function () {
+test('should not be possible to select a member who’s not in the household members', function () {
 
-    $householdService = new HouseholdService();
-    Household::create([
-        'name' => 'Test Current Household',
-        'has_joint_account' => false,
-        'default_distribution_method' => DistributionMethod::EQUAL,
-    ]);
-    $currentHousehold = $householdService->getCurrentHousehold();
-    $anotherHousehold = Household::create([
-        'name' => 'Test Another Household',
-        'has_joint_account' => true,
-        'default_distribution_method' => DistributionMethod::EQUAL,
-    ]);
+    $currentHousehold = bill_factory()->household();
+    $anotherHousehold = bill_factory()->household();
 
-    assert($currentHousehold !== null);
-
-    $memberAFromCurrentHousehold = Member::create([
-        'household_id' => $currentHousehold->id,
-        'first_name' => 'John',
-        'last_name' => 'Doe',
-    ]);
-    $memberBFromCurrentHousehold = Member::create([
-        'household_id' => $currentHousehold->id,
-        'first_name' => 'Jane',
-        'last_name' => 'Doe',
-    ]);
-
-    $memberAFromAnotherHousehold = Member::create([
-        'household_id' => $anotherHousehold->id,
-        'first_name' => 'Dewey',
-        'last_name' => 'Duck',
-    ]);
+    $memberAFromCurrentHousehold = bill_factory()->member([], $currentHousehold);
+    $memberBFromCurrentHousehold = bill_factory()->member([], $currentHousehold);
+    $memberAFromAnotherHousehold = bill_factory()->member([], $anotherHousehold);;
 
     Livewire::test(BillForm::class, [
         'householdMembers' => $currentHousehold->members()->get(),
@@ -229,8 +201,9 @@ test('where there is no joint account, newMemberId shouldn’t be null', functio
 describe("create a new bill from the form", function () {
 
     beforeEach(function () {
-        $this->household = Household::create(['name' => 'Test Household']);
-        $this->member = Member::create(['household_id' => $this->household->id, 'first_name' => 'John', 'last_name' => 'Doe']);
+
+        $this->household = bill_factory()->household(['name' => 'Test Household']);
+        $this->member = bill_factory()->member(['first_name' => 'John', 'last_name' => 'Doe'], $this->household);
 
         $this->called = false;
         $this->fakeAction = new class($this->household, $this->member) extends CreateBill {
@@ -285,47 +258,3 @@ describe("create a new bill from the form", function () {
 
     });
 });
-
-//
-//test('should create a new bill', function () {
-//    // Create a fake repository to avoid database dependency
-//    $fakeBillRepository = new FakeBillRepository();
-//
-//    // Bind the fake repository to the container for this test
-//    app()->instance(BillRepository::class, $fakeBillRepository);
-//
-//    $currentHousehold = Household::create([
-//        'name' => 'Test Current Household',
-//        'has_joint_account' => false,
-//        'default_distribution_method' => DistributionMethod::EQUAL,
-//    ]);
-//
-//    $memberJohnDoe = Member::create([
-//        'household_id' => $currentHousehold->id,
-//        'first_name' => 'John',
-//        'last_name' => 'Doe',
-//    ]);
-//
-//    Livewire::test(BillForm::class, [
-//        'householdMembers' => $currentHousehold->members()->get(),
-//        'defaultDistributionMethod' => $currentHousehold->getDefaultDistributionMethod(),
-//    ])
-//        // Fill all fields
-//        ->set('newName', 'Électricité')
-//        ->set('newMemberId', $memberJohnDoe->id)
-//        ->set('formattedNewAmount', '179')
-//        ->assertSet('newDistributionMethod', $currentHousehold->getDefaultDistributionMethod()->value)
-//        ->call('submit')
-//        ->assertHasNoErrors();
-//
-//    // Verify a new bill has been saved in the fake repository
-//    $bill = $fakeBillRepository->getLastCreatedBill();
-//    expect($bill)
-//        ->toBeInstanceOf(Bill::class)
-//        ->and($bill->household_id)->toBe($currentHousehold->id)
-//        ->and($bill->member_id)->toBe($memberJohnDoe->id)
-//        ->and($bill->amount->value())->toBe(17900)
-//        ->and($bill->distribution_method)->toBe(DistributionMethod::EQUAL);
-//});
-
-// TODO : Form should be empty after saving

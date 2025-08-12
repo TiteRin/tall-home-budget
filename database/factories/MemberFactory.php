@@ -6,6 +6,9 @@ use App\Models\Household;
 use App\Models\Member;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/**
+ * @extends Factory<Member>
+ */
 class MemberFactory extends Factory
 {
     protected $model = Member::class;
@@ -18,4 +21,4 @@ class MemberFactory extends Factory
             'household_id' => Household::factory(),
         ];
     }
-} 
+}

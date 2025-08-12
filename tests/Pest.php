@@ -12,6 +12,7 @@
 */
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\BillFactory;
 
 pest()->extend(Tests\TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
@@ -40,7 +41,7 @@ expect()->extend('toBeOne', function () {
 | Par exemple : appliquer RefreshDatabase automatiquement dans certains dossiers.
 | Cela évite d’avoir à faire "uses(RefreshDatabase::class);" dans chaque fichier.
 */
-uses(RefreshDatabase::class)->in('Feature', 'Http');
+uses(RefreshDatabase::class)->in('Feature', 'Http', 'Actions', 'Livewire');
 
 /*
 |--------------------------------------------------------------------------
@@ -56,4 +57,9 @@ uses(RefreshDatabase::class)->in('Feature', 'Http');
 function something()
 {
     // ..
+}
+
+function bill_factory(): BillFactory
+{
+    return new BillFactory();
 }

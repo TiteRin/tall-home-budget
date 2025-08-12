@@ -3,15 +3,13 @@
 namespace Tests\Http\Controllers;
 
 use App\Enums\DistributionMethod;
-use App\Models\Household;
-use App\Models\Member;
 
 describe("when valid data are sent to the store API", function () {
 
     beforeEach(function () {
 
-        $this->household = Household::factory()->create();
-        $this->member = Member::factory()->create(['household_id' => $this->household->id]);
+        $this->member = bill_factory()->member();
+        $this->household = $this->member->household;
 
         $this->payload = [
             'name' => 'Test bill',
