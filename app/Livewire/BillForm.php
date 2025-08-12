@@ -63,9 +63,9 @@ class BillForm extends Component
             'formattedNewAmount' => 'required|string|min:1',
             'newDistributionMethod' => 'required|in:' . implode(",", DistributionMethod::values()),
             'newMemberId' => [
-                $this->hasJointAccount ? 'nullable' : 'required',
+                'required',
                 'integer',
-                'in:' . implode(",", $this->householdMembers->pluck('id')->toArray()),
+                'in:' . implode(",", array_merge($this->householdMembers->pluck('id')->toArray(), [$this->hasJointAccount ? -1 : null])),
             ]
         ];
     }

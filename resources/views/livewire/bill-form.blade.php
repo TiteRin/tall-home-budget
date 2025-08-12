@@ -42,11 +42,12 @@
     </td>
     <td>
         <select class="select select-bordered" wire:model="newMemberId">
+            <option value="" selected hidden>Membre du foyer</option>
             @foreach ($this->householdMemberOptions as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
             @if ($this->hasJointAccount)
-                <option value="">Compte joint</option>
+                <option value="-1">Compte joint</option>
             @endif
         </select>
 

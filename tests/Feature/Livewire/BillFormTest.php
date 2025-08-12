@@ -113,6 +113,11 @@ describe("when the form is correctly paramtered", function () {
             ))->assertDontSeeText('Compte joint');
     });
 
+    test('should display placeholder when no member is selected', function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSee('Membre du foyer');
+    });
+
     test('should display placeholder if no amount given', function () {
         Livewire::test(BillForm::class, $this->billFormProps)
             ->assertSee('Montant');
@@ -208,21 +213,19 @@ describe("when the form is correctly paramtered", function () {
                 ]);
         });
 
-        test('when there is a joint account, should accept a null value', function () {
+        test('when there is a joint account, should accept the value -1', function () {
             Livewire::test(BillForm::class, [
                 'hasJointAccount' => true
             ])
-                ->set('newMemberId', null)
+                ->set('newMemberId', -1)
                 ->call('submit')
                 ->assertHasNoErrors([
                     'newMemberId'
                 ]);
         });
 
-        test('where there is no joint account, newMemberId shouldn’t be null', function () {
-            Livewire::test(BillForm::class, [
-                'hasJointAccount' => false
-            ])
+        test('newMemberId shouldn’t be null', function () {
+            Livewire::test(BillForm::class)
                 ->set('newMemberId', null)
                 ->call('submit')
                 ->assertHasErrors([
