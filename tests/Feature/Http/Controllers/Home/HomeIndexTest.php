@@ -3,38 +3,28 @@
 namespace Tests\Feature\Http\Controllers\Home;
 
 use App\Enums\DistributionMethod;
-use App\Models\Household;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 
-class HomeIndexTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    /** @test */
-    public function it_redirects_to_household_settings_when_no_household_exists()
-    {
-        $response = $this->get(route('home'));
+test('should redirect to household settings when no household exists', function () {
+    $response = $this->get(route('home'));
+    $response->assertRedirect(route('household.settings'));
+});
 
-        $response->assertRedirect(route('household.settings'));
-    }
+test('should show home page when household exists', function () {
+    $household = bill_factory()->household([
+        'name' => 'Test Household',
+        'has_joint_account' => false,
+        'default_distribution_method' => DistributionMethod::EQUAL,
+    ]);
 
-    /** @test */
-    public function it_shows_home_page_when_household_exists()
-    {
-        $household = Household::create([
-            'name' => 'Test Household',
-            'has_joint_account' => false,
-            'default_distribution_method' => DistributionMethod::EQUAL,
-        ]);
+    $response = $this->get(route('home'));
 
-        $response = $this->get(route('home'));
-
-        $response->assertSuccessful();
-        $response->assertViewIs('home');
-        $response->assertViewHas('household', $household);
-        $response->assertSee('Foyer Test Household');
-        $response->assertSee('50/50'); // Label pour EQUAL
-        $response->assertSee('Non'); // Compte joint
-    }
-}
+    $response->assertSuccessful();
+    $response->assertViewIs('home');
+    $response->assertViewHas('household', $household);
+    $response->assertSee('Foyer Test Household');
+    $response->assertSee('50/50'); // Label pour EQUAL
+    $response->assertSee('Non'); // Compte joint
+});
