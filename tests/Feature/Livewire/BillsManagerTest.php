@@ -42,11 +42,12 @@ test('should display existing bills in a table', function () {
 });
 
 test('when a bill is not affected to a member, should display the bill without member', function () {
-    $member = bill_factory()->member([], $this->household);;
+    $member = bill_factory()->member([], $this->household);
     $bill = bill_factory()->bill([
         'name' => 'Test dépense',
         'amount' => 1000,
-        'distribution_method' => DistributionMethod::EQUAL
+        'distribution_method' => DistributionMethod::EQUAL,
+        'member_id' => null,
     ], null, $this->household);;
 
     Livewire::test(BillsManager::class)
