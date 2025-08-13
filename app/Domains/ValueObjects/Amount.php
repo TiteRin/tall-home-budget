@@ -82,9 +82,14 @@ class Amount
     {
         $amount = str_replace(',', '.', $amount);
 
-        if (!is_numeric($amount)) {
+        if (!self::isValid($amount)) {
             throw new InvalidArgumentException("Amount [$amount] must be a numeric value.");
         }
+
+        $amount = self::extractCurrencySymbols($amount);
+        $amount = self::extractWhiteSpaces($amount);
+        $amount = self::extractThousandsSeparator($amount);
+        $amount = self::normalizeNumericString($amount);
 
         return new Amount((int)round(floatval($amount) * 100));
     }
