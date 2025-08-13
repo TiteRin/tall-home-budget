@@ -2,9 +2,8 @@
 
 namespace App\Livewire;
 
-use App\Models\Household;
-use App\Models\Member;
 use App\Enums\DistributionMethod;
+use App\Models\Household;
 use Livewire\Component;
 
 class HouseholdManager extends Component
@@ -72,10 +71,10 @@ class HouseholdManager extends Component
 
     public function addMember()
     {
-        if (trim($this->newMemberFirstName) === '' || trim($this->newMemberLastName) === '') {
-            session()->flash('error', 'Le prénom et le nom sont requis');
-            return;
-        }
+        $this->validate([
+            'newMemberFirstName' => 'required|string|min:2',
+            'newMemberLastName' => 'required|string|min:2',
+        ]);
 
         $household = $this->household;
 
