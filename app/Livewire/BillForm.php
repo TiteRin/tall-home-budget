@@ -6,7 +6,6 @@ use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
-use App\Services\Household\HouseholdService;
 use Closure;
 use Exception;
 use Illuminate\Support\Collection;
@@ -106,17 +105,13 @@ class BillForm extends Component
     {
         $this->validate();
 
-        // TODO : gérer l’"authentification" d’une meilleure façon
-        $household = (new HouseholdService())->getCurrentHousehold();
-
         try {
-            // Use HTTP client to call the controller endpoint
+
             $createBill->handle(
                 $this->newName,
                 new Amount($this->newAmount),
                 DistributionMethod::from($this->newDistributionMethod),
-                $household->id,
-                $this->newMemberId
+                $this->newMemberId === -1 ? null : $this->newMemberId
             );
 
             $this->resetFormFields();
@@ -133,6 +128,8 @@ class BillForm extends Component
                 'message' => 'Une erreur est survenue: ' . $e->getMessage(),
                 'type' => 'error'
             ]);
+
+            throw $e;
         }
     }
 

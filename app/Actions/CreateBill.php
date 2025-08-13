@@ -6,6 +6,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Repositories\BillRepository;
+use App\Services\Household\HouseholdService;
 
 class CreateBill
 {
@@ -19,15 +20,16 @@ class CreateBill
         string             $billName,
         Amount             $amount,
         DistributionMethod $distributionMethod,
-        int                $householdId,
         ?int               $memberId = null
     ): Bill
     {
+        $household = (new HouseholdService())->getCurrentHousehold();
+
         return $this->billRepository->create(
             $billName,
             $amount,
             $distributionMethod,
-            $householdId,
+            $household->id,
             $memberId
         );
     }

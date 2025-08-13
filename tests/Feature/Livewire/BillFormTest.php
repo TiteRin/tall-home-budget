@@ -5,9 +5,12 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
 use App\Models\Bill;
-use App\Models\Household;
-use App\Models\Member;
+use App\Repositories\BillRepository;
+use App\Repositories\FakeBillRepository;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
+
+uses(RefreshDatabase::class);
 
 test('when no members, should not display form', function () {
 
@@ -18,7 +21,7 @@ test('when no members, should not display form', function () {
         ->assertDontSeeHtml('wire:click="submit"');
 });
 
-describe("when the form is correctly paramtered", function () {
+describe("when the form is correctly parametered", function () {
 
     beforeEach(function () {
 
@@ -237,28 +240,37 @@ describe("when the form is correctly paramtered", function () {
 
 describe("create a new bill from the form", function () {
 
-    beforeEach(function () {
+    beforeEach(closure: function () {
 
-        $this->household = bill_factory()->household(['name' => 'Test Household']);
+        $this->household = bill_factory()->household(['name' => 'Test Household', 'has_joint_account' => true, 'default_distribution_method' => DistributionMethod::EQUAL]);
         $this->member = bill_factory()->member(['first_name' => 'John', 'last_name' => 'Doe'], $this->household);
 
-        $this->called = false;
-        $this->fakeAction = new class($this->household, $this->member) extends CreateBill {
-            public function __construct(private Household $household, private Member $member)
+        $this->fakeRepository = new FakeBillRepository();
+        $this->fakeAction = new class($this->fakeRepository) extends CreateBill {
+
+            private $hasBeenCalled = false;
+
+            public function __construct(readonly private BillRepository $billRepository)
             {
+                parent::__construct($this->billRepository);
             }
 
-            public function handle(string $billName, Amount $amount, DistributionMethod $distributionMethod, int $householdId, ?int $memberId = null): Bill
+            public function handle(string $billName, Amount $amount, DistributionMethod $distributionMethod, ?int $memberId = null): Bill
             {
                 expect($billName)->toBe('Internet')
                     ->and($amount)->toEqual(new Amount(4200))
                     ->and($distributionMethod)->toBe(DistributionMethod::EQUAL)
-                    ->and($householdId)->toEqual($this->household->id)
-                    ->and($memberId)->toBe($this->member->id);
+                    ->and($memberId)->toBeNull();
 
-                return new Bill([
-                    'name' => $billName
-                ]);
+                $this->hasBeenCalled = true;
+
+                return parent::handle($billName, $amount, $distributionMethod, $memberId);
+            }
+
+            public function hasBeenCalled()
+            {
+                return $this->hasBeenCalled;
+
             }
         };
 
@@ -267,11 +279,14 @@ describe("create a new bill from the form", function () {
         $this->livewireTest = Livewire::test(BillForm::class, [
             'householdMembers' => $this->household->members()->get(),
             'defaultDistributionMethod' => $this->household->getDefaultDistributionMethod(),
+            'hasJointAccount' => $this->household->hasJointAccount()
         ])
             // Fill all fields
             ->set('newName', 'Internet')
-            ->set('newMemberId', $this->member->id)
+            // Select "Compte joint"
+            ->set('newMemberId', -1)
             ->set('formattedNewAmount', '42')
+            // Keep the default value
             ->assertSet('newDistributionMethod', $this->household->getDefaultDistributionMethod()->value)
             ->call('submit');
     });
@@ -280,8 +295,20 @@ describe("create a new bill from the form", function () {
         $this->livewireTest->assertHasNoErrors();
     });
 
+    test('the action has been called', function () {
+        expect($this->fakeAction->hasBeenCalled())->toBeTrue();
+    });
+
     test("a new bill should have been persisted", function () {
 
+        $bill = $this->fakeRepository->getLastCreatedBill();
+
+        expect($bill)
+            ->toBeInstanceOf(Bill::class)
+            ->and($bill->name)->toBe('Internet')
+            ->and($bill->amount)->toEqual(new Amount(4200))
+            ->and($bill->distribution_method)->toBe(DistributionMethod::EQUAL)
+            ->and($bill->member)->toBeNull();
     });
 
     test("form should have been reset", function () {

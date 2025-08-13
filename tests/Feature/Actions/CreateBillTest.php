@@ -37,7 +37,6 @@ test('CreateBill should create a new bill with the correct value', function () {
         'Internet',
         new Amount(4200),
         DistributionMethod::EQUAL,
-        $household->id,
         null
     );
     expect($bill)->toBeInstanceOf(Bill::class)

@@ -25,6 +25,23 @@ test('a bill can be created and associated with a household and a member', funct
     ]);
 });
 
+test('a bill can be created without a member', function () {
+    list($household, $members) = bill_factory()->householdWithMembers(2, ['has_joint_account' => true]);
+    $bill = bill_factory()->bill(['member_id' => null], null, $household);
+
+    // Assert: Vérifiez que les relations sont correctes et que les données existent.
+    expect($bill)->toBeInstanceOf(Bill::class)
+        ->and($bill->id)->toBeInt()
+        ->and($bill->household)->toBeInstanceOf(Household::class)
+        ->and($bill->member)->toBeNull();
+
+    // On peut aussi directement vérifier la présence en base de données
+    $this->assertDatabaseHas('bills', [
+        'id' => $bill->id,
+        'name' => $bill->name
+    ]);
+});
+
 test('an exception is thrown when saving an empty bill', function()
 {
     $bill = new Bill();
