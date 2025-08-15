@@ -138,7 +138,7 @@ describe("when the form is correctly parametered", function () {
 
         test('should validate required fields', function () {
             Livewire::test(BillForm::class, $this->billFormProps)
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newName' => 'required',
                     'formattedNewAmount' => 'required',
@@ -149,7 +149,7 @@ describe("when the form is correctly parametered", function () {
         test('newName should be a string with at least 1 character', function () {
             Livewire::test(BillForm::class, $this->billFormProps)
                 ->set('newName', '')
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newName' => 'required'
                 ])
@@ -159,7 +159,7 @@ describe("when the form is correctly parametered", function () {
         test('newAmount and formattedAmount should be numerical representation', function () {
             Livewire::test(BillForm::class, $this->billFormProps)
                 ->set('formattedNewAmount', 'toto')
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newAmount' => 'gt:0',
                 ])
@@ -169,7 +169,7 @@ describe("when the form is correctly parametered", function () {
         test('newDistributionMethod should be included in existing Distribution Method', function () {
             Livewire::test(BillForm::class, $this->billFormProps)
                 ->set('newDistributionMethod', 'invalid-distribution-method')
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newDistributionMethod' => 'in'
                 ])
@@ -181,14 +181,14 @@ describe("when the form is correctly parametered", function () {
             Livewire::test(BillForm::class, $this->billFormProps)
                 ->set('formattedNewAmount', '1000')
                 ->set('newAmount', 200)
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors(['newAmount']);
         });
 
         test('newMemberId should be included in existing House members', function () {
             Livewire::test(BillForm::class, $this->billFormProps)
                 ->set('newMemberId', 1000)
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newMemberId' => 'in'
                 ])
@@ -210,7 +210,7 @@ describe("when the form is correctly parametered", function () {
                 'defaultDistributionMethod' => $currentHousehold->getDefaultDistributionMethod(),
             ])
                 ->set('newMemberId', $memberAFromAnotherHousehold->id)
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newMemberId' => 'in'
                 ]);
@@ -221,7 +221,7 @@ describe("when the form is correctly parametered", function () {
                 'hasJointAccount' => true
             ])
                 ->set('newMemberId', -1)
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasNoErrors([
                     'newMemberId'
                 ]);
@@ -230,7 +230,7 @@ describe("when the form is correctly parametered", function () {
         test('newMemberId shouldn’t be null', function () {
             Livewire::test(BillForm::class)
                 ->set('newMemberId', null)
-                ->call('submit')
+                ->call('addBill')
                 ->assertHasErrors([
                     'newMemberId' => 'required'
                 ]);
@@ -288,7 +288,7 @@ describe("create a new bill from the form", function () {
             ->set('formattedNewAmount', '42')
             // Keep the default value
             ->assertSet('newDistributionMethod', $this->household->getDefaultDistributionMethod()->value)
-            ->call('submit');
+            ->call('addBill');
     });
 
     test("form should validate without errors", function () {

@@ -7,6 +7,7 @@ use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdService;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class BillsManager extends Component
@@ -21,11 +22,7 @@ class BillsManager extends Component
     public DistributionMethod $newDistributionMethod = DistributionMethod::EQUAL;
     public int|null $newMemberId = null;
 
-    protected $listeners = [
-        'refreshBills' => 'refreshBills'
-    ];
-
-    public function mount(HouseholdService $householdService, BillService $billService): void
+    public function boot(HouseholdService $householdService, BillService $billService): void
     {
         $this->householdService = $householdService;
         $this->billService = $billService;
@@ -73,9 +70,11 @@ class BillsManager extends Component
      * Refresh the bills collection
      * This method is called when the 'refreshBills' event is dispatched
      */
+    #[On('refreshBills')]
     public function refreshBills(): void
     {
         $this->bills = $this->billService->getBillsCollection();
+
         $this->dispatch('notify', [
             'message' => 'Bills refreshed successfully',
             'type' => 'success'

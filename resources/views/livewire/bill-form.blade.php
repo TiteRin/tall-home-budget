@@ -59,6 +59,6 @@
         @enderror
     </td>
     <td>
-        <button class="btn btn-primary w-full" wire:click="submit">Ajouter</button>
+        <button class="btn btn-primary w-full" wire:click.prevent="addBill" type="button">Ajouter</button>
     </td>
 </tr>

@@ -101,7 +101,7 @@ class BillForm extends Component
         return view('livewire.bill-form');
     }
 
-    public function submit(CreateBill $createBill): void
+    public function addBill(CreateBill $createBill): void
     {
         $this->validate();
 
@@ -118,18 +118,16 @@ class BillForm extends Component
 
             // Dispatch events to refresh the bills table and show notification
             $this->dispatch('refreshBills');
-            $this->dispatch('notify', [
-                'message' => 'Dépense ajoutée avec succès',
-                'type' => 'success'
-            ]);
+//            $this->dispatch('notify', [
+//                'message' => 'Dépense ajoutée avec succès',
+//                'type' => 'success'
+//            ]);
         } catch (Exception $e) {
             // Handle exception and show notification
-            $this->dispatch('notify', [
-                'message' => 'Une erreur est survenue: ' . $e->getMessage(),
-                'type' => 'error'
-            ]);
-
-            throw $e;
+//            $this->dispatch('notify', [
+//                'message' => 'Une erreur est survenue: ' . $e->getMessage(),
+//                'type' => 'error'
+//            ]);
         }
     }
 
