@@ -38,7 +38,7 @@ class BillsManager extends Component
         $bills = $this->bills;
 
         return view(
-            'livewire.bills-manager',
+            'livewire.bills.manager',
             compact(
                 'bills',
             )

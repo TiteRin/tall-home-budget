@@ -95,10 +95,10 @@ class BillForm extends Component
     public function render(): View
     {
         if ($this->householdMembers->isEmpty()) {
-            return view('livewire.bill-form-empty');
+            return view('livewire.bills.form-empty');
         }
 
-        return view('livewire.bill-form');
+        return view('livewire.bills.form');
     }
 
     public function addBill(CreateBill $createBill): void
