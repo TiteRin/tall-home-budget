@@ -238,7 +238,7 @@ describe("when the form is correctly parametered", function () {
     });
 });
 
-describe("create a new bill from the form", function () {
+describe("when the creation succeeds", function () {
 
     beforeEach(closure: function () {
 
@@ -320,5 +320,68 @@ describe("create a new bill from the form", function () {
 
     test('should dispatch a notification calling for refreshing the bills', function () {
         $this->livewireTest->assertDispatched('refreshBills');
+    });
+});
+
+
+describe("when the creation fails", function () {
+
+    beforeEach(closure: function () {
+
+        $this->household = bill_factory()->household(['name' => 'Test Household', 'has_joint_account' => true, 'default_distribution_method' => DistributionMethod::EQUAL]);
+        $this->member = bill_factory()->member(['first_name' => 'John', 'last_name' => 'Doe'], $this->household);
+
+        $this->fakeRepository = new FakeBillRepository();
+        $this->fakeAction = new class($this->fakeRepository) extends CreateBill {
+
+            private $hasBeenCalled = false;
+
+            public function __construct(readonly private BillRepository $billRepository)
+            {
+                parent::__construct($this->billRepository);
+            }
+
+            public function handle(string $billName, Amount $amount, DistributionMethod $distributionMethod, ?int $memberId = null): Bill
+            {
+                $this->hasBeenCalled = true;
+
+                throw new Exception("Can’t save the bill");
+            }
+
+            public function hasBeenCalled()
+            {
+                return $this->hasBeenCalled;
+
+            }
+        };
+
+        app()->instance(CreateBill::class, $this->fakeAction);
+
+        $this->livewireTest = Livewire::test(BillForm::class, [
+            'householdMembers' => $this->household->members()->get(),
+            'defaultDistributionMethod' => $this->household->getDefaultDistributionMethod(),
+            'hasJointAccount' => $this->household->hasJointAccount()
+        ])
+            // Fill all fields
+            ->set('newName', 'Internet')
+            // Select "Compte joint"
+            ->set('newMemberId', -1)
+            ->set('formattedNewAmount', '42')
+            // Keep the default value
+            ->assertSet('newDistributionMethod', $this->household->getDefaultDistributionMethod()->value)
+            ->call('addBill');
+    });
+
+    test('the action has been called', function () {
+        expect($this->fakeAction->hasBeenCalled())->toBeTrue();
+    });
+
+    test('the bill is non existant', function () {
+        $bill = $this->fakeRepository->getLastCreatedBill();
+        expect($bill)->toBeNull();
+    });
+
+    test('should dispatch a notification about the exception', function () {
+        $this->livewireTest->assertDispatched('notify', type: 'error', details: 'Can’t save the bill');
     });
 });

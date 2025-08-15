@@ -124,10 +124,7 @@ class BillForm extends Component
 //            ]);
         } catch (Exception $e) {
             // Handle exception and show notification
-//            $this->dispatch('notify', [
-//                'message' => 'Une erreur est survenue: ' . $e->getMessage(),
-//                'type' => 'error'
-//            ]);
+            $this->dispatch('notify', type: 'error', message: 'Une erreur est survenue.', details: $e->getMessage());
         }
     }
 
