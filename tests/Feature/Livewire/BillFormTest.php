@@ -318,7 +318,7 @@ describe("create a new bill from the form", function () {
             ->assertSet('formattedNewAmount', '');
     });
 
-    test("a success message should be visible", function () {
-
+    test('should dispatch a notification calling for refreshing the bills', function () {
+        $this->livewireTest->assertDispatched('refreshBills');
     });
 });
