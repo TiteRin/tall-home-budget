@@ -1,12 +1,16 @@
 <tr>
     <td>{{ $this->bill->name ?? '' }}</td>
-    {{--    <td>{{ $bill->amount->toCurrency() ?? '-' }}</td>--}}
-    {{--    <td>{{ $bill->distribution_method->label() ?? '' }}</td>--}}
-    {{--    <td>--}}
-    {{--        @if ($bill->member)--}}
-    {{--            {{ $bill->member->fullname }}--}}
-    {{--        @else--}}
-    {{--            <em>Compte joint</em>--}}
-    {{--    @endif--}}
-    {{--    <td>Actions</td>--}}
+    <td>{{ $this->bill->amount->toCurrency() ?? '-' }}</td>
+    <td>{{ $this->bill->distribution_method->label() ?? '' }}</td>
+    <td>
+        @if ($this->bill->member)
+            {{ $this->bill->member->full_name ?? '' }}
+        @else
+            Compte joint
+        @endif
+    </td>
+    <td>
+        <button class="btn btn-primary">Modifier</button>
+        <button class="btn btn-secondary">Supprimer</button>
+    </td>
 </tr>
