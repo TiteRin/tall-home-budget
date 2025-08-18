@@ -1,9 +1,14 @@
 <?php
 
 use App\Livewire\BillsManager;
+use App\Repositories\BillRepository;
+use App\Repositories\FakeBillRepository;
 use Livewire\Livewire;
 
 beforeEach(function () {
+    $this->fakeRepository = new FakeBillRepository();
+    $this->app->instance(BillRepository::class, $this->fakeRepository);
+
     $this->household = bill_factory()->household();
 });
 
@@ -20,41 +25,19 @@ test('should display an empty table if no bills', function () {
         ->assertSeeText('Aucune dépense');
 });
 
-//test('should display existing bills in a table', function () {
-//
-//    $member = bill_factory()->member([
-//        'first_name' => 'Test',
-//        'last_name' => 'Member',
-//    ], $this->household);;
-//
-//    $bill = bill_factory()->bill([
-//        'name' => 'Test dépense',
-//        'amount' => 1000,
-//        'distribution_method' => DistributionMethod::EQUAL
-//    ], $member, $this->household);
-//
-//    Livewire::test(BillsManager::class)
-//        ->assertSeeText('Test dépense')
-//        ->assertSee('10,00 €')
-//        ->assertSee('Test Member')
-//        ->assertSee($bill->distribution_method->label());
-//});
-//
-//test('when a bill is not affected to a member, should display the bill without member', function () {
-//    $member = bill_factory()->member([], $this->household);
-//    $bill = bill_factory()->bill([
-//        'name' => 'Test dépense',
-//        'amount' => 1000,
-//        'distribution_method' => DistributionMethod::EQUAL,
-//        'member_id' => null,
-//    ], null, $this->household);;
-//
-//    Livewire::test(BillsManager::class)
-//        ->assertSeeText('Test dépense')
-//        ->assertSeeText('Compte joint');
-//});
-
 test('should use the BillForm component to add a bill', function () {
     Livewire::test(BillsManager::class)
         ->assertSeeLivewire('bill-form');
+});
+
+describe('when there’s a list of 5 bills', function () {
+    beforeEach(function () {
+        $member = bill_factory()->member([], $this->household);
+        bill_factory()->bills(5, [], $member, $this->household);
+    });
+
+    test('the component bill-row should have been called', function () {
+        Livewire::test(BillsManager::class)
+            ->assertSeeLivewire('bills.row');
+    });
 });
