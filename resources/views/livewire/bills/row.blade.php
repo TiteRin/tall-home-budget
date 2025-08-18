@@ -11,6 +11,6 @@
     </td>
     <td>
         <button class="btn btn-primary">Modifier</button>
-        <button class="btn btn-secondary">Supprimer</button>
+        <button class="btn btn-secondary" wire:click="deleteBill">Supprimer</button>
     </td>
 </tr>

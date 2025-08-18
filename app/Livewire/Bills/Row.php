@@ -8,7 +8,7 @@ use Livewire\Component;
 class Row extends Component
 {
     #[Prop]
-    private Bill $bill;
+    public Bill $bill;
 
     public function mount(Bill $bill): void
     {
@@ -18,5 +18,11 @@ class Row extends Component
     public function render()
     {
         return view('livewire.bills.row');
+    }
+
+    public function deleteBill()
+    {
+        $this->bill->delete();
+        $this->dispatch('refreshBills');
     }
 }

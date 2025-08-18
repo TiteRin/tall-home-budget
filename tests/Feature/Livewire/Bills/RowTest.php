@@ -3,6 +3,8 @@
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\Bills\Row;
+use App\Repositories\BillRepository;
+use App\Repositories\FakeBillRepository;
 use Livewire\Livewire;
 
 it('renders successfully', function () {
@@ -12,6 +14,10 @@ it('renders successfully', function () {
 
 describe("Should display a bill", function () {
     beforeEach(function () {
+
+        $this->fakeRepository = new FakeBillRepository();
+        $this->app->instance(BillRepository::class, $this->fakeRepository);
+
         $this->bill = bill_factory()->bill([
             'name' => 'Test bill',
             'amount' => new Amount(17900),
@@ -48,4 +54,19 @@ describe("Should display a bill", function () {
             ->assertSee('Modifier')
             ->assertSee('Supprimer');
     });
+
+    describe("when delete action is called", function () {
+        beforeEach(function () {
+            $this->livewire->call('deleteBill');
+        });
+
+        test('the bill should be deleted', function () {
+            expect($this->fakeRepository->getCreatedBills())->toHaveCount(0);
+        });
+
+        test("the component should notify the deletion", function () {
+            $this->livewire->assertDispatched("refreshBills");
+        });
+    });
+
 });
