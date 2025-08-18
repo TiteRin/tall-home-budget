@@ -2,6 +2,9 @@
 // TODO : accessibilité de BillForm (aria-labelledby entête du tableau ?)
 // TODO : Apparence du formulaire
 
+// TODO : supprimer une dépense
+// TODO : modifier une dépense
+
 // TODO : empêcher la modification du avec compte joint à sans compte joint s’il y a des dépenses existantes
 // TODO : rendre possible la modification à condition de passer les dépenses sur une personne
 // TODO : empêcher de supprimer un membre du foyer si des dépenses lui sont affectées

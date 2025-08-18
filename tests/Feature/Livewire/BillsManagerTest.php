@@ -33,7 +33,7 @@ test('should use the BillForm component to add a bill', function () {
 describe('when there’s a list of 5 bills', function () {
     beforeEach(function () {
         $member = bill_factory()->member([], $this->household);
-        bill_factory()->bills(5, [], $member, $this->household);
+        $this->bills = bill_factory()->bills(5, [], $member, $this->household);
     });
 
     test('the component bill-row should have been called', function () {

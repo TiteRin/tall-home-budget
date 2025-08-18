@@ -28,7 +28,6 @@ class Row extends Component
 
     public function delete(): void
     {
-        $this->bill->delete();
-        $this->dispatch('refreshBills');
+        $this->dispatch('billHasBeenDeleted', billId: $this->bill->id);
     }
 }

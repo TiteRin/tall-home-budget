@@ -60,12 +60,8 @@ describe("Should display a bill", function () {
             $this->livewire->call('delete');
         });
 
-        test('the bill should be deleted', function () {
-            expect($this->fakeRepository->getCreatedBills())->toHaveCount(0);
-        });
-
         test("the component should notify the deletion", function () {
-            $this->livewire->assertDispatched("refreshBills");
+            $this->livewire->assertDispatched("billHasBeenDeleted", billId: $this->bill->id);
         });
     });
 

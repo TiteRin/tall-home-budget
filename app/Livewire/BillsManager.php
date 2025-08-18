@@ -71,6 +71,7 @@ class BillsManager extends Component
      * This method is called when the 'refreshBills' event is dispatched
      */
     #[On('refreshBills')]
+    #[On('billHasBeenDeleted')]
     public function refreshBills(): void
     {
         $this->bills = $this->billService->getBillsCollection();
