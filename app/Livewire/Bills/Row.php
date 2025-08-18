@@ -3,6 +3,7 @@
 namespace App\Livewire\Bills;
 
 use App\Models\Bill;
+use Illuminate\View\View;
 use Livewire\Component;
 
 class Row extends Component
@@ -15,12 +16,17 @@ class Row extends Component
         $this->bill = $bill;
     }
 
-    public function render()
+    public function render(): View
     {
         return view('livewire.bills.row');
     }
 
-    public function deleteBill()
+    public function edit(): void
+    {
+        $this->dispatch('editBill', billId: $this->bill->id);
+    }
+
+    public function delete(): void
     {
         $this->bill->delete();
         $this->dispatch('refreshBills');

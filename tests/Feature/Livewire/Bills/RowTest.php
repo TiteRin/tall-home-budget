@@ -57,7 +57,7 @@ describe("Should display a bill", function () {
 
     describe("when delete action is called", function () {
         beforeEach(function () {
-            $this->livewire->call('deleteBill');
+            $this->livewire->call('delete');
         });
 
         test('the bill should be deleted', function () {
@@ -66,6 +66,16 @@ describe("Should display a bill", function () {
 
         test("the component should notify the deletion", function () {
             $this->livewire->assertDispatched("refreshBills");
+        });
+    });
+
+    describe("when modifier action is called", function () {
+        beforeEach(function () {
+            $this->livewire->call('edit');
+        });
+
+        test('the component should notify the editing action', function () {
+            $this->livewire->assertDispatched("editBill", billId: $this->bill->id);
         });
     });
 
