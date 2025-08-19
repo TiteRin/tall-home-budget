@@ -40,4 +40,12 @@ describe('when there’s a list of 5 bills', function () {
         Livewire::test(BillsManager::class)
             ->assertSeeLivewire('bills.row');
     });
+
+    test('should remove a bill when a billDeleted is triggered', function () {
+        $bill = bill_factory()->bill(['name' => 'Électricité']);
+
+        Livewire::test(BillsManager::class)
+            ->dispatch('billDeleted', $bill->id)
+            ->assertDontSee('Électricité');
+    });
 });

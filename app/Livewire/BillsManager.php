@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
+use App\Models\Bill;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdService;
 use Illuminate\Support\Collection;
@@ -71,7 +72,6 @@ class BillsManager extends Component
      * This method is called when the 'refreshBills' event is dispatched
      */
     #[On('refreshBills')]
-    #[On('billHasBeenDeleted')]
     public function refreshBills(): void
     {
         $this->bills = $this->billService->getBillsCollection();
@@ -80,5 +80,12 @@ class BillsManager extends Component
             'message' => 'Bills refreshed successfully',
             'type' => 'success'
         ]);
+    }
+
+    #[On('billDeleted')]
+    public function removeBill(int $billId): void
+    {
+        Bill::findOrFail($billId)->delete();
+        $this->refreshBills();
     }
 }
