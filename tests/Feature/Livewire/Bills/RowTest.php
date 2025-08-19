@@ -61,7 +61,7 @@ describe("Should display a bill", function () {
         });
 
         test("the component should notify the deletion", function () {
-            $this->livewire->assertDispatched("billHasBeenDeleted", billId: $this->bill->id);
+            $this->livewire->assertDispatched("billDeleted", billId: $this->bill->id);
         });
     });
 

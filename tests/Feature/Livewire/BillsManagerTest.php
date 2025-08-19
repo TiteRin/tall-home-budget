@@ -45,7 +45,7 @@ describe('when there’s a list of 5 bills', function () {
         $bill = bill_factory()->bill(['name' => 'Électricité']);
 
         Livewire::test(BillsManager::class)
-            ->dispatch('billDeleted', $bill->id)
+            ->dispatch('billDeleted', billId: $bill->id)
             ->assertDontSee('Électricité');
     });
 });
