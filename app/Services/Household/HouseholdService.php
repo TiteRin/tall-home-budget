@@ -5,7 +5,7 @@ namespace App\Services\Household;
 use App\Http\Resources\HouseholdSummaryResource;
 use App\Models\Household;
 
-readonly class HouseholdService
+class HouseholdService
 {
     public function getHousehold(int $id): Household|null
     {
