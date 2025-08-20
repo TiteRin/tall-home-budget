@@ -5,11 +5,11 @@ namespace App\Services\Household;
 use App\Http\Resources\HouseholdSummaryResource;
 use App\Models\Household;
 
-class HouseholdService
+class HouseholdService implements HouseholdServiceContract
 {
-    public function getHousehold(int $id): Household|null
+    public function getHousehold(int $householdId): Household|null
     {
-        return Household::find($id);
+        return Household::find($householdId);
     }
 
     public function getCurrentHousehold(): Household|null
@@ -17,7 +17,7 @@ class HouseholdService
         return Household::orderBy('id')->first();
     }
 
-    public function getSummary(int $householdId): array|null
+    public function getSummary(?int $householdId = null): array|null
     {
         $household = $householdId
             ? $this->getHousehold($householdId)

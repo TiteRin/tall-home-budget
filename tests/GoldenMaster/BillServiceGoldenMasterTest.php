@@ -7,7 +7,7 @@ use App\Models\Household as HouseholdModel;
 use App\Models\Member as MemberModel;
 use App\Repositories\BillRepository;
 use App\Services\Bill\BillService;
-use App\Services\Household\HouseholdService;
+use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -23,14 +23,14 @@ afterEach(function () {
 
 it('golden master: getBillsForHousehold with no current household', function () {
     // Arrange
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn(null);
     $householdService->shouldNotReceive('getHousehold');
 
     // Pas utilisé dans ce scénario
     $billRepository = m::mock(BillRepository::class);
 
-    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
 
     /** @var BillService $service */
@@ -59,14 +59,14 @@ it('golden master: getBillsForHousehold with no current household', function () 
 it('golden master: getBillsForHousehold with explicit non-existing household id', function () {
     // Arrange
     $fakeId = 987654321;
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with($fakeId)->andReturn(null);
     $householdService->shouldNotReceive('getCurrentHousehold');
 
     // Pas utilisé dans ce scénario
     $billRepository = m::mock(BillRepository::class);
 
-    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
 
     /** @var BillService $service */
@@ -146,14 +146,14 @@ it('golden master: getBillsForHousehold with a household having one bill and mem
     $householdId = 3001;
 
     // Mock HouseholdService
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn($household);
     $householdService->shouldNotReceive('getCurrentHousehold');
 
     // Repository non utilisé
     $billRepository = m::mock(BillRepository::class);
 
-    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
 
     /** @var BillService $service */
@@ -181,13 +181,13 @@ it('golden master: getBillsForHousehold with a household having one bill and mem
 
 it('golden master: getBillsCollection with no current household', function () {
     // Arrange
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn(null);
     $householdService->shouldNotReceive('getHousehold');
 
     $billRepository = m::mock(BillRepository::class);
 
-    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
 
     /** @var BillService $service */
@@ -229,13 +229,13 @@ it('golden master: getBillsCollection with a household having one bill and membe
     $household->shouldReceive('bills')->atLeast()->once()->andReturn($hasManyFake);
     $household->setRelation('bills', $fakeBills);
 
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with(3002)->andReturn($household);
     $householdService->shouldNotReceive('getCurrentHousehold');
 
     $billRepository = m::mock(BillRepository::class);
 
-    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
 
     /** @var BillService $service */
@@ -308,7 +308,7 @@ it('golden master: createBill returns created bill (EQUAL)', function () {
     $returned->setAttribute('household_id', $householdId);
     $returned->setAttribute('member_id', $memberId);
 
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn($household);
     $householdService->shouldNotReceive('getCurrentHousehold');
 
@@ -347,7 +347,7 @@ it('golden master: createBill returns created bill (EQUAL)', function () {
 it('createBill throws when household is not found', function () {
     // Arrange
     $householdId = 4444;
-    $householdService = m::mock(HouseholdService::class);
+    $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn(null);
     $householdService->shouldNotReceive('getCurrentHousehold');
 

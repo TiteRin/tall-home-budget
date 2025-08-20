@@ -4,7 +4,14 @@ use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
+use App\Models\Household;
 use App\Repositories\BillRepository;
+use App\Services\Household\HouseholdServiceContract;
+use Mockery as m;
+
+afterEach(function () {
+    m::close();
+});
 
 test('CreateBill should create a new bill with the correct value', function () {
 
@@ -31,8 +38,13 @@ test('CreateBill should create a new bill with the correct value', function () {
         }
     };
 
-    $household = bill_factory()->household();
-    $action = new CreateBill($fakeRepository);
+    $householdId = 4444;
+    $household = new Household();
+    $household->setAttribute('id', $householdId);
+    $householdService = m::mock(HouseholdServiceContract::class);
+    $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($household);
+
+    $action = new CreateBill($fakeRepository, $householdService);
     $bill = $action->handle(
         'Internet',
         new Amount(4200),

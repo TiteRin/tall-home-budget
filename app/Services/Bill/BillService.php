@@ -10,13 +10,13 @@ use App\Http\Resources\HouseholdSummaryResource;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Repositories\BillRepository;
-use App\Services\Household\HouseholdService;
+use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Support\Collection;
 
 readonly class BillService
 {
     public function __construct(
-        protected HouseholdService $householdService,
+        protected HouseholdServiceContract $householdService,
         protected BillRepository   $billRepository
     ) {}
 
