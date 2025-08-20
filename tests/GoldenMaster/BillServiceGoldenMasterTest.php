@@ -177,3 +177,112 @@ it('golden master: getBillsForHousehold with a household having one bill and mem
     // Assert Golden Master
     expect(json_encode($normalized, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))->toMatchSnapshot();
 });
+
+it('golden master: getBillsCollection with no current household', function () {
+    // Arrange
+    $householdService = m::mock(HouseholdService::class);
+    $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn(null);
+    $householdService->shouldNotReceive('getHousehold');
+
+    $billRepository = m::mock(BillRepository::class);
+
+    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(BillRepository::class, $billRepository);
+
+    /** @var BillService $service */
+    $service = app(BillService::class);
+
+    // Act
+    $collection = $service->getBillsCollection();
+
+    // Assert
+    expect($collection)->toBeInstanceOf(\Illuminate\Support\Collection::class);
+    expect($collection->isEmpty())->toBeTrue();
+});
+
+it('golden master: getBillsCollection with a household having one bill and member', function () {
+    // Arrange: modèles en mémoire
+    $member = new MemberModel();
+    $member->setAttribute('id', 1001);
+    $member->setAttribute('name', 'Alice');
+
+    $bill = new BillModel();
+    $bill->setAttribute('id', 2001);
+    $bill->setAttribute('name', 'Internet');
+    $bill->setAttribute('amount', 10000);
+    $bill->setAttribute('distribution_method', 'equal');
+    $bill->setAttribute('member_id', 1001);
+    $bill->setRelation('member', $member);
+
+    /** @var HouseholdModel|Mockery\MockInterface $household */
+    $household = m::mock(HouseholdModel::class)->makePartial();
+    $household->setAttribute('id', 3002);
+    $household->setAttribute('name', 'GM Household 2');
+
+    $fakeBills = collect([$bill]);
+
+    // HasMany factice conforme au type de retour
+    $hasManyFake = makeHasManyFake($household, $fakeBills);
+
+    // Autoriser plusieurs appels à bills()
+    $household->shouldReceive('bills')->atLeast()->once()->andReturn($hasManyFake);
+    $household->setRelation('bills', $fakeBills);
+
+    $householdService = m::mock(HouseholdService::class);
+    $householdService->shouldReceive('getHousehold')->once()->with(3002)->andReturn($household);
+    $householdService->shouldNotReceive('getCurrentHousehold');
+
+    $billRepository = m::mock(BillRepository::class);
+
+    app()->instance(HouseholdService::class, $householdService);
+    app()->instance(BillRepository::class, $billRepository);
+
+    /** @var BillService $service */
+    $service = app(BillService::class);
+
+    // Act
+    $collection = $service->getBillsCollection(3002);
+
+    // Normalize minimal pour un snapshot stable (modèles -> tableau simple)
+    $asArray = $collection->map(function (BillModel $b) {
+        return [
+            'id' => $b->id,
+            'name' => $b->name,
+            'member' => [
+                'id' => optional($b->member)->id,
+                'name' => optional($b->member)->name,
+            ],
+        ];
+    })->values()->all();
+
+    // Assert via snapshot
+    expect(json_encode($asArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))->toMatchSnapshot();
+});
+
+/**
+ * Fabrique une relation HasMany factice qui supporte ->with('member')->get()
+ */
+function makeHasManyFake(\Illuminate\Database\Eloquent\Model $parent, \Illuminate\Support\Collection $fake): HasMany
+{
+    $query = (new BillModel())->newQuery();
+
+    return new class($query, $parent, $fake) extends HasMany {
+        private \Illuminate\Support\Collection $fake;
+
+        public function __construct(EloquentBuilder $query, EloquentModel $parent, \Illuminate\Support\Collection $fake)
+        {
+            $this->fake = $fake;
+            parent::__construct($query, $parent, 'household_id', $parent->getKeyName());
+        }
+
+        public function with($relations)
+        {
+            return $this; // relations déjà préchargées
+        }
+
+        public function get($columns = ['*'])
+        {
+            return $this->fake;
+        }
+    };
+}
