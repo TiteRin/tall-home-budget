@@ -6,17 +6,18 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Http\Resources\BillResource;
 use App\Http\Resources\BillResourceCollection;
-use App\Http\Resources\HouseholdSummaryResource;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Repositories\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\HouseholdSummaryService;
 use Illuminate\Support\Collection;
 
 readonly class BillService
 {
     public function __construct(
         protected HouseholdServiceContract $householdService,
+        protected HouseholdSummaryService $householdSummaryService,
         protected BillRepository   $billRepository
     ) {}
 
@@ -37,7 +38,7 @@ readonly class BillService
 
         return [
             'bills' => $billCollection,
-            'household_summary' => new HouseholdSummaryResource($household),
+            'household_summary' => $this->householdSummaryService->forHousehold($household),
         ];
     }
 
@@ -54,7 +55,7 @@ readonly class BillService
 
     public function getHouseholdSummary(int $householdId = null): ?array
     {
-        return $this->householdService->getSummary($householdId);
+        return $this->householdSummaryService->getSummaryArray($householdId);
     }
 
     private function getHousehold(int $householdId = null): ?Household

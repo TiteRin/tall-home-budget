@@ -8,6 +8,7 @@ use App\Models\Member as MemberModel;
 use App\Repositories\BillRepository;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\HouseholdSummaryService;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\Model as EloquentModel;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -325,7 +326,11 @@ it('golden master: createBill returns created bill (EQUAL)', function () {
         })
         ->andReturn($returned);
 
-    $service = new BillService($householdService, $billRepository);
+    $service = new BillService(
+        $householdService,
+        new HouseholdSummaryService($householdService),
+        $billRepository
+    );
 
     // Act
     $bill = $service->createBill($name, $amount, $method, $householdId, $memberId);
@@ -353,7 +358,11 @@ it('createBill throws when household is not found', function () {
 
     $billRepository = m::mock(BillRepository::class); // non utilisé
 
-    $service = new BillService($householdService, $billRepository);
+    $service = new BillService(
+        $householdService,
+        new HouseholdSummaryService($householdService),
+        $billRepository
+    );
 
     // Assert + Act
     $fn = fn() => $service->createBill(

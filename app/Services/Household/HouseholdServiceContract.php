@@ -10,7 +10,4 @@ interface HouseholdServiceContract
     public function getHousehold(int $householdId): ?Household;
 
     public function getCurrentHousehold(): ?Household;
-
-    public function getSummary(?int $householdId = null): ?array;
-
 }
