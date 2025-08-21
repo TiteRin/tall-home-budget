@@ -1,14 +1,9 @@
 <?php
 
 use App\Livewire\BillsManager;
-use App\Repositories\BillRepository;
-use App\Repositories\FakeBillRepository;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->fakeRepository = new FakeBillRepository();
-    $this->app->instance(BillRepository::class, $this->fakeRepository);
-
     $this->household = bill_factory()->household();
 });
 

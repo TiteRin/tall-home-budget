@@ -33,7 +33,8 @@ readonly class BillService
             ];
         }
 
-        $bills = $household->bills()->with('member')->get();
+        $bills = $this->billRepository->listForHousehold($household->id);
+        $household->setRelation('bills', $bills);
         $billCollection = new BillResourceCollection(BillResource::collection($bills));
 
         return [
@@ -50,7 +51,7 @@ readonly class BillService
             return collect();
         }
 
-        return $household->bills()->with('member')->get();
+        return $this->billRepository->listForHousehold($household->id);
     }
 
     public function getHouseholdSummary(int $householdId = null): ?array

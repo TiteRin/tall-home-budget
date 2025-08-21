@@ -21,12 +21,12 @@ class Household extends Model
 
     public function members(): HasMany
     {
-        return $this->hasMany(Member::class);
+        return $this->hasMany(Member::class, 'household_id');
     }
 
     public function bills(): HasMany
     {
-        return $this->hasMany(Bill::class);
+        return $this->hasMany(Bill::class, 'household_id');
     }
 
     public function getTotalAmountAttribute(): Amount

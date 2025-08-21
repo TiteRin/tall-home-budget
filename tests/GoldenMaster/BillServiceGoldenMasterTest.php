@@ -9,9 +9,6 @@ use App\Repositories\BillRepository;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdServiceContract;
 use App\Services\Household\HouseholdSummaryService;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
-use Illuminate\Database\Eloquent\Model as EloquentModel;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Tests\TestCase;
@@ -114,54 +111,22 @@ it('golden master: getBillsForHousehold with a household having one bill and mem
     $household->setAttribute('name', 'GM Household');
     $household->setAttribute('default_distribution_method', DistributionMethod::EQUAL);
 
-    // Collection de bills
-    $fakeBills = new Collection([$bill]);
-
-    // Relation HasMany factice, conforme au type de retour
-    $query = (new BillModel())->newQuery(); // ne déclenche pas de requête tant qu'on ne fait pas ->get() sur le builder
-    $hasManyFake = new class($query, $household, $fakeBills) extends HasMany {
-        private Collection $fake;
-
-        public function __construct(EloquentBuilder $query, EloquentModel $parent, Collection $fake)
-        {
-            $this->fake = $fake;
-            parent::__construct($query, $parent, 'household_id', $parent->getKeyName());
-        }
-
-        public function with($relations)
-        {
-            return $this; // on ignore les relations, car déjà eager-loadées
-        }
-
-        public function get($columns = ['*'])
-        {
-            return $this->fake;
-        }
-    };
-
-    // Le Resource de résumé peut rappeler bills() => autorisons plusieurs appels
-    $household->shouldReceive('bills')->atLeast()->once()->andReturn($hasManyFake);
-    // Précharge aussi la relation en propriété si une Resource y accède directement
-    $household->setRelation('bills', $fakeBills);
-
-    $householdId = 3001;
-
-    // Mock HouseholdService
     $householdService = m::mock(HouseholdServiceContract::class);
-    $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn($household);
-    $householdService->shouldNotReceive('getCurrentHousehold');
+    $householdService->shouldReceive('getHousehold')->once()->with(3001)->andReturn($household);
 
-    // Repository non utilisé
     $billRepository = m::mock(BillRepository::class);
+    $billRepository
+        ->shouldReceive('listForHousehold')
+        ->once()
+        ->with(3001)
+        ->andReturn(new Collection([$bill]));
 
     app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
 
-    /** @var BillService $service */
     $service = app(BillService::class);
+    $result = $service->getBillsForHousehold(3001);
 
-    // Act
-    $result = $service->getBillsForHousehold($householdId);
 
     // Normalize vers JSON stable
     $normalize = function ($value) {
@@ -221,20 +186,17 @@ it('golden master: getBillsCollection with a household having one bill and membe
     $household->setAttribute('id', 3002);
     $household->setAttribute('name', 'GM Household 2');
 
-    $fakeBills = collect([$bill]);
-
-    // HasMany factice conforme au type de retour
-    $hasManyFake = makeHasManyFake($household, $fakeBills);
-
-    // Autoriser plusieurs appels à bills()
-    $household->shouldReceive('bills')->atLeast()->once()->andReturn($hasManyFake);
-    $household->setRelation('bills', $fakeBills);
-
     $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with(3002)->andReturn($household);
     $householdService->shouldNotReceive('getCurrentHousehold');
 
     $billRepository = m::mock(BillRepository::class);
+    $billRepository
+        ->shouldReceive('listForHousehold')
+        ->once()
+        ->with(3002)
+        ->andReturn(collect([$bill]));
+
 
     app()->instance(HouseholdServiceContract::class, $householdService);
     app()->instance(BillRepository::class, $billRepository);
@@ -264,30 +226,6 @@ it('golden master: getBillsCollection with a household having one bill and membe
 /**
  * Fabrique une relation HasMany factice qui supporte ->with('member')->get()
  */
-function makeHasManyFake(EloquentModel $parent, Collection $fake): HasMany
-{
-    $query = (new BillModel())->newQuery();
-
-    return new class($query, $parent, $fake) extends HasMany {
-        private Collection $fake;
-
-        public function __construct(EloquentBuilder $query, EloquentModel $parent, Collection $fake)
-        {
-            $this->fake = $fake;
-            parent::__construct($query, $parent, 'household_id', $parent->getKeyName());
-        }
-
-        public function with($relations)
-        {
-            return $this; // relations déjà préchargées
-        }
-
-        public function get($columns = ['*'])
-        {
-            return $this->fake;
-        }
-    };
-}
 
 it('golden master: createBill returns created bill (EQUAL)', function () {
     // Arrange

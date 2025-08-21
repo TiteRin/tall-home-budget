@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
+use Illuminate\Support\Collection;
 
 class EloquentBillRepository implements BillRepository
 {
@@ -33,5 +34,13 @@ class EloquentBillRepository implements BillRepository
             'household_id' => $householdId,
             'member_id' => $memberId,
         ]);
+    }
+
+    public function listForHousehold(int $householdId): Collection
+    {
+        return Bill::query()
+            ->where('household_id', $householdId)
+            ->with('member')
+            ->get();
     }
 }

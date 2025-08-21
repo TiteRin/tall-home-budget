@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
+use Illuminate\Support\Collection;
 
 interface BillRepository
 {
@@ -25,4 +26,6 @@ interface BillRepository
         int                $householdId,
         ?int               $memberId = null
     ): Bill;
+
+    public function listForHousehold(int $householdId): Collection;
 }

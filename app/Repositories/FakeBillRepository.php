@@ -54,6 +54,11 @@ class FakeBillRepository implements BillRepository
         return $bill;
     }
 
+    public function listForHousehold(int $householdId): Collection
+    {
+        return $this->bills->where('household_id', $householdId)->values();
+    }
+
     /**
      * Get all bills created by this repository
      *

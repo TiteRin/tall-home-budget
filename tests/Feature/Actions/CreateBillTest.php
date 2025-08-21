@@ -5,7 +5,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
-use App\Repositories\BillRepository;
+use App\Repositories\FakeBillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Mockery as m;
 
@@ -15,28 +15,7 @@ afterEach(function () {
 
 test('CreateBill should create a new bill with the correct value', function () {
 
-    $fakeRepository = new class implements BillRepository {
-        public Bill|null $lastBill = null;
-
-        public function create(
-            string             $name,
-            Amount             $amount,
-            DistributionMethod $distributionMethod,
-            int                $householdId,
-            ?int               $memberId = null
-        ): Bill
-        {
-            $this->lastBill = new Bill([
-                'name' => $name,
-                'amount' => $amount,
-                'distribution_method' => $distributionMethod,
-                'household_id' => $householdId,
-                'member_id' => $memberId
-            ]);
-
-            return $this->lastBill;
-        }
-    };
+    $fakeRepository = new FakeBillRepository();
 
     $householdId = 4444;
     $household = new Household();
