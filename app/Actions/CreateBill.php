@@ -7,6 +7,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Repositories\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
+use Exception;
 
 class CreateBill
 {
@@ -17,6 +18,9 @@ class CreateBill
     {
     }
 
+    /**
+     * @throws Exception
+     */
     public function handle(
         string             $billName,
         Amount             $amount,
@@ -25,6 +29,10 @@ class CreateBill
     ): Bill
     {
         $household = $this->householdService->getCurrentHousehold();
+
+        if (!$household) {
+            throw new Exception('No current household found');
+        }
 
         return $this->billRepository->create(
             $billName,

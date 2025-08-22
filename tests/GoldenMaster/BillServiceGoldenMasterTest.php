@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill as BillModel;
@@ -8,7 +9,6 @@ use App\Models\Member as MemberModel;
 use App\Repositories\BillRepository;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdServiceContract;
-use App\Services\Household\HouseholdSummaryService;
 use Illuminate\Support\Collection;
 use Mockery as m;
 use Tests\TestCase;
@@ -223,10 +223,6 @@ it('golden master: getBillsCollection with a household having one bill and membe
     expect(json_encode($asArray, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES))->toMatchSnapshot();
 });
 
-/**
- * Fabrique une relation HasMany factice qui supporte ->with('member')->get()
- */
-
 it('golden master: createBill returns created bill (EQUAL)', function () {
     // Arrange
     $householdId = 4001;
@@ -248,8 +244,7 @@ it('golden master: createBill returns created bill (EQUAL)', function () {
     $returned->setAttribute('member_id', $memberId);
 
     $householdService = m::mock(HouseholdServiceContract::class);
-    $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn($household);
-    $householdService->shouldNotReceive('getCurrentHousehold');
+    $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($household);
 
     $billRepository = m::mock(BillRepository::class);
     $billRepository
@@ -264,14 +259,10 @@ it('golden master: createBill returns created bill (EQUAL)', function () {
         })
         ->andReturn($returned);
 
-    $service = new BillService(
-        $householdService,
-        new HouseholdSummaryService($householdService),
-        $billRepository
-    );
+    $action = new CreateBill($billRepository, $householdService);
 
     // Act
-    $bill = $service->createBill($name, $amount, $method, $householdId, $memberId);
+    $bill = $action->handle($name, $amount, $method, $memberId);
 
     // Normalize pour snapshot stable
     $asArray = [
@@ -291,24 +282,18 @@ it('createBill throws when household is not found', function () {
     // Arrange
     $householdId = 4444;
     $householdService = m::mock(HouseholdServiceContract::class);
-    $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn(null);
-    $householdService->shouldNotReceive('getCurrentHousehold');
+    $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn(null);
 
     $billRepository = m::mock(BillRepository::class); // non utilisé
 
-    $service = new BillService(
-        $householdService,
-        new HouseholdSummaryService($householdService),
-        $billRepository
-    );
+    $action = new CreateBill($billRepository, $householdService);
 
     // Assert + Act
-    $fn = fn() => $service->createBill(
+    $fn = fn() => $action->handle(
         'Anything',
         new Amount(5000),
         DistributionMethod::PRORATA,
-        $householdId
     );
 
-    expect($fn)->toThrow(\InvalidArgumentException::class, 'Household not found');
+    expect($fn)->toThrow(Exception::class, 'No current household found');
 });

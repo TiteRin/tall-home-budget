@@ -2,18 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Services\Bill\BillService;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class BillsController extends Controller
 {
-    public function __construct(
-        private readonly BillService $billService
-    ) {}
+    public function __construct()
+    {
+    }
 
     public function index(): View
     {
@@ -24,9 +24,10 @@ class BillsController extends Controller
      * Create a new bill
      *
      * @param Request $request
+     * @param CreateBill $createBillAction
      * @return JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request, CreateBill $createBillAction): JsonResponse
     {
         $validated = $request->validate([
             'name' => 'required|string|min:1',
@@ -38,11 +39,10 @@ class BillsController extends Controller
         $amount = new Amount($validated['amount']);
         $distributionMethod = DistributionMethod::from($validated['distribution_method']);
 
-        $bill = $this->billService->createBill(
+        $bill = $createBillAction->handle(
             $validated['name'],
             $amount,
             $distributionMethod,
-            null, // Use current household
             $validated['member_id'] ?? null
         );
 
