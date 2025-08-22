@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use Exception;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,16 +40,23 @@ class BillsController extends Controller
         $amount = new Amount($validated['amount']);
         $distributionMethod = DistributionMethod::from($validated['distribution_method']);
 
-        $bill = $createBillAction->handle(
-            $validated['name'],
-            $amount,
-            $distributionMethod,
-            $validated['member_id'] ?? null
-        );
+        try {
+            $bill = $createBillAction->handle(
+                $validated['name'],
+                $amount,
+                $distributionMethod,
+                $validated['member_id'] ?? null
+            );
 
-        return response()->json([
-            'message' => 'Bill created successfully',
-            'bill' => $bill,
-        ], 201);
+            return response()->json([
+                'message' => 'Bill created successfully',
+                'bill' => $bill,
+            ], 201);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => 'An error occurred while creating the bill',
+                'error' => $e->getMessage(),
+            ], 422);
+        }
     }
 }
