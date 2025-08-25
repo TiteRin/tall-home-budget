@@ -11,11 +11,6 @@ class Row extends Component
     #[Prop]
     public Bill $bill;
 
-    public function mount(Bill $bill): void
-    {
-        $this->bill = $bill;
-    }
-
     public function render(): View
     {
         return view('livewire.bills.row');

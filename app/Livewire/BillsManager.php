@@ -6,6 +6,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\On;
@@ -16,7 +17,7 @@ class BillsManager extends Component
     protected HouseholdService $householdService;
     protected BillService $billService;
 
-    protected Collection $bills;
+    public Collection $bills;
 
     public string $newName = '';
     public float $newAmount = 0;
@@ -38,12 +39,7 @@ class BillsManager extends Component
 
         $bills = $this->bills;
 
-        return view(
-            'livewire.bills.manager',
-            compact(
-                'bills',
-            )
-        );
+        return view('livewire.bills.manager', compact('bills'));
     }
 
     public function getHouseholdMembersProperty(): Collection
@@ -85,7 +81,11 @@ class BillsManager extends Component
     #[On('billDeleted')]
     public function removeBill(int $billId): void
     {
-        Bill::findOrFail($billId)->delete();
+        $bill = Bill::find($billId);
+        if (!$bill) {
+            throw new ModelNotFoundException();
+        }
+        $bill->delete();
         $this->refreshBills();
     }
 }

@@ -17,7 +17,7 @@
         </thead>
         <tbody>
         @forelse($bills as $index => $bill)
-            @livewire('bills.row', ['bill' => $bill])
+            @livewire('bills.row', ['bill' => $bill], key($bill->id))
         @empty
             <tr>
                 <td colspan="6">
