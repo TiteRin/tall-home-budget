@@ -2,20 +2,19 @@
 
 namespace App\Services\Bill;
 
-use App\Http\Resources\BillResource;
 use App\Http\Resources\BillResourceCollection;
 use App\Models\Household;
+use App\Presenters\BillsOverviewPresenter;
 use App\Repositories\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
-use App\Services\Household\HouseholdSummaryService;
 use Illuminate\Support\Collection;
 
 readonly class BillService
 {
     public function __construct(
         protected HouseholdServiceContract $householdService,
-        protected HouseholdSummaryService $householdSummaryService,
-        protected BillRepository   $billRepository
+        protected BillRepository         $billRepository,
+        protected BillsOverviewPresenter $presenter
     ) {}
 
 
@@ -32,12 +31,8 @@ readonly class BillService
 
         $bills = $this->billRepository->listForHousehold($household->id);
         $household->setRelation('bills', $bills);
-        $billCollection = new BillResourceCollection(BillResource::collection($bills));
 
-        return [
-            'bills' => $billCollection,
-            'household_summary' => $this->householdSummaryService->forHousehold($household),
-        ];
+        return $this->presenter->present($household, $bills);
     }
 
     public function getBillsCollection(int $householdId = null): Collection
@@ -49,11 +44,6 @@ readonly class BillService
         }
 
         return $this->billRepository->listForHousehold($household->id);
-    }
-
-    public function getHouseholdSummary(int $householdId = null): ?array
-    {
-        return $this->householdSummaryService->getSummaryArray($householdId);
     }
 
     private function getHousehold(int $householdId = null): ?Household
