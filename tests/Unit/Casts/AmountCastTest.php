@@ -5,6 +5,7 @@ namespace Tests\Unit\Casts;
 use App\Casts\AmountCast;
 use App\Domains\ValueObjects\Amount;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 
 class FakeModel extends Model
 {
@@ -29,10 +30,17 @@ test('should cast an Amount object back from a raw integer', function () {
     expect($raw)->toBe(1234);
 });
 
+test('should throw an exception when casting an invalid value', function () {
+    $cast = new AmountCast();
+    $model = new FakeModel();
+
+    $raw = $cast->get($model, 'amount', 'invalid', []);
+})->throws(InvalidArgumentException::class);
+
 test('when value is null, AmountCast should return null', function () {
     $cast = new AmountCast();
     $model = new FakeModel();
 
-    expect($cast->get($model, 'amount', null, []))->toBeNull();
-    expect($cast->set($model, 'amount', null, []))->toBeNull();
+    expect($cast->get($model, 'amount', null, []))->toBeNull()
+        ->and($cast->set($model, 'amount', null, []))->toBeNull();
 });

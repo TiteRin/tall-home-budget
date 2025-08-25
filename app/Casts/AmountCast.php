@@ -5,6 +5,7 @@ namespace App\Casts;
 use App\Domains\ValueObjects\Amount;
 use Illuminate\Contracts\Database\Eloquent\CastsAttributes;
 use Illuminate\Database\Eloquent\Model;
+use InvalidArgumentException;
 
 class AmountCast implements CastsAttributes
 {
@@ -20,7 +21,7 @@ class AmountCast implements CastsAttributes
         }
 
         if (!is_int($value)) {
-            throw new \InvalidArgumentException('Amount must be an integer');
+            throw new InvalidArgumentException('Amount must be an integer');
         }
 
         return new Amount($value);

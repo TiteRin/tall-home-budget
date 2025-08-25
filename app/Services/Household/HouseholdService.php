@@ -13,6 +13,6 @@ class HouseholdService implements HouseholdServiceContract
 
     public function getCurrentHousehold(): Household|null
     {
-        return Household::orderBy('id')->first();
+        return Household::orderBy('created_at')->first();
     }
 }

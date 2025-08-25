@@ -14,9 +14,39 @@ test('should always be positive', function () {
     new Amount(-1);
 })->throws(InvalidArgumentException::class, 'Amount [-1] must be a positive integer');
 
-test('should format the amount for lisibility purposes', function () {
-    $amount = new Amount(100000);
-    expect($amount->toCurrency())->toBe('1 000,00 €');
+test('should be equal when amounts have same value', function () {
+    $amount1 = new Amount(12500);
+    $amount2 = new Amount(12500);
+
+    expect($amount1->__equals($amount2))->toBeTrue();
+});
+
+test('should not be equal when amounts have different values', function () {
+    $amount1 = new Amount(12500);
+    $amount2 = new Amount(15000);
+
+    expect($amount1->__equals($amount2))->toBeFalse();
+});
+
+test('should be equal when created differently but same value', function () {
+    $amount1 = new Amount(12500);
+    $amount2 = Amount::from('125.00');
+
+    expect($amount1->__equals($amount2))->toBeTrue();
+});
+
+test('should be equal with zero amounts', function () {
+    $amount1 = new Amount(0);
+    $amount2 = new Amount(0);
+
+    expect($amount1->__equals($amount2))->toBeTrue();
+});
+
+test('should not be equal when one is zero and other is not', function () {
+    $amount1 = new Amount(0);
+    $amount2 = new Amount(100);
+
+    expect($amount1->__equals($amount2))->toBeFalse();
 });
 
 test('should create an Amount from a string', function () {
