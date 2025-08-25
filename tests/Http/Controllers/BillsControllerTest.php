@@ -27,12 +27,12 @@ describe("when valid data are sent to the store API", function () {
         $response->assertJsonFragment(['message' => 'Bill created successfully']);
     });
 
-    it('should save a new bill', function () {
-
-    });
-
-    it('should emit a notification', function () {
-
-    });
+//    it('should save a new bill', function () {
+//
+//    });
+//
+//    it('should emit a notification', function () {
+//
+//    });
 });
 
