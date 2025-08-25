@@ -2,7 +2,6 @@
 
 namespace App\Services\Bill;
 
-use App\Http\Resources\BillResourceCollection;
 use App\Models\Household;
 use App\Presenters\BillsOverviewPresenter;
 use App\Repositories\BillRepository;
@@ -23,10 +22,7 @@ readonly class BillService
         $household = $this->getHousehold($householdId);
 
         if (!$household) {
-            return [
-                'bills' => new BillResourceCollection(collect()),
-                'household_summary' => null,
-            ];
+            return BillsOverviewPresenter::empty();
         }
 
         $bills = $this->billRepository->listForHousehold($household->id);

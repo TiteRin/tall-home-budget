@@ -25,4 +25,12 @@ class BillsOverviewPresenter
             'household_summary' => $this->householdSummaryService->forHousehold($household),
         ];
     }
+
+    public static function empty(): array
+    {
+        return [
+            'bills' => new BillResourceCollection(collect()),
+            'household_summary' => null,
+        ];
+    }
 }
