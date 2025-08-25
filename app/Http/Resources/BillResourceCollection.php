@@ -3,15 +3,12 @@
 namespace App\Http\Resources;
 
 use App\Domains\ValueObjects\Amount;
-use App\Traits\HasCurrencyFormatting;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 use Illuminate\Support\Collection;
 
 class BillResourceCollection extends ResourceCollection
 {
-    use HasCurrencyFormatting;
-
     public function toArray(Request $request): array
     {
         return [

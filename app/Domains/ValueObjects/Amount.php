@@ -2,15 +2,11 @@
 
 namespace App\Domains\ValueObjects;
 
-use App\Traits\HasCurrencyFormatting;
 use Illuminate\Support\Number;
 use InvalidArgumentException;
 
 class Amount
 {
-
-    use HasCurrencyFormatting;
-
     private int $amount;
 
     public function __construct(int $amount)
