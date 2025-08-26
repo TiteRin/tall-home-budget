@@ -90,6 +90,10 @@ class BillsManager extends Component
     #[On('editBill')]
     public function editBill(int $billId): void
     {
+        if (!$this->bills->contains('id', $billId)) {
+            throw new ModelNotFoundException();
+        }
+
         $this->isEditing = true;
         $this->editingBillId = $billId;
     }

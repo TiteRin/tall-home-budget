@@ -215,5 +215,10 @@ describe('Édition de dépense', function () {
         expect($component->get('isEditing'))->toBeFalse()
             ->and($component->get('editingBillId'))->toBeNull();
     });
+
+    test('shouldn’t edit a non existing bill', function () {
+        $component = Livewire::test(BillsManager::class);
+        $component->dispatch('editBill', billId: 99999);
+    })->throws(ModelNotFoundException::class);
 });
 
