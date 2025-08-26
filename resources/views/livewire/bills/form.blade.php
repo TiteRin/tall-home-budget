@@ -59,6 +59,11 @@
         @enderror
     </td>
     <td>
-        <button class="btn btn-primary w-full" wire:click.prevent="addBill" type="button">Ajouter</button>
+        @if ($this->bill)
+            <button class="btn btn-primary w-full" wire:click.prevent="saveBill" type="button">Sauvegarder</button>
+            <button class="btn w-full" wire:click.prevent="cancelEdition" type="button">Annuler</button>
+        @else
+            <button class="btn btn-primary w-full" wire:click.prevent="addBill" type="button">Ajouter</button>
+        @endif
     </td>
 </tr>

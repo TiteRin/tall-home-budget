@@ -5,6 +5,7 @@ namespace App\Livewire;
 use App\Actions\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Models\Bill;
 use App\Models\Member;
 use Closure;
 use Exception;
@@ -21,6 +22,8 @@ class BillForm extends Component
     public Collection $householdMembers;
     #[Prop]
     public bool $hasJointAccount = true;
+    #[Prop]
+    public ?Bill $bill = null;
 
     public string $newName = '';
     public int $newAmount;
@@ -32,6 +35,14 @@ class BillForm extends Component
     {
         $this->newDistributionMethod = ($this->defaultDistributionMethod ?? DistributionMethod::EQUAL)->value;
         $this->householdMembers = $this->householdMembers ?? collect();
+
+        if ($this->bill) {
+            $this->newName = $this->bill->name;
+            $this->newAmount = $this->bill->amount->value();
+            $this->formattedNewAmount = $this->bill->amount->toCurrency();
+            $this->newDistributionMethod = $this->bill->distribution_method->value;
+            $this->newMemberId = $this->bill->member_id;
+        }
     }
 
     /**

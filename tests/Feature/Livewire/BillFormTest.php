@@ -405,3 +405,62 @@ describe("when the creation fails", function () {
         $this->livewireTest->assertDispatched('notify', type: 'error', details: 'Can’t save the bill');
     });
 });
+
+describe("when a bill is edited", function () {
+    beforeEach(function () {
+        $household = bill_factory()->household();
+        $memberHuey = bill_factory()->member([
+            'first_name' => 'Huey',
+            'last_name' => 'Duck',
+        ], $household);
+        $memberDewey = bill_factory()->member([
+            'first_name' => 'Dewey',
+            'last_name' => 'Duck',
+        ], $household);
+        $memberLouis = bill_factory()->member([
+            'first_name' => 'Louis',
+            'last_name' => 'Duck',
+        ], $household);;
+
+        $householdMembers = [$memberHuey, $memberDewey, $memberLouis];
+
+        $bill = bill_factory()->bill([
+            'name' => 'Internet',
+            'amount' => 4200,
+            'distribution_method' => DistributionMethod::PRORATA,
+        ], $memberHuey, $household);
+
+        $this->billFormProps = [
+            'householdMembers' => collect($householdMembers),
+            'defaultDistributionMethod' => DistributionMethod::EQUAL,
+            'hasJointAccount' => false,
+            'bill' => $bill,
+        ];
+    });
+
+    test("should accept a bill as a prop", function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSet('bill', $this->billFormProps['bill']);
+    });
+
+    test("the form should have the bill name in the newName field", function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSet('newName', 'Internet');
+    });
+
+    test("the form should have the bill amount in the newAmount field", function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSet('newAmount', 4200)
+            ->assertSet('formattedNewAmount', '42,00 €');
+    });
+
+    test('the form should have the bill distribution method in the newDistributionMethod field', function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSet('newDistributionMethod', DistributionMethod::PRORATA->value);
+    });
+
+    test('the form should have the bill member in the newMemberId field', function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSet('newMemberId', $this->billFormProps['bill']->member->id);
+    });
+});
