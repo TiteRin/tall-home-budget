@@ -31,12 +31,20 @@ class BillForm extends Component
     public string $newDistributionMethod;
     public int|null $newMemberId = null;
 
+    /**
+     * @throws Exception
+     */
     public function mount(): void
     {
         $this->newDistributionMethod = ($this->defaultDistributionMethod ?? DistributionMethod::EQUAL)->value;
         $this->householdMembers = $this->householdMembers ?? collect();
 
         if ($this->bill) {
+
+            if ($this->bill->member_id && !$this->householdMembers->contains('id', $this->bill->member_id)) {
+                throw new Exception("Incoherent data: the bill's member is not in the household members list.");
+            }
+
             $this->newName = $this->bill->name;
             $this->newAmount = $this->bill->amount->value();
             $this->formattedNewAmount = $this->bill->amount->toCurrency();

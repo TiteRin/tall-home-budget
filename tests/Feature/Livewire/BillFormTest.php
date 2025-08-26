@@ -463,4 +463,9 @@ describe("when a bill is edited", function () {
         Livewire::test(BillForm::class, $this->billFormProps)
             ->assertSet('newMemberId', $this->billFormProps['bill']->member->id);
     });
+
+    test('if the bill references a member that’s not in the household, it should throw an error', function () {
+        $this->billFormProps['bill']->member_id = 1000;
+        Livewire::test(BillForm::class, $this->billFormProps);
+    })->throws(Exception::class, "Incoherent data: the bill's member is not in the household members list.");
 });
