@@ -17,7 +17,16 @@
         </thead>
         <tbody>
         @forelse($bills as $index => $bill)
-            @livewire('bills.row', ['bill' => $bill], key($bill->id))
+            @if ($bill->id === $this->editingBillId && $this->isEditing === true)
+                @livewire('bill-form', [
+                    'householdMembers' => $this->householdMembers,
+                    'hasJointAccount' => $this->hasHouseholdJointAccount,
+                    'defaultDistributionMethod' => $this->defaultDistributionMethod,
+                    'bill' => $bill
+                ])
+            @else
+                @livewire('bills.row', ['bill' => $bill], key($bill->id))
+            @endif
         @empty
             <tr>
                 <td colspan="6">

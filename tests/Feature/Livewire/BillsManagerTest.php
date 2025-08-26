@@ -220,5 +220,11 @@ describe('Édition de dépense', function () {
         $component = Livewire::test(BillsManager::class);
         $component->dispatch('editBill', billId: 99999);
     })->throws(ModelNotFoundException::class);
+
+    test('when editing, should use a BillForm component', function () {
+        $component = Livewire::test(BillsManager::class);
+        $component->dispatch('editBill', billId: $this->bill->id);
+        $component->assertSeeLivewire('bill-form');
+    });
 });
 
