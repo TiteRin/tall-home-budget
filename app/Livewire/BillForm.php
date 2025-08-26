@@ -147,6 +147,16 @@ class BillForm extends Component
         }
     }
 
+    public function saveBill()
+    {
+        $this->dispatch('billHasBeenUpdated');
+    }
+
+    public function cancelEdition()
+    {
+        $this->dispatch('cancelEditBill');
+    }
+
     public function updatedFormattedNewAmount(string $newAmount): void
     {
         if (!Amount::isValid($newAmount)) {

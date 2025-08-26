@@ -468,4 +468,18 @@ describe("when a bill is edited", function () {
         $this->billFormProps['bill']->member_id = 1000;
         Livewire::test(BillForm::class, $this->billFormProps);
     })->throws(Exception::class, "Incoherent data: the bill's member is not in the household members list.");
+
+    test('the form should display save button', function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSee("Sauvegarder")
+            ->call('saveBill')
+            ->assertDispatched('billHasBeenUpdated');
+    });
+
+    test('the form should display cancel button', function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->assertSee("Annuler")
+            ->call('cancelEdition')
+            ->assertDispatched('cancelEditBill');
+    });
 });
