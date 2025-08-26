@@ -175,3 +175,45 @@ test('should maintain correct bills after deletion', function () {
     expect($firstIndex)->toBeLessThan($thirdIndex);
 });
 
+describe('Édition de dépense', function () {
+    beforeEach(function () {
+        $this->member = bill_factory()->member([], $this->household);
+        $this->bill = bill_factory()->bill(['name' => 'Facture test'], $this->member, $this->household);
+    });
+
+    test('should switch to edit mode when editBill is triggered', function () {
+        $component = Livewire::test(BillsManager::class);
+
+        expect($component->get('isEditing'))->toBeFalse()
+            ->and($component->get('editingBillId'))->toBeNull();
+
+        $component->dispatch('editBill', billId: $this->bill->id);
+
+        expect($component->get('isEditing'))->toBeTrue()
+            ->and($component->get('editingBillId'))->toBe($this->bill->id);
+    });
+
+    test('should quit edit mode when cancelEdit is triggered', function () {
+        $component = Livewire::test(BillsManager::class);
+        $component
+            ->set('isEditing', true)
+            ->set('editingBillId', 10)
+            ->dispatch('cancelEditBill');
+
+        expect($component->get('isEditing'))->toBeFalse()
+            ->and($component->get('editingBillId'))->toBeNull();
+    });
+
+    test('should quit edit mode et refresh bills when billHasBeenUpdated is triggered', function () {
+        $component = Livewire::test(BillsManager::class);
+
+        $component
+            ->set('isEditing', true)
+            ->set('editingBillId', 10)
+            ->dispatch('billHasBeenUpdated');
+
+        expect($component->get('isEditing'))->toBeFalse()
+            ->and($component->get('editingBillId'))->toBeNull();
+    });
+});
+

@@ -19,10 +19,8 @@ class BillsManager extends Component
 
     public Collection $bills;
 
-    public string $newName = '';
-    public float $newAmount = 0;
-    public DistributionMethod $newDistributionMethod = DistributionMethod::EQUAL;
-    public int|null $newMemberId = null;
+    public bool $isEditing = false;
+    public ?int $editingBillId = null;
 
     public function boot(HouseholdService $householdService, BillService $billService): void
     {
@@ -86,6 +84,28 @@ class BillsManager extends Component
             throw new ModelNotFoundException();
         }
         $bill->delete();
+        $this->refreshBills();
+    }
+
+    #[On('editBill')]
+    public function editBill(int $billId): void
+    {
+        $this->isEditing = true;
+        $this->editingBillId = $billId;
+    }
+
+    #[On('cancelEditBill')]
+    public function cancelEditBill(): void
+    {
+        $this->isEditing = false;
+        $this->editingBillId = null;
+    }
+
+    #[On('billHasBeenUpdated')]
+    public function saveBill(): void
+    {
+        $this->isEditing = false;
+        $this->editingBillId = null;
         $this->refreshBills();
     }
 }
