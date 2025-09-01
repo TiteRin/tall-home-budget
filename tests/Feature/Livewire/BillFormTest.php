@@ -6,8 +6,6 @@ use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
 use App\Models\Bill;
 use App\Models\Household;
-use App\Repositories\Contracts\BillRepository;
-use App\Repositories\Fake\FakeBillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
@@ -253,21 +251,16 @@ describe("when the creation succeeds", function () {
         $this->household = bill_factory()->household(['name' => 'Test Household', 'has_joint_account' => true, 'default_distribution_method' => DistributionMethod::EQUAL]);
         $this->member = bill_factory()->member(['first_name' => 'John', 'last_name' => 'Doe'], $this->household);
 
-        $this->fakeRepository = new FakeBillRepository();
-
-        $householdId = 4444;
-        $household = new Household();
-        $household->setAttribute('id', $householdId);
         $this->householdService = m::mock(HouseholdServiceContract::class);
-        $this->householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($household);
+        $this->householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($this->household);;
 
-        $this->fakeAction = new class($this->fakeRepository, $this->householdService) extends CreateBill {
+        $this->fakeAction = new class($this->householdService) extends CreateBill {
 
             private $hasBeenCalled = false;
 
-            public function __construct(readonly private BillRepository $billRepository, readonly private HouseholdServiceContract $householdService)
+            public function __construct(readonly private HouseholdServiceContract $householdService)
             {
-                parent::__construct($this->billRepository, $this->householdService);
+                parent::__construct($this->householdService);
             }
 
             public function handle(string $billName, Amount $amount, DistributionMethod $distributionMethod, ?int $memberId = null): Bill
@@ -316,7 +309,7 @@ describe("when the creation succeeds", function () {
 
     test("a new bill should have been persisted", function () {
 
-        $bill = $this->fakeRepository->getLastCreatedBill();
+        $bill = Bill::where('name', 'Internet')->first();;
 
         expect($bill)
             ->toBeInstanceOf(Bill::class)
@@ -351,14 +344,13 @@ describe("when the creation fails", function () {
         $household->setAttribute('id', $householdId);
         $this->householdService = m::mock(HouseholdServiceContract::class);
 
-        $this->fakeRepository = new FakeBillRepository();
-        $this->fakeAction = new class($this->fakeRepository, $this->householdService) extends CreateBill {
+        $this->fakeAction = new class($this->householdService) extends CreateBill {
 
             private $hasBeenCalled = false;
 
-            public function __construct(readonly private BillRepository $billRepository, readonly private HouseholdServiceContract $householdService)
+            public function __construct(readonly private HouseholdServiceContract $householdService)
             {
-                parent::__construct($this->billRepository, $this->householdService);
+                parent::__construct($this->householdService);
             }
 
             public function handle(string $billName, Amount $amount, DistributionMethod $distributionMethod, ?int $memberId = null): Bill
@@ -397,7 +389,7 @@ describe("when the creation fails", function () {
     });
 
     test('the bill is non existant', function () {
-        $bill = $this->fakeRepository->getLastCreatedBill();
+        $bill = Bill::query()->latest('id')->first();
         expect($bill)->toBeNull();
     });
 

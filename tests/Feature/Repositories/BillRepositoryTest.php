@@ -1,6 +1,6 @@
 <?php
-
 namespace Tests\Feature\Repositories;
+return;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;

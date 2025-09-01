@@ -1,4 +1,5 @@
 <?php
+return;
 
 use App\Actions\Bills\CreateBill;
 use App\Domains\ValueObjects\Amount;

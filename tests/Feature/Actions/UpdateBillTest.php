@@ -7,7 +7,6 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Exceptions\Households\InvalidHouseholdException;
 use App\Exceptions\Households\MismatchedHouseholdException;
-use App\Repositories\Fake\FakeBillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -18,7 +17,6 @@ use ValueError;
 uses(RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->fakeRepository = new FakeBillRepository();
     $this->householdService = m::mock(HouseholdServiceContract::class);
 
     $this->household = bill_factory()->household(['has_joint_account' => true]);

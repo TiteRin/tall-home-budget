@@ -5,9 +5,11 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
-use App\Repositories\Fake\FakeBillRepository;
 use App\Services\Household\HouseholdServiceContract;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery as m;
+
+uses(RefreshDatabase::class);
 
 afterEach(function () {
     m::close();
@@ -15,15 +17,11 @@ afterEach(function () {
 
 test('CreateBill should create a new bill with the correct value', function () {
 
-    $fakeRepository = new FakeBillRepository();
-
-    $householdId = 4444;
-    $household = new Household();
-    $household->setAttribute('id', $householdId);
+    $household = Household::factory()->create();
     $householdService = m::mock(HouseholdServiceContract::class);
     $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($household);
 
-    $action = new CreateBill($fakeRepository, $householdService);
+    $action = new CreateBill($householdService);
     $bill = $action->handle(
         'Internet',
         new Amount(4200),

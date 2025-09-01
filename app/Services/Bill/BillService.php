@@ -2,9 +2,9 @@
 
 namespace App\Services\Bill;
 
+use App\Models\Bill as BillModel;
 use App\Models\Household;
 use App\Presenters\BillsOverviewPresenter;
-use App\Repositories\Contracts\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Support\Collection;
 
@@ -12,7 +12,6 @@ readonly class BillService
 {
     public function __construct(
         protected HouseholdServiceContract $householdService,
-        protected BillRepository         $billRepository,
         protected BillsOverviewPresenter $presenter
     ) {}
 
@@ -25,7 +24,10 @@ readonly class BillService
             return BillsOverviewPresenter::empty();
         }
 
-        $bills = $this->billRepository->listForHousehold($household->id);
+        $bills = BillModel::query()
+            ->where('household_id', $household->id)
+            ->with('member')
+            ->get();
         $household->setRelation('bills', $bills);
 
         return $this->presenter->present($household, $bills);
@@ -39,7 +41,10 @@ readonly class BillService
             return collect();
         }
 
-        return $this->billRepository->listForHousehold($household->id);
+        return BillModel::query()
+            ->where('household_id', $household->id)
+            ->with('member')
+            ->get();
     }
 
     private function getHousehold(int $householdId = null): ?Household

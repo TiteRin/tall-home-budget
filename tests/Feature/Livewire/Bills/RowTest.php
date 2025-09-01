@@ -3,8 +3,6 @@
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\Bills\Row;
-use App\Repositories\Contracts\BillRepository;
-use App\Repositories\Fake\FakeBillRepository;
 use Livewire\Livewire;
 
 it('renders successfully', function () {
@@ -15,8 +13,6 @@ it('renders successfully', function () {
 describe("Should display a bill", function () {
     beforeEach(function () {
 
-        $this->fakeRepository = new FakeBillRepository();
-        $this->app->instance(BillRepository::class, $this->fakeRepository);
 
         $this->bill = bill_factory()->bill([
             'name' => 'Test bill',

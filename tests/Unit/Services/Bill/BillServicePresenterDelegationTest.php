@@ -3,12 +3,12 @@
 use App\Models\Bill as BillModel;
 use App\Models\Household as HouseholdModel;
 use App\Presenters\BillsOverviewPresenter;
-use App\Repositories\Contracts\BillRepository;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdServiceContract;
-use Illuminate\Support\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery as m;
 
+uses(RefreshDatabase::class);
 
 afterEach(function () {
     m::close();
@@ -16,37 +16,33 @@ afterEach(function () {
 
 test('getBillsForHousehold delegates to presenter with resolved household and bills', function () {
     // Arrange
-    $householdId = 3001;
+    $household = HouseholdModel::factory()->create();
 
-    $household = new HouseholdModel();
-    $household->setAttribute('id', $householdId);
-
-    $bill = new BillModel();
-    $bill->setAttribute('id', 2001);
-    $bills = new Collection([$bill]);
+    $bill = BillModel::factory()->create([
+        'household_id' => $household->id,
+    ]);
+    $bills = BillModel::query()->where('household_id', $household->id)->with('member')->get();
 
     $householdService = m::mock(HouseholdServiceContract::class);
-    $householdService->shouldReceive('getHousehold')->once()->with($householdId)->andReturn($household);
-
-    $billRepository = m::mock(BillRepository::class);
-    $billRepository->shouldReceive('listForHousehold')->once()->with($householdId)->andReturn($bills);
+    $householdService->shouldReceive('getHousehold')->once()->with($household->id)->andReturn($household);
 
     // Presenter mocké: on vérifie que BillService lui délègue bien
     $presenter = m::mock(BillsOverviewPresenter::class);
     $presenter->shouldReceive('present')
         ->once()
-        ->with($household, $bills)
+        ->with($household, \Mockery::on(function ($arg) use ($bills) {
+            // compare collections by ids
+            return $arg instanceof \Illuminate\Support\Collection && $arg->pluck('id')->sort()->values()->all() === $bills->pluck('id')->sort()->values()->all();
+        }))
         ->andReturn(['bills' => 'X', 'household_summary' => 'Y']);
 
-    // SUT — ce constructeur nécessite l'injection du Presenter (TDD: ce test échouera tant que ce n'est pas le cas)
     $service = new BillService(
         $householdService,
-        $billRepository,
         $presenter
     );
 
     // Act
-    $result = $service->getBillsForHousehold($householdId);
+    $result = $service->getBillsForHousehold($household->id);
 
     // Assert
     expect($result)->toBe(['bills' => 'X', 'household_summary' => 'Y']);
