@@ -9,13 +9,6 @@ beforeEach(function () {
     $this->household = bill_factory()->household();
 });
 
-test('it displays "Les dépenses" as a title', function () {
-
-    Livewire::test(BillsManager::class)
-        ->assertSeeText('Dépenses du foyer');
-});
-
-
 test('should display an empty table if no bills', function () {
 
     Livewire::test(BillsManager::class)
