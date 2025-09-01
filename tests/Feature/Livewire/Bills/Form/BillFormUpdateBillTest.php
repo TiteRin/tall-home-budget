@@ -95,12 +95,6 @@ describe("when a bill is edited", function () {
 
 describe('when the save button is clicked', function () {
 
-    test('it should dispatch the billHasBeenUpdated event', function () {
-        Livewire::test(BillForm::class, $this->billFormProps)
-            ->call('saveBill')
-            ->assertDispatched('billHasBeenUpdated');
-    });
-
     test('it should not dispatch unrelated events (like cancelEditBill)', function () {
         Livewire::test(BillForm::class, $this->billFormProps)
             ->call('saveBill')
@@ -180,8 +174,57 @@ describe("when the update succeeds", function () {
             ->and($this->bill->distribution_method)->toEqual(DistributionMethod::EQUAL)
             ->and($this->bill->member_id)->toEqual($this->memberLouis->id);
     });
+
+    test('it should dispatch the billHasBeenUpdated event', function () {
+        $this->component->assertDispatched('billHasBeenUpdated');
+    });
 });
 
 describe("when the update fails", function () {
 
+    beforeEach(function () {
+
+        $this->householdService = m::mock(HouseholdServiceContract::class);
+        $this->householdService->shouldReceive('getCurrentHousehold')->never();
+
+        $this->fakeAction = new class($this->householdService) extends UpdateBill {
+
+            private $hasBeenCalled = false;
+
+            public function __construct(readonly private HouseholdServiceContract $householdService)
+            {
+                parent::__construct($this->householdService);
+            }
+
+            public function handle(int $billId, array $data): Bill
+            {
+                $this->hasBeenCalled = true;
+
+                throw new Exception('Can’t save the bill');
+            }
+
+            public function hasBeenCalled()
+            {
+                return $this->hasBeenCalled;
+
+            }
+        };
+
+        app()->instance(UpdateBill::class, $this->fakeAction);
+
+        $this->component = Livewire::test(BillForm::class, $this->billFormProps)
+            ->set('newName', 'Nouveau nom')
+            ->set('formattedNewAmount', '70')
+            ->set('newDistributionMethod', DistributionMethod::EQUAL->value)
+            ->set('newMemberId', $this->memberLouis->id)
+            ->call('saveBill');
+    });
+
+    test('the action should have been called', function () {
+        expect($this->fakeAction->hasBeenCalled())->toBeTrue();
+    });
+
+    test('it should dispatch an error event', function () {
+        $this->component->assertDispatched('notify', type: 'error', details: 'Can’t save the bill');
+    });
 });

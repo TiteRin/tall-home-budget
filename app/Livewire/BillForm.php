@@ -152,17 +152,21 @@ class BillForm extends Component
     {
         $this->validate();
 
-        $updateBill->handle(
-            $this->bill->id,
-            [
-                'name' => $this->newName,
-                'amount' => new Amount($this->newAmount),
-                'distribution_method' => DistributionMethod::from($this->newDistributionMethod),
-                'member_id' => $this->newMemberId === -1 ? null : $this->newMemberId,
-            ]
-        );
+        try {
+            $updateBill->handle(
+                $this->bill->id,
+                [
+                    'name' => $this->newName,
+                    'amount' => new Amount($this->newAmount),
+                    'distribution_method' => DistributionMethod::from($this->newDistributionMethod),
+                    'member_id' => $this->newMemberId === -1 ? null : $this->newMemberId,
+                ]
+            );
+            $this->dispatch('billHasBeenUpdated');
+        } catch (Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Une erreur est survenue.', details: $e->getMessage());
+        }
 
-        $this->dispatch('billHasBeenUpdated');
     }
 
     public function cancelEdition()
