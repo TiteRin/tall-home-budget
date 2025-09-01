@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Models;
 
-use App\Exceptions\MismatchedHouseholdException;
+use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;

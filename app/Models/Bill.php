@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Casts\AmountCast;
 use App\Enums\DistributionMethod;
-use App\Exceptions\MismatchedHouseholdException;
+use App\Exceptions\Households\MismatchedHouseholdException;
 use Database\Factories\BillFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

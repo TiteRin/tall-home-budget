@@ -48,6 +48,7 @@ class FakeBillRepository implements BillRepository
         $bill->distribution_method = $distributionMethod;
         $bill->household_id = $householdId;
         $bill->member_id = $memberId;
+        $bill->id = $this->bills->count() + 1;
 
         // Add to our collection
         $this->bills->push($bill);

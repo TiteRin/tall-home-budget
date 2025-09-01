@@ -9,6 +9,23 @@ use Illuminate\Support\Collection;
 
 interface BillRepository
 {
+    /**
+     * @param int $billId
+     * @return Bill|null
+     */
+    public function find(int $billId): ?Bill;
+
+    /**
+     * @param int $householdId
+     * @return Collection
+     */
+    public function listForHousehold(int $householdId): Collection;
+
+    /**
+     * @param int $memberId
+     * @return Collection
+     */
+    public function listForMember(int $memberId): Collection;
 
     /**
      * Create a new bill
@@ -27,10 +44,4 @@ interface BillRepository
         int                $householdId,
         ?int               $memberId = null
     ): Bill;
-
-    public function find(int $billId): ?Bill;
-
-    public function listForHousehold(int $householdId): Collection;
-
-    public function listForMember(int $memberId): Collection;
 }
