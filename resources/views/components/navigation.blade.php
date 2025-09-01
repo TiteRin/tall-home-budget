@@ -16,10 +16,10 @@
                 <a href="{{ route('household.settings') }}">Paramétrage</a>
             </li>
             <li>
-                <a href="{{ route('bills.settings') }}">Dépenses</a>
+                <a href="{{ route('bills') }}">Dépenses</a>
             </li>
         </ul>
     </details>
 
-    
+
 </div>

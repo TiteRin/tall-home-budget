@@ -11,9 +11,12 @@
 |
 */
 
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Support\BillFactory;
+
 pest()->extend(Tests\TestCase::class)
  // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+ ->in('Feature', 'Http', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +33,16 @@ expect()->extend('toBeOne', function () {
     return $this->toBe(1);
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Traits Globaux (facultatifs mais utiles)
+|--------------------------------------------------------------------------
+| Par exemple : appliquer RefreshDatabase automatiquement dans certains dossiers.
+| Cela évite d’avoir à faire "uses(RefreshDatabase::class);" dans chaque fichier.
+*/
+uses(RefreshDatabase::class)->in('Feature', 'Http', 'Actions', 'Livewire');
+
 /*
 |--------------------------------------------------------------------------
 | Functions
@@ -44,4 +57,9 @@ expect()->extend('toBeOne', function () {
 function something()
 {
     // ..
+}
+
+function bill_factory(): BillFactory
+{
+    return new BillFactory();
 }

@@ -1,0 +1,8 @@
+{
+    "id": 9001,
+    "name": "Groceries",
+    "amount": 12345,
+    "distribution_method": "equal",
+    "household_id": 4001,
+    "member_id": null
+}

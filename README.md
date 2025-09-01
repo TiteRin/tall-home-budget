@@ -56,6 +56,11 @@ DB_PORT=5432
 DB_DATABASE=your_database_name
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
+
+# pgAdmin Configuration
+PGADMIN_PORT=5050
+PGADMIN_DEFAULT_EMAIL=admin@example.com
+PGADMIN_DEFAULT_PASSWORD=admin
 ```
 
 5. Démarrer les conteneurs Docker :
@@ -74,7 +79,22 @@ DB_PASSWORD=your_password
 ./vendor/bin/sail npm run dev
 ```
 
+8. Générer la clef privée
+```bash
+./vendor/bin/sail artisan key:generate
+```
+
 L'application sera accessible à l'adresse : http://localhost:8080
+
+pgAdmin sera accessible à l'adresse : http://localhost:5050 (ou le port configuré dans PGADMIN_PORT)
+- Utilisez l'email et le mot de passe configurés dans les variables PGADMIN_DEFAULT_EMAIL et PGADMIN_DEFAULT_PASSWORD pour vous connecter
+- Pour configurer une connexion à la base de données PostgreSQL, utilisez :
+  - Nom : Votre choix (ex: "Home Budget DB")
+  - Hôte : pgsql
+  - Port : 5432
+  - Base de données : la valeur de DB_DATABASE
+  - Nom d'utilisateur : la valeur de DB_USERNAME
+  - Mot de passe : la valeur de DB_PASSWORD
 
 ## Commandes utiles
 

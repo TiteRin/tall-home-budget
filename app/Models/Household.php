@@ -2,16 +2,15 @@
 
 namespace App\Models;
 
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
-use App\Traits\HasCurrencyFormatting;
-
 class Household extends Model
 {
-    use HasFactory, HasCurrencyFormatting;
+    use HasFactory;
 
     protected $fillable = ['name', 'has_joint_account', 'default_distribution_method'];
 
@@ -22,26 +21,31 @@ class Household extends Model
 
     public function members(): HasMany
     {
-        return $this->hasMany(Member::class);
+        return $this->hasMany(Member::class, 'household_id');
     }
 
     public function bills(): HasMany
     {
-        return $this->hasMany(Bill::class);
+        return $this->hasMany(Bill::class, 'household_id');
     }
 
-    public function getTotalAmountAttribute(): int
+    public function getTotalAmountAttribute(): Amount
     {
-        return $this->bills->sum('amount') ?? 0;
+        return new Amount($this->bills->sum(fn($bill) => $bill->amount->value()) ?? 0);
     }
 
     public function getTotalAmountFormattedAttribute(): string
     {
-        return $this->formatCurrency($this->total_amount);
+        return $this->total_amount->toCurrency();
     }
 
     public function getDefaultDistributionMethod(): DistributionMethod
     {
         return $this->default_distribution_method ?? DistributionMethod::EQUAL;
+    }
+
+    public function hasJointAccount(): bool
+    {
+        return $this->has_joint_account;
     }
 }

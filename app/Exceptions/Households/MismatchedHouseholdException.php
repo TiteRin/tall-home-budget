@@ -1,5 +1,6 @@
-<?php 
-    namespace App\Exceptions;
+<?php
+
+namespace App\Exceptions\Households;
 
     use Exception;
 
