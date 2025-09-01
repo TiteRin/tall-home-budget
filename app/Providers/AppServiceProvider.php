@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Repositories\BillRepository;
-use App\Repositories\EloquentBillRepository;
+use App\Repositories\Contracts\BillRepository;
+use App\Repositories\Eloquent\EloquentBillRepository;
 use App\Services\Household\HouseholdService;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Support\ServiceProvider;

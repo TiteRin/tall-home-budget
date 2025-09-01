@@ -6,7 +6,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Bill as BillModel;
 use App\Models\Household as HouseholdModel;
 use App\Models\Member as MemberModel;
-use App\Repositories\BillRepository;
+use App\Repositories\Contracts\BillRepository;
 use App\Services\Bill\BillService;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Support\Collection;

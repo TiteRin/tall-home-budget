@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Fake;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
+use App\Repositories\Contracts\BillRepository;
 use Illuminate\Support\Collection;
 
 class FakeBillRepository implements BillRepository
@@ -54,9 +55,19 @@ class FakeBillRepository implements BillRepository
         return $bill;
     }
 
+    public function find(int $billId): ?Bill
+    {
+        return $this->bills->firstWhere('id', $billId);
+    }
+
     public function listForHousehold(int $householdId): Collection
     {
         return $this->bills->where('household_id', $householdId)->values();
+    }
+
+    public function listForMember(int $memberId): Collection
+    {
+        return $this->bills->where('member_id', $memberId)->values();
     }
 
     /**

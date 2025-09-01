@@ -4,7 +4,7 @@ namespace App\Services\Bill;
 
 use App\Models\Household;
 use App\Presenters\BillsOverviewPresenter;
-use App\Repositories\BillRepository;
+use App\Repositories\Contracts\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Support\Collection;
 

@@ -3,8 +3,8 @@
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\Bills\Row;
-use App\Repositories\BillRepository;
-use App\Repositories\FakeBillRepository;
+use App\Repositories\Contracts\BillRepository;
+use App\Repositories\Fake\FakeBillRepository;
 use Livewire\Livewire;
 
 it('renders successfully', function () {

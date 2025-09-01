@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Eloquent;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
+use App\Repositories\Contracts\BillRepository;
 use Illuminate\Support\Collection;
 
 class EloquentBillRepository implements BillRepository
@@ -36,11 +37,24 @@ class EloquentBillRepository implements BillRepository
         ]);
     }
 
+    public function find(int $id): ?Bill
+    {
+        return Bill::find($id);
+    }
+
     public function listForHousehold(int $householdId): Collection
     {
         return Bill::query()
             ->where('household_id', $householdId)
             ->with('member')
+            ->get();
+    }
+
+    public function listForMember(int $memberId): Collection
+    {
+        return Bill::query()
+            ->where('member_id', $memberId)
+            ->with('household')
             ->get();
     }
 }

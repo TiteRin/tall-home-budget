@@ -6,7 +6,7 @@ use App\Actions\Bills\UpdateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Household;
-use App\Repositories\FakeBillRepository;
+use App\Repositories\Fake\FakeBillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Mockery as m;

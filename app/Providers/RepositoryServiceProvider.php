@@ -2,8 +2,8 @@
 
 namespace App\Providers;
 
-use App\Repositories\BillRepository;
-use App\Repositories\EloquentBillRepository;
+use App\Repositories\Contracts\BillRepository;
+use App\Repositories\Eloquent\EloquentBillRepository;
 use Illuminate\Support\ServiceProvider;
 
 class RepositoryServiceProvider extends ServiceProvider

@@ -5,7 +5,7 @@ namespace App\Actions\Bills;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
-use App\Repositories\BillRepository;
+use App\Repositories\Contracts\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Exception;
 

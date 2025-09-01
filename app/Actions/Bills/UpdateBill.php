@@ -4,7 +4,7 @@ namespace App\Actions\Bills;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Repositories\BillRepository;
+use App\Repositories\Contracts\BillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
@@ -27,6 +27,8 @@ class UpdateBill
     {
 
         $currentHousehold = $this->householdService->getCurrentHousehold();
+
+        $existingBill = $this->billRepository->find($billId);
 
         throw new ModelNotFoundException();
     }

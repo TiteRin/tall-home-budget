@@ -5,7 +5,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
-use App\Repositories\FakeBillRepository;
+use App\Repositories\Fake\FakeBillRepository;
 use App\Services\Household\HouseholdServiceContract;
 use Mockery as m;
 

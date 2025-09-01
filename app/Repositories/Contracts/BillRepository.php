@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Contracts;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 
 interface BillRepository
 {
+
     /**
      * Create a new bill
      *
@@ -27,5 +28,9 @@ interface BillRepository
         ?int               $memberId = null
     ): Bill;
 
+    public function find(int $billId): ?Bill;
+
     public function listForHousehold(int $householdId): Collection;
+
+    public function listForMember(int $memberId): Collection;
 }
