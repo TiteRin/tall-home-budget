@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Actions;
+namespace App\Actions\Bills;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;

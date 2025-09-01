@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\CreateBill;
+use App\Actions\Bills\CreateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
