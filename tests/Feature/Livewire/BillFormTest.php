@@ -471,15 +471,52 @@ describe("when a bill is edited", function () {
 
     test('the form should display save button', function () {
         Livewire::test(BillForm::class, $this->billFormProps)
-            ->assertSee("Sauvegarder")
-            ->call('saveBill')
-            ->assertDispatched('billHasBeenUpdated');
+            ->assertSee("Sauvegarder");
     });
 
     test('the form should display cancel button', function () {
         Livewire::test(BillForm::class, $this->billFormProps)
-            ->assertSee("Annuler")
-            ->call('cancelEdition')
-            ->assertDispatched('cancelEditBill');
+            ->assertSee("Annuler");
+    });
+
+    describe('when the save button is clicked', function () {
+
+        test('it should dispatch the billHasBeenUpdated event', function () {
+            Livewire::test(BillForm::class, $this->billFormProps)
+                ->call('saveBill')
+                ->assertDispatched('billHasBeenUpdated');
+        });
+
+        test('it should dispatch even if fields are edited', function () {
+            Livewire::test(BillForm::class, $this->billFormProps)
+                ->set('newName', 'Fibre')
+                ->set('formattedNewAmount', '52,50')
+                ->set('newDistributionMethod', DistributionMethod::EQUAL->value)
+                ->set('newMemberId', $this->billFormProps['householdMembers']->first()->id)
+                ->call('saveBill')
+                ->assertDispatched('billHasBeenUpdated');
+        });
+
+        test('it should keep the current form values (no reset on save)', function () {
+            $firstMemberId = $this->billFormProps['householdMembers']->first()->id;
+
+            Livewire::test(BillForm::class, $this->billFormProps)
+                ->set('newName', 'Mobile')
+                ->set('formattedNewAmount', '19,99')
+                ->set('newDistributionMethod', DistributionMethod::EQUAL->value)
+                ->set('newMemberId', $firstMemberId)
+                ->call('saveBill')
+                ->assertSet('newName', 'Mobile')
+                ->assertSet('formattedNewAmount', '19,99 €')
+                ->assertSet('newDistributionMethod', DistributionMethod::EQUAL->value)
+                ->assertSet('newMemberId', $firstMemberId);
+        });
+
+        test('it should not dispatch unrelated events (like cancelEditBill)', function () {
+            Livewire::test(BillForm::class, $this->billFormProps)
+                ->call('saveBill')
+                ->assertNotDispatched('cancelEditBill');
+        });
+
     });
 });
