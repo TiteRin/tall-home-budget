@@ -106,6 +106,19 @@ describe('when the save button is clicked', function () {
             ->call('saveBill')
             ->assertNotDispatched('cancelEditBill');
     });
+
+    test('it should validates the form', function () {
+        Livewire::test(BillForm::class, $this->billFormProps)
+            ->set('newName', '')
+            ->set('newDistributionMethod', '')
+            ->set('newMemberId', '')
+            ->call('saveBill')
+            ->assertHasErrors([
+                'newName' => 'required',
+                'newDistributionMethod' => 'required',
+                'newMemberId' => 'required',
+            ]);
+    });
 });
 
 describe("when the update succeeds", function () {
