@@ -3,6 +3,7 @@
 namespace Tests\Feature\Livewire\Bills\Form;
 
 use App\Actions\Bills\UpdateBill;
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillForm;
 use App\Models\Bill;
@@ -34,7 +35,7 @@ beforeEach(function () {
 
     $householdMembers = [$this->memberHuey, $this->memberDewey, $this->memberLouis];
 
-    $bill = bill_factory()->bill([
+    $this->bill = bill_factory()->bill([
         'name' => 'Internet',
         'amount' => 4200,
         'distribution_method' => DistributionMethod::PRORATA,
@@ -44,7 +45,7 @@ beforeEach(function () {
         'householdMembers' => collect($householdMembers),
         'defaultDistributionMethod' => DistributionMethod::EQUAL,
         'hasJointAccount' => false,
-        'bill' => $bill,
+        'bill' => $this->bill,
     ];
 });
 
@@ -141,7 +142,7 @@ describe("when the update succeeds", function () {
 
         $this->component = Livewire::test(BillForm::class, $this->billFormProps)
             ->set('newName', 'Nouveau nom')
-            ->set('formattedNewAmount', '7000')
+            ->set('formattedNewAmount', '70')
             ->set('newDistributionMethod', DistributionMethod::EQUAL->value)
             ->set('newMemberId', $this->memberLouis->id)
             ->call('saveBill');
@@ -153,6 +154,18 @@ describe("when the update succeeds", function () {
 
     test('the action should have been called', function () {
         expect($this->fakeAction->hasBeenCalled())->toBeTrue();
+    });
+
+    test('the bill should have been updated', function () {
+
+        $this->bill->refresh();
+
+        expect($this->bill)
+            ->toBeInstanceOf(Bill::class)
+            ->and($this->bill->name)->toBe('Nouveau nom')
+            ->and($this->bill->amount)->toEqual(new Amount(7000))
+            ->and($this->bill->distribution_method)->toEqual(DistributionMethod::EQUAL)
+            ->and($this->bill->member_id)->toEqual($this->memberLouis->id);
     });
 });
 
