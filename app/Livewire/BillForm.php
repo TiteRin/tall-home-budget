@@ -3,6 +3,7 @@
 namespace App\Livewire;
 
 use App\Actions\Bills\CreateBill;
+use App\Actions\Bills\UpdateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
@@ -147,8 +148,20 @@ class BillForm extends Component
         }
     }
 
-    public function saveBill()
+    public function saveBill(UpdateBill $updateBill)
     {
+        $this->validate();
+
+        $updateBill->handle(
+            $this->bill->id,
+            [
+                'name' => $this->newName,
+                'amount' => new Amount($this->newAmount),
+                'distribution_method' => DistributionMethod::from($this->newDistributionMethod),
+                'member_id' => $this->newMemberId === -1 ? null : $this->newMemberId,
+            ]
+        );
+
         $this->dispatch('billHasBeenUpdated');
     }
 
