@@ -121,7 +121,6 @@ describe("should not validate that string…", function () {
 
 
 describe('extraction methods', function () {
-
     test('should remove currency symbols', function () {
         expect(Amount::extractCurrencySymbols("1000€"))->toBe("1000");
     });
@@ -132,5 +131,29 @@ describe('extraction methods', function () {
 
     test('should remove thousands separator', function () {
         expect(Amount::extractThousandsSeparator("1.000.000"))->toBe("1000000");
+    });
+});
+
+describe('conversion methods', function () {
+    test('should convert to string', function () {
+        expect((string)new Amount(1000))->toBe("10,00 €");
+    });
+
+    test('should convert to cents', function () {
+        expect((new Amount(1000))->toCents())->toBe(1000);
+    });
+
+    test('should convert to decimal', function () {
+        expect((new Amount(1000))->toDecimal())->toBe(10.00);
+    });
+});
+
+describe("manipulation methods", function () {
+    test('should add an amount to another amount', function () {
+        $amountA = new Amount(1000);
+        $amountB = new Amount(2000);
+
+        expect($amountA->add($amountB))->toEqual(new Amount(3000));
+        expect($amountB->add($amountA))->toEqual(new Amount(3000));
     });
 });

@@ -69,9 +69,24 @@ class Amount
         return Number::currency($this->amount / 100.0, in: 'EUR', locale: 'fr_FR');
     }
 
+    public function toCents(): int
+    {
+        return $this->amount;
+    }
+
+    public function toDecimal(): float
+    {
+        return $this->amount / 100.0;
+    }
+
     public function __equals(Amount $amount): bool
     {
         return $this->value() === $amount->value();
+    }
+
+    public function add(Amount $amount): Amount
+    {
+        return new Amount($this->value() + $amount->value());
     }
 
     public static function from(string $amount): Amount
@@ -98,5 +113,10 @@ class Amount
         $amount = self::normalizeNumericString($amount);
 
         return is_numeric($amount);
+    }
+
+    public function __toString(): string
+    {
+        return $this->toCurrency();
     }
 }
