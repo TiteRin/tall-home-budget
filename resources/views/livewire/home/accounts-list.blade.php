@@ -15,7 +15,7 @@
                 <tr>
                     <td>{{ $member->full_name }}</td>
                     <td>
-                        <input type="text" wire:model.live="incomes.{{ $member->id }}"/>
+                        <input type="text" class="input" wire:model.blur="incomes.{{ $member->id }}"/>
                     </td>
                 </tr>
             @endforeach
