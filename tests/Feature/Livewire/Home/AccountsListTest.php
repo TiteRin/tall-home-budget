@@ -142,5 +142,15 @@ describe('When a household exists', function () {
                 ->set('incomes.' . $this->memberHuey->id, "500")
                 ->assertDontSee("50%");
         });
+
+        test('when an income is emptied, the ratio should be removed', function () {
+            Livewire::test(AccountsList::class)
+                ->set('incomes.' . $this->memberDewey->id, "500")
+                ->set('incomes.' . $this->memberHuey->id, "500")
+                ->set('incomes.' . $this->memberLouis->id, "1000")
+                ->assertSee('50%')
+                ->set('incomes.' . $this->memberLouis->id, "")
+                ->assertDontSee("50%");
+        });
     });
 });
