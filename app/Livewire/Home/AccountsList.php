@@ -77,6 +77,22 @@ class AccountsList extends Component
         return new Amount(array_sum($this->incomesInCents));
     }
 
+    public function ratioForMember(int $memberId): string
+    {
+        if (empty($this->incomesInCents[$memberId])) {
+            return "-";
+        }
+
+        if (count($this->incomesInCents) !== count($this->members)) {
+            return "-";
+        }
+
+        $ratio = $this->incomesInCents[$memberId] / array_sum($this->incomesInCents) * 100;
+        $ratio = round($ratio, 2);
+
+        return "$ratio%";
+    }
+
     protected function rules(): array
     {
         return [

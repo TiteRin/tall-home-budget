@@ -127,5 +127,20 @@ describe('When a household exists', function () {
                 ->set('incomes.' . $this->memberLouis->id, "")
                 ->assertDontSee("2 000,00 €");
         });
+
+        test('should calculate the ratio between members, once all inputs are filled', function () {
+            Livewire::test(AccountsList::class)
+                ->set('incomes.' . $this->memberDewey->id, "500")
+                ->set('incomes.' . $this->memberHuey->id, "250")
+                ->set('incomes.' . $this->memberLouis->id, "250")
+                ->assertSeeInOrder(["50%", "25%", "25%"]);
+        });
+
+        test('shoud not display ration if not all inputs are filled', function () {
+            Livewire::test(AccountsList::class)
+                ->set('incomes.' . $this->memberDewey->id, "500")
+                ->set('incomes.' . $this->memberHuey->id, "500")
+                ->assertDontSee("50%");
+        });
     });
 });

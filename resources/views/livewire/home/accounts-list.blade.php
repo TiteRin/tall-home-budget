@@ -8,16 +8,28 @@
             <tr>
                 <th>Nom</th>
                 <th>Revenu</th>
+                <th>Ratio</th>
             </tr>
             </thead>
             <tbody>
             @foreach($members as $member)
-                <tr>
-                    <td>{{ $member->full_name }}</td>
-                    <td>
-                        <input type="text" class="input" wire:model.blur="incomes.{{ $member->id }}"/>
-                    </td>
-                </tr>
+                <fieldset>
+                    <tr>
+                        <td>
+                            <label class="cursor-pointer" for="income-{{ $member->id }}">
+                                {{ $member->full_name }}
+                            </label>
+                        </td>
+                        <td>
+                            <input type="text" class="input w-30" wire:model.blur="incomes.{{ $member->id }}"
+                                   id="income-{{ $member->id }}"
+                                   aria-label="Montant du revenu de {{ $member->full_name }}"/>
+                        </td>
+                        <td>
+                            {{ $this->ratioForMember($member->id)  }}
+                        </td>
+                    </tr>
+                </fieldset>
             @endforeach
             </tbody>
             <tfoot>
