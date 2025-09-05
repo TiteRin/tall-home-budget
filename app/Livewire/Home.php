@@ -18,6 +18,6 @@ class Home extends Component
     public function render(): View
     {
         $household = $this->household;
-        return view('livewire.home.home');
+        return view('livewire.home.home', compact('household'));
     }
 }
