@@ -11,24 +11,24 @@ class Home extends Component
 {
     public Household $household;
 
-    public $members;
-    public $bills;
+    private $bills;
     public array $incomes = [];
 
     protected $listeners = [
         'incomeModified' => 'onIncomeModified'
     ];
 
-    public function mount(): void
+    public function mount(Household $household): void
     {
-        $this->members = $this->household->members;
-        $this->bills = $this->household->bills;
+        $this->household = $household;
+        $this->bills = $this->household->bills ?? collect();
     }
 
     public function render(): View
     {
         $household = $this->household;
-        return view('livewire.home.home', compact('household'));
+        $members = $this->household->members->all();
+        return view('livewire.home.home', compact('household', 'members'));
     }
 
     /**
@@ -36,7 +36,7 @@ class Home extends Component
      */
     public function onIncomeModified(int $memberId, ?int $amount): void
     {
-        if (!$this->members->contains('id', $memberId)) {
+        if (!$this->household->members->contains('id', $memberId)) {
             throw new MismatchedHouseholdException();
         }
 
