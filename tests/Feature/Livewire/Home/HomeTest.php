@@ -50,7 +50,7 @@ describe("When the component is mounted", function () {
 });
 
 
-describe("Basic component test", function () {
+describe("Basic component tests", function () {
 
     test('should display the component', function () {
         Livewire::test(Home::class, ['household' => $this->household])
@@ -75,5 +75,46 @@ describe("Basic component test", function () {
     test('should have a MovementsList component', function () {
         Livewire::test(Home::class, ['household' => $this->household])
             ->assertSeeLivewire('home.movements-list');
+    });
+});
+
+describe("Event listener tests", function () {
+
+    beforeEach(function () {
+        $this->memberJohn = bill_factory()->member(['first_name' => 'John'], $this->household);
+        $this->memberMarie = bill_factory()->member(['first_name' => 'Marie'], $this->household);
+
+        $this->billInternet = bill_factory()->bill(['name' => 'Internet', 'amount' => 2999], $this->memberJohn, $this->household);
+        $this->billRent = bill_factory()->bill(['name' => 'Loyer', 'amount' => 67000], null, $this->household);
+        $this->billPhone = bill_factory()->bill(['name' => 'Téléphone', 'amount' => 2498], $this->memberMarie, $this->household);
+    });
+
+    test('should listen to incomeModified event', function () {
+
+        Livewire::test(Home::class, ['household' => $this->household])
+            ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: 210000);
+    })->throwsNoExceptions();
+
+    test('when an income is modified, should add to the incomes state', function () {
+        Livewire::test(Home::class, ['household' => $this->household])
+            ->assertSet('incomes', function (array $incomes) {
+                return empty($incomes);
+            })
+            ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: 210000)
+            ->assertSet('incomes', function (array $incomes) {
+                return $incomes[$this->memberJohn->id] == 210000;
+            });
+    });
+
+    test('when an income is emptied, should remove from the incomes state', function () {
+        Livewire::test(Home::class, ['household' => $this->household])
+            ->set('incomes.' . $this->memberJohn->id, 210000)
+            ->assertSet('incomes', function (array $incomes) {
+                return $incomes[$this->memberJohn->id] == 210000;
+            })
+            ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: null)
+            ->assertSet('incomes', function (array $incomes) {
+                return empty($incomes);
+            });
     });
 });

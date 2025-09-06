@@ -15,6 +15,10 @@ class Home extends Component
     public $bills;
     public array $incomes = [];
 
+    protected $listeners = [
+        'incomeModified' => 'onIncomeModified'
+    ];
+
     public function mount(): void
     {
         $this->members = $this->household->members;
@@ -26,4 +30,16 @@ class Home extends Component
         $household = $this->household;
         return view('livewire.home.home', compact('household'));
     }
+
+    public function onIncomeModified(int $memberId, ?int $amount): void
+    {
+        if ($amount === null) {
+            unset($this->incomes[$memberId]);
+            return;
+        }
+
+        $this->incomes[$memberId] = $amount;
+    }
+
+
 }
