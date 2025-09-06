@@ -11,9 +11,15 @@ class Home extends Component
     #[Prop]
     public Household $household;
 
-    public array $members;
-    public array $bills;
-    public array $incomes;
+    public $members;
+    public $bills;
+    public array $incomes = [];
+
+    public function mount(): void
+    {
+        $this->members = $this->household->members;
+        $this->bills = $this->household->bills;
+    }
 
     public function render(): View
     {
