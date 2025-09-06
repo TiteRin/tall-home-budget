@@ -172,4 +172,20 @@ describe('When incomes are edited', function () {
             ->set('incomes.' . $this->memberLouis->id, "")
             ->assertDontSee("50%");
     });
+
+    describe("events are emitted", function () {
+        test('when an income is modified, should trigger the incomeModified event', function () {
+            Livewire::test(AccountsList::class)
+                ->set('incomes.' . $this->memberDewey->id, "500")
+                ->assertDispatched('incomeModified', memberId: $this->memberDewey->id, amount: 50000);
+        });
+
+        test('when an income is emptied, should trigger the incomeModified event', function () {
+            Livewire::test(AccountsList::class)
+                ->set('incomes.' . $this->memberDewey->id, "500")
+                ->assertDispatched('incomeModified', memberId: $this->memberDewey->id, amount: 50000)
+                ->set('incomes.' . $this->memberDewey->id, "")
+                ->assertDispatched('incomeModified', memberId: $this->memberDewey->id, amount: null);
+        });
+    });
 });

@@ -56,6 +56,8 @@ class AccountsList extends Component
         if (empty($amount)) {
             unset($this->incomes[$memberId]);
             unset($this->incomesInCents[$memberId]);
+
+            $this->dispatch('incomeModified', memberId: $memberId, amount: null);
             return;
         }
 
@@ -64,7 +66,8 @@ class AccountsList extends Component
         $amount = Amount::from($amount);
 
         $this->incomes[$memberId] = $amount->toCurrency();
-        $this->incomesInCents[$memberId] = $amount->toCents();;
+        $this->incomesInCents[$memberId] = $amount->toCents();
+        $this->dispatch('incomeModified', memberId: $memberId, amount: $amount->value());
     }
 
     #[Computed]
