@@ -4,16 +4,14 @@ namespace App\Livewire\Home;
 
 use App\Domains\ValueObjects\Amount;
 use App\Rules\ValidAmount;
-use App\Services\Household\HouseholdServiceContract;
 use Exception;
-use Illuminate\Support\Collection;
 use Illuminate\View\View;
 use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class AccountsList extends Component
 {
-    public Collection $members;
+    public array $members = [];
     public array $incomes = [];
 
     public array $incomesInCents = [];
@@ -21,18 +19,14 @@ class AccountsList extends Component
     /**
      * @throws Exception
      */
-    public function mount(HouseholdServiceContract $householdService): void
+    public function mount(?array $members = []): void
     {
-        if (!$householdService->getCurrentHousehold()) {
-            throw new Exception("No household exists");
-        }
-
-        $this->members = $householdService->getCurrentHousehold()->members;
+        $this->members = $members;
     }
 
     public function render(): View
     {
-        if ($this->members->count() === 0) {
+        if (count($this->members) === 0) {
             return view('livewire.home.accounts-list-empty');
         }
 
