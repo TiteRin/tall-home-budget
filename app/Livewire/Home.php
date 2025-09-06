@@ -21,14 +21,15 @@ class Home extends Component
     public function mount(Household $household): void
     {
         $this->household = $household;
-        $this->bills = $this->household->bills ?? collect();
     }
 
     public function render(): View
     {
         $household = $this->household;
         $members = $this->household->members->all();
-        return view('livewire.home.home', compact('household', 'members'));
+        $bills = $this->household->bills->all();
+
+        return view('livewire.home.home', compact('household', 'members', 'bills'));
     }
 
     /**
