@@ -2,13 +2,13 @@
 
 namespace App\Livewire;
 
+use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Household;
 use Illuminate\Contracts\View\View;
 use Livewire\Component;
 
 class Home extends Component
 {
-    #[Prop]
     public Household $household;
 
     public $members;
@@ -31,8 +31,15 @@ class Home extends Component
         return view('livewire.home.home', compact('household'));
     }
 
+    /**
+     * @throws MismatchedHouseholdException
+     */
     public function onIncomeModified(int $memberId, ?int $amount): void
     {
+        if (!$this->members->contains('id', $memberId)) {
+            throw new MismatchedHouseholdException();
+        }
+
         if ($amount === null) {
             unset($this->incomes[$memberId]);
             return;

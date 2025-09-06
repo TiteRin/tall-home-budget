@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\Home;
 
+use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Livewire\Home;
 use Livewire;
 
@@ -117,4 +118,21 @@ describe("Event listener tests", function () {
                 return empty($incomes);
             });
     });
+
+    test('when an income is modified, should edit to the incomes state', function () {
+        Livewire::test(Home::class, ['household' => $this->household])
+            ->set('incomes.' . $this->memberJohn->id, 210000)
+            ->assertSet('incomes', function (array $incomes) {
+                return $incomes[$this->memberJohn->id] == 210000;
+            })
+            ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: 195000)
+            ->assertSet('incomes', function (array $incomes) {
+                return $incomes[$this->memberJohn->id] == 195000;
+            });
+    });
+
+    test('when an income is modified, the member should be part of the household', function () {
+        Livewire::test(Home::class, ['household' => $this->household])
+            ->dispatch('incomeModified', memberId: 99, amount: 195000);
+    })->throws(MismatchedHouseholdException::class);
 });
