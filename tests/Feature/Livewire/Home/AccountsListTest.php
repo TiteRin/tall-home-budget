@@ -163,24 +163,6 @@ describe('When incomes are edited', function () {
 
     describe("events are emitted", function () {
 
-        beforeEach(function () {
-            $this->household = bill_factory()->household();
-            $this->memberDewey = bill_factory()->member([
-                'first_name' => 'Dewey',
-                'last_name' => 'Duck',
-            ], $this->household);
-            $this->memberHuey = bill_factory()->member([
-                'first_name' => 'Huey',
-                'last_name' => 'Duck',
-            ], $this->household);
-            $this->memberLouis = bill_factory()->member([
-                'first_name' => 'Louis',
-                'last_name' => 'Duck',
-            ], $this->household);
-
-            $this->props = ['members' => [$this->memberDewey, $this->memberHuey, $this->memberLouis]];
-        });
-
         test('when an income is modified, should trigger the incomeModified event', function () {
             Livewire::test(AccountsList::class, $this->props)
                 ->set('incomes.' . $this->memberDewey->id, "500")
