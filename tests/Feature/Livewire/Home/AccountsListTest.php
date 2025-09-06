@@ -82,75 +82,94 @@ describe('When a household exists', function () {
                 ->assertSeeHtml('wire:model.blur="incomes.' . $this->memberHuey->id . '"')
                 ->assertSeeHtml('wire:model.blur="incomes.' . $this->memberLouis->id . '"');
         });
+    });
+});
 
-        test("shouldn’t be possible to set an invalid amount for income", function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, 'abc')
-                ->assertHasErrors(['incomes.' . $this->memberDewey->id => ValidAmount::class]);
-        });
+describe('When incomes are edited', function () {
 
-        test('should convert the income to a correct amount', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, '1540,25')
-                ->assertSet('incomes.' . $this->memberDewey->id, "1 540,25 €");
-        });
+    beforeEach(function () {
+        $this->household = bill_factory()->household();
+        $this->memberDewey = bill_factory()->member([
+            'first_name' => 'Dewey',
+            'last_name' => 'Duck',
+        ], $this->household);
+        $this->memberHuey = bill_factory()->member([
+            'first_name' => 'Huey',
+            'last_name' => 'Duck',
+        ], $this->household);
+        $this->memberLouis = bill_factory()->member([
+            'first_name' => 'Louis',
+            'last_name' => 'Duck',
+        ], $this->household);
+    });
 
-        test('should sum the incomes when an input is changed', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "2000")
-                ->set('incomes.' . $this->memberHuey->id, "1000")
-                ->set('incomes.' . $this->memberLouis->id, "1000")
-                ->assertSet('totalIncomes', Amount::from("4000"));
-        });
+    test("shouldn’t be possible to set an invalid amount for income", function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, 'abc')
+            ->assertHasErrors(['incomes.' . $this->memberDewey->id => ValidAmount::class]);
+    });
 
-        test('should display the total', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "2000")
-                ->set('incomes.' . $this->memberHuey->id, "2000")
-                ->set('incomes.' . $this->memberLouis->id, "1000")
-                ->assertSee('5 000,00 €');
-        });
+    test('should format the income', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, '1540,25')
+            ->assertSet('incomes.' . $this->memberDewey->id, "1 540,25 €");
+    });
 
-        test('should not display the total if not all inputs are filled', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "2000")
-                ->set('incomes.' . $this->memberHuey->id, "2000")
-                ->assertDontSee('4 000,00 €');
-        });
+    test('should sum the incomes when an input is changed', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "2000")
+            ->set('incomes.' . $this->memberHuey->id, "1000")
+            ->set('incomes.' . $this->memberLouis->id, "1000")
+            ->assertSet('totalIncomes', Amount::from("4000"));
+    });
 
-        test('when an income is emptied, the total should be removed', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "2000")
-                ->set('incomes.' . $this->memberHuey->id, "2000")
-                ->set('incomes.' . $this->memberLouis->id, "1000")
-                ->assertSee('5 000,00 €')
-                ->set('incomes.' . $this->memberLouis->id, "")
-                ->assertDontSee("2 000,00 €");
-        });
+    test('should display the total', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "2000")
+            ->set('incomes.' . $this->memberHuey->id, "2000")
+            ->set('incomes.' . $this->memberLouis->id, "1000")
+            ->assertSee('5 000,00 €');
+    });
 
-        test('should calculate the ratio between members, once all inputs are filled', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "500")
-                ->set('incomes.' . $this->memberHuey->id, "250")
-                ->set('incomes.' . $this->memberLouis->id, "250")
-                ->assertSeeInOrder(["50%", "25%", "25%"]);
-        });
+    test('should not display the total if not all inputs are filled', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "2000")
+            ->set('incomes.' . $this->memberHuey->id, "2000")
+            ->assertDontSee('4 000,00 €');
+    });
 
-        test('shoud not display ration if not all inputs are filled', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "500")
-                ->set('incomes.' . $this->memberHuey->id, "500")
-                ->assertDontSee("50%");
-        });
+    test('when an income is emptied, the total should be removed', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "2000")
+            ->set('incomes.' . $this->memberHuey->id, "2000")
+            ->set('incomes.' . $this->memberLouis->id, "1000")
+            ->assertSee('5 000,00 €')
+            ->set('incomes.' . $this->memberLouis->id, "")
+            ->assertDontSee("2 000,00 €");
+    });
 
-        test('when an income is emptied, the ratio should be removed', function () {
-            Livewire::test(AccountsList::class)
-                ->set('incomes.' . $this->memberDewey->id, "500")
-                ->set('incomes.' . $this->memberHuey->id, "500")
-                ->set('incomes.' . $this->memberLouis->id, "1000")
-                ->assertSee('50%')
-                ->set('incomes.' . $this->memberLouis->id, "")
-                ->assertDontSee("50%");
-        });
+    test('should calculate the ratio between members, once all inputs are filled', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "500")
+            ->set('incomes.' . $this->memberHuey->id, "250")
+            ->set('incomes.' . $this->memberLouis->id, "250")
+            ->assertSeeInOrder(["50%", "25%", "25%"]);
+    });
+
+    test('shoud not display ration if not all inputs are filled', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "500")
+            ->set('incomes.' . $this->memberHuey->id, "500")
+            ->assertDontSee("50%");
+    });
+
+    test('when an income is emptied, the ratio should be removed', function () {
+        Livewire::test(AccountsList::class)
+            ->set('incomes.' . $this->memberDewey->id, "500")
+            ->set('incomes.' . $this->memberHuey->id, "500")
+            ->set('incomes.' . $this->memberLouis->id, "1000")
+            ->assertSee('50%')
+            ->set('incomes.' . $this->memberLouis->id, "")
+            ->assertDontSee("50%");
     });
 });
