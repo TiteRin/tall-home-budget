@@ -3,5 +3,11 @@
         <h2 class="card-title">
             Dépenses
         </h2>
+        <div>
+            <p class="alert alert-info alert-soft">Aucune dépense</p>
+            <a href="{{ route('bills.settings') }}" class="btn btn-primary">
+                Paramétrer les dépenses
+            </a>
+        </div>
     </div>
 </section>
