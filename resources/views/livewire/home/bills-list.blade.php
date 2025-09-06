@@ -3,13 +3,31 @@
         <h2 class="card-title mb-4">
             Dépenses
         </h2>
-        <div class="grow">
-            <p class="alert alert-info alert-soft">Aucune dépense</p>
-        </div>
-        <div class="card-actions justify-end">
-            <a href="{{ route('bills.settings') }}" class="btn btn-primary">
-                Paramétrer les dépenses
-            </a>
-        </div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Dépense</th>
+                <th>Montant</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($bills as $bill)
+                <tr>
+                    <td>
+                        {{ $bill->name }}
+                    </td>
+                    <td>
+                        {{ $bill->amount->toCurrency() }}
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+            <tfoot>
+            <tr>
+                <td>Total</td>
+                <td> -</td>
+            </tr>
+            </tfoot>
+        </table>
     </div>
 </section>
