@@ -41,16 +41,6 @@ class AccountsList extends Component
         return view('livewire.home.accounts-list', compact('members'));
     }
 
-//    public function updatingIncomes(int $memberId): void
-//    {
-//        $this->incomes[$memberId] = Amount::from($amount);
-//    }
-
-    public function updatingIncomes(string $amount, int $memberId): void
-    {
-
-    }
-
     public function updatedIncomes(string $amount, int $memberId): void
     {
         if (empty($amount)) {
