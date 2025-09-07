@@ -71,6 +71,7 @@ describe("Manipulation", function () {
 
         $this->movementAB = new Movement($this->memberAlice, $this->memberBob, new Amount(35000));
         $this->movementBC = new Movement($this->memberBob, $this->memberCharlie, new Amount(15000));
+        $this->movementCB = new Movement($this->memberCharlie, $this->memberBob, new Amount(10000));
         $this->movementCD = new Movement($this->memberCharlie, $this->memberDave, new Amount(20000));
     });
 
@@ -86,6 +87,20 @@ describe("Manipulation", function () {
 
     describe("Sum", function () {
 
+        test('if movements have no members in common, should return an array with the same movements', function () {
+            $movements = $this->movementAB->sum($this->movementCD);
+            expect($movements)->toHaveCount(2)
+                ->and($movements[0])->toBe($this->movementAB)
+                ->and($movements[1])->toBe($this->movementCD);
+        });
+
+        test("if movements own to the same member, should return an array with the same movement", function () {
+            $movements = $this->movementAB->sum($this->movementCB);
+            expect($movements)->toHaveCount(2)
+                ->and($movements[0])->toBe($this->movementAB)
+                ->and($movements[1])->toBe($this->movementCB);
+        });
+
         test("should be able to sum movements", function () {
             $movements = $this->movementAB->sum($this->movementBC);
             expect($movements)->toHaveCount(2)
@@ -97,11 +112,19 @@ describe("Manipulation", function () {
                 ->and($movements[1]->amount)->toEqual(new Amount(15000));
         });
 
-        test('if movements have no members in common, should return an array with the same movements', function () {
-            $movements = $this->movementAB->sum($this->movementCD);
-            expect($movements)->toHaveCount(2)
-                ->and($movements[0])->toBe($this->movementAB)
-                ->and($movements[1])->toBe($this->movementCD);
-        });
+
+        // A doit 100 à B
+        // C doit 100 à B
+        // retourne tableau AB, CB
+
+        // A doit 100 à B
+        // A doit 100 à C
+        // retourne tableau AB, AC
+
+        // A doit 100 à B
+        // B doit 100 à C
+        // retourne tableau AC
+
+
     });
 });

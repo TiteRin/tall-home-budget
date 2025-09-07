@@ -43,15 +43,19 @@ class Movement
 
     public function hasCommonMember(Movement $movement): bool
     {
-        return $this->memberFrom === $movement->memberFrom
-            || $this->memberTo === $movement->memberTo
-            || $this->memberFrom === $movement->memberTo
-            || $this->memberTo === $movement->memberFrom;
+        return $this->memberFrom->id === $movement->memberFrom->id
+            || $this->memberTo->id === $movement->memberTo->id
+            || $this->memberFrom->id === $movement->memberTo->id
+            || $this->memberTo->id === $movement->memberFrom->id;
     }
 
     public function sum(Movement $movement): array
     {
         if (!$this->hasCommonMember($movement)) {
+            return [$this, $movement];
+        }
+
+        if ($this->memberTo->id === $movement->memberTo->id) {
             return [$this, $movement];
         }
 
