@@ -73,8 +73,10 @@ describe("Manipulation", function () {
         $this->movementBA = new Movement($this->memberBob, $this->memberAlice, new Amount(35000));
         $this->movementAC = new Movement($this->memberAlice, $this->memberCharlie, new Amount(10000));
         $this->movementBC = new Movement($this->memberBob, $this->memberCharlie, new Amount(15000));
+        $this->movementCA = new Movement($this->memberCharlie, $this->memberAlice, new Amount(10000));
         $this->movementCB = new Movement($this->memberCharlie, $this->memberBob, new Amount(10000));
         $this->movementCD = new Movement($this->memberCharlie, $this->memberDave, new Amount(20000));
+
     });
 
     describe("hasCommonMember", function () {
@@ -87,31 +89,31 @@ describe("Manipulation", function () {
         });
     });
 
-    describe("Sum", function () {
+    describe("Reduce", function () {
 
         test('if movements have no members in common, should return an array with the same movements', function () {
-            $movements = $this->movementAB->sum($this->movementCD);
+            $movements = $this->movementAB->reduce($this->movementCD);
             expect($movements)->toHaveCount(2)
                 ->and($movements[0])->toBe($this->movementAB)
                 ->and($movements[1])->toBe($this->movementCD);
         });
 
         test("if movements own to the same member, should return an array with the same movements", function () {
-            $movements = $this->movementAB->sum($this->movementCB);
+            $movements = $this->movementAB->reduce($this->movementCB);
             expect($movements)->toHaveCount(2)
                 ->and($movements[0])->toBe($this->movementAB)
                 ->and($movements[1])->toBe($this->movementCB);
         });
 
         test("if movements belongs to the same member, should return an array with the same movements", function () {
-            $movements = $this->movementAB->sum($this->movementAC);
+            $movements = $this->movementAB->reduce($this->movementAC);
             expect($movements)->toHaveCount(2)
                 ->and($movements[0])->toBe($this->movementAB)
                 ->and($movements[1])->toBe($this->movementAC);
         });
 
         test("if movements null each other, should return an empty array", function () {
-            $movements = $this->movementAB->sum($this->movementBA);
+            $movements = $this->movementAB->reduce($this->movementBA);
             expect($movements)->toHaveCount(0);
         });
 
@@ -119,15 +121,40 @@ describe("Manipulation", function () {
             $this->movementAB->amount = new Amount(10000);
             $this->movementBA->amount = new Amount(20000);
 
-            $movements = $this->movementAB->sum($this->movementBA);
+            $movements = $this->movementAB->reduce($this->movementBA);
             expect($movements)->toHaveCount(1)
                 ->and($movements[0]->memberFrom)->toBe($this->memberBob)
                 ->and($movements[0]->memberTo)->toBe($this->memberAlice)
                 ->and($movements[0]->amount)->toEqual(new Amount(10000));
         });
 
-        test("should be able to sum movements", function () {
-            $movements = $this->movementAB->sum($this->movementBC);
+        test("if movements have the same From and To members, should return an array with one movement", function () {
+            $movements = $this->movementAB->reduce($this->movementAB);
+            expect($movements)->toHaveCount(1)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberBob)
+                ->and($movements[0]->amount)->toEqual(new Amount(70000));
+        });
+
+        test("if movemements have the same amount, should return an array with one movement", function () {
+            $this->movementAB->amount = new Amount(10000);
+            $this->movementBC->amount = new Amount(10000);
+            $this->movementCA->amount = new Amount(10000);
+            $movements = $this->movementAB->reduce($this->movementBC);
+            expect($movements)->toHaveCount(1)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[0]->amount)->toEqual(new Amount(10000));
+
+            $movements = $this->movementAB->reduce($this->movementCA);
+            expect($movements)->toHaveCount(1)
+                ->and($movements[0]->memberFrom)->toBe($this->memberCharlie)
+                ->and($movements[0]->memberTo)->toBe($this->memberBob)
+                ->and($movements[0]->amount)->toEqual(new Amount(10000));
+        });
+
+        test("should be able to reduce movements", function () {
+            $movements = $this->movementAB->reduce($this->movementBC);
             expect($movements)->toHaveCount(2)
                 ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
                 ->and($movements[0]->memberTo)->toBe($this->memberBob)
@@ -137,18 +164,10 @@ describe("Manipulation", function () {
                 ->and($movements[1]->amount)->toEqual(new Amount(15000));
         });
 
-        // A doit 100 à B
-        // B doit 100 à A
-        // retourne tableau vide
+        // [AB300, BC100] = [AB200, AC100]
+        // [AB300, BC100] = [AB300, CB-100] => [AB200, AC100]
 
-        // A doit 100 à B
-        // A doit 100 à C
-        // retourne tableau AB, AC
-
-        // A doit 100 à B
-        // B doit 100 à C
-        // retourne tableau AC
-
-
+        // [AB200, CA100] = [CA100, AB200]
+        // [AB200, CA300] = [CA300, AB200] = [CA300, BA-200] => [CA100, CB200]
     });
 });

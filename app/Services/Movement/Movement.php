@@ -49,10 +49,17 @@ class Movement
             || $this->memberTo->id === $movement->memberFrom->id;
     }
 
-    public function sum(Movement $movement): array
+    public function reduce(Movement $movement): array
     {
         if (!$this->hasCommonMember($movement)) {
             return [$this, $movement];
+        }
+
+        if ($this->memberFrom->id === $movement->memberFrom->id
+            && $this->memberTo->id === $movement->memberTo->id) {
+            return [
+                new Movement($this->memberFrom, $this->memberTo, new Amount($this->amount->value() + $movement->amount->value()))
+            ];
         }
 
         if ($this->memberTo->id === $movement->memberTo->id) {
@@ -77,6 +84,19 @@ class Movement
             }
 
             return [new Movement($this->memberTo, $this->memberFrom, new Amount(-$amount))];
+        }
+
+        if ($this->amount->__equals($movement->amount)) {
+
+            if ($this->memberFrom->id === $movement->memberTo->id) {
+                return [
+                    new Movement($movement->memberFrom, $this->memberTo, $this->amount)
+                ];
+            }
+
+            return [
+                new Movement($this->memberFrom, $movement->memberTo, $this->amount)
+            ];
         }
 
         return [
