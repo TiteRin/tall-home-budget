@@ -59,6 +59,26 @@ class Movement
             return [$this, $movement];
         }
 
+        if ($this->memberFrom->id === $movement->memberFrom->id) {
+            return [$this, $movement];
+        }
+
+        if ($this->memberFrom->id === $movement->memberTo->id
+            && $this->memberTo->id === $movement->memberFrom->id) {
+
+            $amount = $this->amount->value() - $movement->amount->value();
+
+            if ($amount === 0) {
+                return [];
+            }
+
+            if ($amount > 0) {
+                return [new Movement($this->memberFrom, $this->memberTo, new Amount($amount))];
+            }
+
+            return [new Movement($this->memberTo, $this->memberFrom, new Amount(-$amount))];
+        }
+
         return [
             new Movement($this->memberFrom, $this->memberTo, new Amount(10000)),
             new Movement($this->memberFrom, $movement->memberTo, new Amount(15000))
