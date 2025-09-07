@@ -10,9 +10,10 @@ test('should represent an amount', function () {
     expect($amount->value())->toBe(1000);
 });
 
-test('should always be positive', function () {
-    new Amount(-1);
-})->throws(InvalidArgumentException::class, 'Amount [-1] must be a positive integer');
+test('should represent a negative amount', function () {
+    $amount = new Amount(-1000);
+    expect($amount->value())->toBe(-1000);
+});
 
 test('should be equal when amounts have same value', function () {
     $amount1 = new Amount(12500);
@@ -142,6 +143,10 @@ describe('extraction methods', function () {
 describe('conversion methods', function () {
     test('should convert to string', function () {
         expect((string)new Amount(1000))->toBe("10,00 €");
+    });
+
+    test('should convert a negative amount to string', function () {
+        expect((string)new Amount(-1000))->toBe("-10,00 €");
     });
 
     test('should convert to cents', function () {

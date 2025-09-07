@@ -11,10 +11,6 @@ class Amount
 
     public function __construct(int $amount)
     {
-        if ($amount < 0) {
-            throw new InvalidArgumentException("Amount [$amount] must be a positive integer");
-        }
-
         $this->amount = $amount;
     }
 
