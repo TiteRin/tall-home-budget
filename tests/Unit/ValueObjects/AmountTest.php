@@ -18,35 +18,40 @@ test('should be equal when amounts have same value', function () {
     $amount1 = new Amount(12500);
     $amount2 = new Amount(12500);
 
-    expect($amount1->__equals($amount2))->toBeTrue();
+    expect($amount1->__equals($amount2))->toBeTrue()
+        ->and($amount1 == $amount2)->toBeTrue();
 });
 
 test('should not be equal when amounts have different values', function () {
     $amount1 = new Amount(12500);
     $amount2 = new Amount(15000);
 
-    expect($amount1->__equals($amount2))->toBeFalse();
+    expect($amount1->__equals($amount2))->toBeFalse()
+        ->and($amount1 == $amount2)->toBeFalse();
 });
 
 test('should be equal when created differently but same value', function () {
     $amount1 = new Amount(12500);
     $amount2 = Amount::from('125.00');
 
-    expect($amount1->__equals($amount2))->toBeTrue();
+    expect($amount1->__equals($amount2))->toBeTrue()
+        ->and($amount1 == $amount2)->toBeTrue();
 });
 
 test('should be equal with zero amounts', function () {
     $amount1 = new Amount(0);
     $amount2 = new Amount(0);
 
-    expect($amount1->__equals($amount2))->toBeTrue();
+    expect($amount1->__equals($amount2))->toBeTrue()
+        ->and($amount1 == $amount2)->toBeTrue();
 });
 
 test('should not be equal when one is zero and other is not', function () {
     $amount1 = new Amount(0);
     $amount2 = new Amount(100);
 
-    expect($amount1->__equals($amount2))->toBeFalse();
+    expect($amount1->__equals($amount2))->toBeFalse()
+        ->and($amount1 == $amount2)->toBeFalse();
 });
 
 test('should create an Amount from a string', function () {
@@ -153,7 +158,7 @@ describe("manipulation methods", function () {
         $amountA = new Amount(1000);
         $amountB = new Amount(2000);
 
-        expect($amountA->add($amountB))->toEqual(new Amount(3000));
-        expect($amountB->add($amountA))->toEqual(new Amount(3000));
+        expect($amountA->add($amountB))->toEqual(new Amount(3000))
+            ->and($amountB->add($amountA))->toEqual(new Amount(3000));
     });
 });
