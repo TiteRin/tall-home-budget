@@ -153,21 +153,57 @@ describe("Manipulation", function () {
                 ->and($movements[0]->amount)->toEqual(new Amount(10000));
         });
 
+
         test("should be able to reduce movements", function () {
+            $this->movementAB->amount = new Amount(30000);
+            $this->movementBC->amount = new Amount(10000);
+
+
+            $movements = $this->movementAB->reduce($this->movementBC);
+            expect($movements)->toHaveCount(2)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberBob)
+                ->and($movements[0]->amount)->toEqual(new Amount(20000))
+                ->and($movements[1]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[1]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[1]->amount)->toEqual(new Amount(10000));
+
+            $this->movementAB->amount = new Amount(10000);
+            $this->movementBC->amount = new Amount(10000);
+
+
+            $movements = $this->movementAB->reduce($this->movementBC);
+            expect($movements)->toHaveCount(1)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[0]->amount)->toEqual(new Amount(10000));
+
+
+            $this->movementAB->amount = new Amount(10000);
+            $this->movementBC->amount = new Amount(30000);
+
+
             $movements = $this->movementAB->reduce($this->movementBC);
             expect($movements)->toHaveCount(2)
                 ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
                 ->and($movements[0]->memberTo)->toBe($this->memberBob)
                 ->and($movements[0]->amount)->toEqual(new Amount(10000))
-                ->and($movements[1]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[1]->memberFrom)->toBe($this->memberBob)
                 ->and($movements[1]->memberTo)->toBe($this->memberCharlie)
-                ->and($movements[1]->amount)->toEqual(new Amount(15000));
+                ->and($movements[1]->amount)->toEqual(new Amount(30000));
+
+
+            $this->movementAB->amount = new Amount(10000);
+            $this->movementCA->amount = new Amount(30000);
+
+            $movements = $this->movementAB->reduce($this->movementCA);
+            expect($movements)->toHaveCount(2)
+                ->and($movements[0]->memberFrom)->toBe($this->memberCharlie)
+                ->and($movements[0]->memberTo)->toBe($this->memberAlice)
+                ->and($movements[0]->amount)->toEqual(new Amount(20000))
+                ->and($movements[1]->memberFrom)->toBe($this->memberCharlie)
+                ->and($movements[1]->memberTo)->toBe($this->memberBob)
+                ->and($movements[1]->amount)->toEqual(new Amount(10000));
         });
-
-        // [AB300, BC100] = [AB200, AC100]
-        // [AB300, BC100] = [AB300, CB-100] => [AB200, AC100]
-
-        // [AB200, CA100] = [CA100, AB200]
-        // [AB200, CA300] = [CA300, AB200] = [CA300, BA-200] => [CA100, CB200]
     });
 });

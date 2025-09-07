@@ -99,9 +99,50 @@ class Movement
             ];
         }
 
+        // trouver la direction du mouvement
+        $memberFrom = $memberTo = $intermediary = $amount = null;
+
+        // AB and BC => AC / B
+        if ($this->memberTo->id === $movement->memberFrom->id) {
+            $memberFrom = $this->memberFrom;
+            $memberTo = $movement->memberTo;
+            $intermediary = $movement->memberFrom;
+            $amount = $this->amount->value() - $movement->amount->value();
+        }
+        // AB and CA => CB / A
+        if ($this->memberFrom->id === $movement->memberTo->id) {
+            $memberFrom = $movement->memberFrom;
+            $memberTo = $this->memberTo;
+            $intermediary = $this->memberFrom;
+            $amount = $movement->amount->value() - $this->amount->value();
+        }
+
+        // [AB100, BC100] = [AC100]
+        // [AB100, CA100] = [CB100]
+        if ($amount === 0) {
+            return [
+                new Movement($memberFrom, $memberTo, $this->amount),
+            ];
+        }
+
+        // [AB300, BC100] => [AB200, AC100]
+        // [AB100, CA300] => [CA300, AB100] => [CA200, CB100]
+        if ($amount > 0) {
+
+            $maxAmount = max($this->amount->value(), $movement->amount->value());
+            $leftAmount = $maxAmount - $amount;
+
+            return [
+                new Movement($memberFrom, $intermediary, new Amount($amount)),
+                new Movement($memberFrom, $memberTo, new Amount($leftAmount))
+            ];
+        }
+
+        // [AB50, BC100] => idem
+        // [AB100, CA50] => [CA50, AB100] => idem
         return [
-            new Movement($this->memberFrom, $this->memberTo, new Amount(10000)),
-            new Movement($this->memberFrom, $movement->memberTo, new Amount(15000))
+            $this,
+            $movement
         ];
     }
 }
