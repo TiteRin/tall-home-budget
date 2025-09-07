@@ -77,5 +77,11 @@ describe('When the component has bills', function () {
                 ]
             );
     });
+
+    test('should display the total', function () {
+        $bills = bill_factory()->bills(5, ['amount' => 10000], null, $this->household);
+        Livewire::test(BillsList::class, ['bills' => $bills->all()])
+            ->assertSee('500,00 €');
+    });
 });
 

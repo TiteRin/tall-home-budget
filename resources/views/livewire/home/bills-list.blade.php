@@ -3,7 +3,7 @@
         <h2 class="card-title mb-4">
             Dépenses
         </h2>
-        <table class="table">
+        <table class="table table-zebra">
             <thead>
             <tr>
                 <th>Dépense</th>
@@ -25,7 +25,7 @@
             <tfoot>
             <tr>
                 <td>Total</td>
-                <td> -</td>
+                <td>{{ $this->totalAmount() }}</td>
             </tr>
             </tfoot>
         </table>
