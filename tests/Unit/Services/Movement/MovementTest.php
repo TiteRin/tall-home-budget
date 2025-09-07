@@ -47,4 +47,61 @@ describe("Initialization", function () {
     test('should throw an exception if both members are null', function () {
         $movement = new Movement(null, null, $this->amount);
     })->throws(Exception::class, "No valid member");
+
+    test("should throw an exception if members are not from the same household", function () {
+        $movement = new Movement(
+            $this->memberAlice,
+            bill_factory()->member(['first_name' => 'Charlie']),
+            $this->amount
+        );
+    })->throws(Exception::class, "Members are not in the same household");
+});
+
+
+describe("Manipulation", function () {
+    beforeEach(function () {
+        $this->household = bill_factory()->household([
+            'name' => 'Test Household',
+            'has_joint_account' => true
+        ]);
+        $this->memberAlice = bill_factory()->member(['first_name' => 'Alice'], $this->household);
+        $this->memberBob = bill_factory()->member(['first_name' => 'Bob'], $this->household);
+        $this->memberCharlie = bill_factory()->member(['first_name' => 'Charlie'], $this->household);
+        $this->memberDave = bill_factory()->member(['first_name' => 'Dave'], $this->household);
+
+        $this->movementAB = new Movement($this->memberAlice, $this->memberBob, new Amount(35000));
+        $this->movementBC = new Movement($this->memberBob, $this->memberCharlie, new Amount(15000));
+        $this->movementCD = new Movement($this->memberCharlie, $this->memberDave, new Amount(20000));
+    });
+
+    describe("hasCommonMember", function () {
+        test("should return true if has a common member", function () {
+            expect($this->movementAB->hasCommonMember($this->movementBC))->toBeTrue();
+        });
+
+        test("should return false if has no common member", function () {
+            expect($this->movementAB->hasCommonMember($this->movementCD))->toBeFalse();
+        });
+    });
+
+    describe("Sum", function () {
+
+        test("should be able to sum movements", function () {
+            $movements = $this->movementAB->sum($this->movementBC);
+            expect($movements)->toHaveCount(2)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberBob)
+                ->and($movements[0]->amount)->toEqual(new Amount(10000))
+                ->and($movements[1]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[1]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[1]->amount)->toEqual(new Amount(15000));
+        });
+
+        test('if movements have no members in common, should return an array with the same movements', function () {
+            $movements = $this->movementAB->sum($this->movementCD);
+            expect($movements)->toHaveCount(2)
+                ->and($movements[0])->toBe($this->movementAB)
+                ->and($movements[1])->toBe($this->movementCD);
+        });
+    });
 });
