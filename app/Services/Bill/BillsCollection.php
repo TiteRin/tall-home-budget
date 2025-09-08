@@ -32,7 +32,7 @@ class BillsCollection
         return new Amount($this->bills->sum(fn($bill) => $bill->amount->value()));
     }
 
-    public function getTotalFor(DistributionMethod $distributionMethod): Amount
+    public function getTotalForDistributionMethod(DistributionMethod $distributionMethod): Amount
     {
         return (new BillsCollection($this->bills->filter(fn($bill) => $bill->distribution_method === $distributionMethod)))->getTotal();
     }

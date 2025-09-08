@@ -70,8 +70,8 @@ describe("Summarization", function () {
             ]
         );
 
-        expect($collection->getTotalFor(DistributionMethod::PRORATA))->toEqual(new Amount(3000 + 10000))
-            ->and($collection->getTotalFor(DistributionMethod::EQUAL))->toEqual(new Amount(67000));
+        expect($collection->getTotalForDistributionMethod(DistributionMethod::PRORATA))->toEqual(new Amount(3000 + 10000))
+            ->and($collection->getTotalForDistributionMethod(DistributionMethod::EQUAL))->toEqual(new Amount(67000));
     });
 
     test("should obtain the total for a member", function () {
