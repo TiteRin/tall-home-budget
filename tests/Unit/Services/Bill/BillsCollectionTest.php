@@ -21,3 +21,10 @@ test("should initialize with array of bills", function () {
 
     expect($collection->toArray())->toHaveCount(3);
 });
+
+test("should initialize with a collection of bills", function () {
+    $bills = collect(bill_factory()->bills(3, [], $this->memberAlice, $this->household));
+    $collection = new BillsCollection($bills);
+
+    expect($collection->toArray())->toHaveCount(3);
+});
