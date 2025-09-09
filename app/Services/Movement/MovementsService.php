@@ -33,6 +33,36 @@ class MovementsService
         return array_merge(['total' => $this->bills->getTotal()], ...$totals);
     }
 
+    public function getTotalIncome(): Amount
+    {
+        return array_reduce(
+            $this->incomes,
+            function (Amount $carry, Amount $income) {
+                return $carry->add($income);
+            },
+            new Amount(0)
+        );
+    }
+
+    public function getRatiosFromIncome(): array
+    {
+        $totalIncome = $this->getTotalIncome();
+        return array_combine(
+            array_map(
+                function (Member $member) {
+                    return $member->id;
+                },
+                $this->members
+            ),
+            array_map(
+                function (Member $member) use ($totalIncome) {
+                    return $this->incomes[$member->id]->toCents() / $totalIncome->toCents();
+                },
+                $this->members
+            )
+        );
+    }
+
     public function toMovements()
     {
         $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
@@ -41,15 +71,8 @@ class MovementsService
         return array_map(function (Member $member) {
             $totalMember = $this->bills->getTotalForMember($member);
 
-            // J’ai mal joué mon coup ici
-            // À deux personne + 1 compte joint, c’est "facile"
-            // on calcule ce que chacun a déjà payé, et on le déduit de ce qui a été payé par le compte joint
-            // mais sans compte joint
-            // ou si le compte join paie moins que quelqu’un
-            // ou à plus de deux
-            // il va falloir tricounteriser
+            // cf. EXAMPLES.md
 
-            // Je peux déjà faire une version simple, mais il y a un peu de taf ici
 
             return new Movement($member, null, new Amount(0));
         }, $this->members);

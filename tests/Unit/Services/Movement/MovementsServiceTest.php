@@ -52,4 +52,41 @@ test('should obtain the bills total amount in an array', function () {
         );
 });
 
+test("should obtain the total of incomes", function () {
+    $service = new MovementsService(
+        $this->members,
+        $this->bills,
+        [
+            $this->memberAlice->id => new Amount(200000),
+            $this->memberBob->id => new Amount(200000),
+        ],
+    );
+
+    $totalIncome = $service->getTotalIncome();
+    expect($totalIncome)->toBeInstanceOf(Amount::class)
+        ->and($totalIncome)->toEqual(new Amount(400000));;
+});
+
+test('should obtain the ratios of incomes', function () {
+    $service = new MovementsService(
+        $this->members,
+        $this->bills,
+        [
+            $this->memberAlice->id => new Amount(200000),
+            $this->memberBob->id => new Amount(200000),
+        ],
+    );
+
+    $ratios = $service->getRatiosFromIncome();
+
+    expect($ratios)->toBeArray()
+        ->and($ratios)->toHaveCount(2)
+        ->and($ratios)->toMatchArray(
+            [
+                $this->memberAlice->id => 0.5,
+                $this->memberBob->id => 0.5,
+            ]
+        );
+});
+
 
