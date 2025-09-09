@@ -33,6 +33,12 @@ test('should return an array of movements from bills and incomes', function () {
     expect($service->toMovements())->toBeArray();
 });
 
+describe("Example.md test", function () {
+    test("Example 1", function () {
+        expect(true)->toBefalse();
+    });
+});
+
 test('should obtain the bills total amount in an array', function () {
     $service = new MovementsService(
         $this->members,
