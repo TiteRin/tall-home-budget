@@ -67,14 +67,23 @@ class MovementsService
     {
         $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
         $totalEqual = $this->bills->getTotalForDistributionMethod(DistributionMethod::EQUAL);
+        $ratios = $this->getRatiosFromIncome();
 
-        return array_map(function (Member $member) {
+        return array_map(function (Member $member) use ($totalProrata, $totalEqual, $ratios) {
             $totalMember = $this->bills->getTotalForMember($member);
 
             // cf. EXAMPLES.md
+            $amountProrataForMember = new Amount($totalProrata->toCents() * $ratios[$member->id]);
+            $amountEqualForMember = new Amount($totalEqual->toCents() / count($this->members));
+            $amountForMember = $amountProrataForMember->add($amountEqualForMember);
 
+            $debt = $totalMember->subtract($amountForMember);
 
-            return new Movement($member, null, new Amount(0));
+            if ($debt->toCents() > 0) {
+                return new Movement($member, null, $debt);
+            }
+
+            return new Movement(null, $member, $debt);
         }, $this->members);
     }
 }

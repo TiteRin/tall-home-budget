@@ -18,8 +18,8 @@ beforeEach(function () {
         bill_factory()->bill(['name' => 'Bill 3', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA], null, $this->household),
     ]);
     $this->incomes = [
-        $this->memberAlice->id => 200000,
-        $this->memberBob->id => 200000,
+        $this->memberAlice->id => new Amount(200000),
+        $this->memberBob->id => new Amount(200000),
     ];
 });
 
