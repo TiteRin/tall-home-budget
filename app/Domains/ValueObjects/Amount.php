@@ -85,6 +85,11 @@ class Amount
         return new Amount($this->value() + $amount->value());
     }
 
+    public function subtract(Amount $amount): Amount
+    {
+        return new Amount($this->value() - $amount->value());
+    }
+
     public static function from(string $amount): Amount
     {
         $amount = str_replace(',', '.', $amount);

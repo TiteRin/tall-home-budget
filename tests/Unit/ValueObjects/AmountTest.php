@@ -166,4 +166,12 @@ describe("manipulation methods", function () {
         expect($amountA->add($amountB))->toEqual(new Amount(3000))
             ->and($amountB->add($amountA))->toEqual(new Amount(3000));
     });
+
+    test('should obtain a new amount from a substraction', function () {
+        $amountA = new Amount(1000);
+        $amountB = new Amount(2000);
+
+        expect($amountA->subtract($amountB))->toEqual(new Amount(-1000))
+            ->and($amountB->subtract($amountA))->toEqual(new Amount(1000));
+    });
 });
