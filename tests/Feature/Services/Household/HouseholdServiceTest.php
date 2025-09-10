@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Services\Household;
+namespace Tests\Feature\Services\Household;
 
 use App\Models\Household;
 use App\Services\Household\HouseholdService;

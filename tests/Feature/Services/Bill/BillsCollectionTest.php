@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Unit\Services\Bill;
+namespace Tests\Feature\Services\Bill;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;

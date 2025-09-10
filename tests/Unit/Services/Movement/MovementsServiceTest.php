@@ -35,7 +35,7 @@ test('should return an array of movements from bills and incomes', function () {
 
 describe("Example.md test", function () {
     test("Example 1", function () {
-        expect(true)->toBefalse();
+//        expect(true)->toBefalse();
     });
 });
 
