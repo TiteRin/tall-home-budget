@@ -90,6 +90,11 @@ class Amount
         return new Amount($this->value() - $amount->value());
     }
 
+    public function opposite(): Amount
+    {
+        return new Amount(-$this->value());
+    }
+
     public static function from(string $amount): Amount
     {
         $amount = str_replace(',', '.', $amount);
