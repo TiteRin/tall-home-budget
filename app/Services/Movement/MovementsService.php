@@ -77,7 +77,7 @@ class MovementsService
             $amountEqualForMember = new Amount($totalEqual->toCents() / count($this->members));
             $amountForMember = $amountProrataForMember->add($amountEqualForMember);
 
-            $debt = $totalMember->subtract($amountForMember);
+            $debt = $amountForMember->subtract($totalMember);
 
             if ($debt->toCents() > 0) {
                 return new Movement($member, null, $debt);

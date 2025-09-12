@@ -35,7 +35,54 @@ test('should return an array of movements from bills and incomes', function () {
 
 describe("Example.md test", function () {
     test("Example 1", function () {
-//        expect(true)->toBefalse();
+        $household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => true]);
+
+        $memberAlice = bill_factory()->member(['first_name' => 'Alice'], $household);
+        $memberBob = bill_factory()->member(['first_name' => 'Bob'], $household);
+
+        $loyer = bill_factory()->bill([
+            'name' => 'Loyer',
+            'amount' => 70000,
+            'distribution_method' => DistributionMethod::EQUAL,
+            'member_id' => null
+        ], null, $household);
+
+        $electricity = bill_factory()->bill([
+            'name' => 'Électricité',
+            'amount' => 9000,
+            'distribution_method' => DistributionMethod::PRORATA,
+        ], $memberAlice, $household);
+
+        $internet = bill_factory()->bill([
+            'name' => 'Internet',
+            'amount' => 3000,
+            'distribution_method' => DistributionMethod::PRORATA,
+        ], $memberBob, $household);
+
+        $veterinaire = bill_factory()->bill([
+            'name' => 'Vétérinaire',
+            'amount' => 10000,
+            'distribution_method' => DistributionMethod::EQUAL,
+        ], $memberBob, $household);
+
+        $members = [$memberAlice, $memberBob];
+        $bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
+
+        $incomes = [
+            $memberAlice->id => new Amount(200000),
+            $memberBob->id => new Amount(100000),
+        ];
+
+        $movementService = new MovementsService($members, $bills, $incomes);
+        $movements = $movementService->toMovements();
+        expect($movements)->toBeArray()
+            ->and($movements)->toHaveCount(2)
+            ->and($movements[0]->memberFrom)->toBe($memberAlice)
+            ->and($movements[0]->memberTo)->toBeNull()
+            ->and($movements[0]->amount)->toEqual(new Amount(39000))
+            ->and($movements[1]->memberFrom)->toBe($memberBob)
+            ->and($movements[1]->memberTo)->toBeNull()
+            ->and($movements[1]->amount)->toEqual(new Amount(31000));
     });
 });
 
