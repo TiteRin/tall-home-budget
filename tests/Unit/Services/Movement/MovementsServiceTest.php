@@ -84,6 +84,58 @@ describe("Example.md test", function () {
             ->and($movements[1]->memberTo)->toBeNull()
             ->and($movements[1]->amount)->toEqual(new Amount(31000));
     });
+
+    test('Example 2', function () {
+        $household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => false]);
+
+        $memberAlice = bill_factory()->member(['first_name' => 'Alice'], $household);
+        $memberBob = bill_factory()->member(['first_name' => 'Bob'], $household);
+        $memberCharlie = bill_factory()->member(['first_name' => 'Charlie'], $household);
+
+        $loyer = bill_factory()->bill([
+            'name' => 'Loyer',
+            'amount' => 70000,
+            'distribution_method' => DistributionMethod::PRORATA,
+        ], $memberCharlie, $household);
+
+        $electricity = bill_factory()->bill([
+            'name' => 'Électricité',
+            'amount' => 9000,
+            'distribution_method' => DistributionMethod::EQUAL,
+        ], $memberAlice, $household);
+
+        $internet = bill_factory()->bill([
+            'name' => 'Internet',
+            'amount' => 3000,
+            'distribution_method' => DistributionMethod::PRORATA,
+        ], $memberBob, $household);
+
+        $veterinaire = bill_factory()->bill([
+            'name' => 'Vétérinaire',
+            'amount' => 10000,
+            'distribution_method' => DistributionMethod::PRORATA,
+        ], $memberAlice, $household);
+
+        $members = [$memberAlice, $memberBob, $memberCharlie];
+        $bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
+
+        $incomes = [
+            $memberAlice->id => new Amount(200000),
+            $memberBob->id => new Amount(100000),
+            $memberCharlie->id => new Amount(200000),
+        ];
+
+        $movementService = new MovementsService($members, $bills, $incomes);
+        $movements = $movementService->toMovements();
+        expect($movements)->toBeArray()
+            ->and($movements)->toHaveCount(2)
+            ->and($movements[0]->memberFrom)->toBe($memberAlice)
+            ->and($movements[0]->memberTo)->toBe($memberCharlie)
+            ->and($movements[0]->amount)->toEqual(new Amount(17200))
+            ->and($movements[1]->memberFrom)->toBe($memberBob)
+            ->and($movements[1]->memberTo)->toBe($memberCharlie)
+            ->and($movements[1]->amount)->toEqual(new Amount(16600));
+    });
 });
 
 test('should obtain the bills total amount in an array', function () {
