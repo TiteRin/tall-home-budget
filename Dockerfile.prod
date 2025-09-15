@@ -3,20 +3,19 @@ FROM php:8.4-fpm AS vendor
 
 WORKDIR /app
 
-# Installer dépendances système et extensions PHP
+# Installer extensions PHP pour Laravel + Postgres + Redis
 RUN apt-get update && apt-get install -y \
-    unzip git curl libicu-dev libpq-dev \
+    unzip git curl libicu-dev libpq-dev zlib1g-dev \
     && docker-php-ext-install intl pdo_pgsql \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer Composer
+# Installer composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+# Copier et installer les dépendances PHP
 COPY composer.json composer.lock ./
-
-# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 # Copier le reste du projet
@@ -26,34 +25,37 @@ COPY . .
 FROM node:20 AS frontend
 
 WORKDIR /app
+
+# Copier package.json et installer les dépendances Node
 COPY package.json package-lock.json ./
 RUN npm ci
 
+# Copier le reste du projet et builder Vite en prod
 COPY . .
 ENV NODE_ENV=production
-
 RUN npm run build
 
-# ---- Étape finale : image de prod Laravel ----
+# ---- Étape finale : image Laravel prod ----
 FROM php:8.4-fpm AS prod
 
 WORKDIR /var/www/html
 
-# Installer extensions PHP nécessaires
-RUN apt-get update && apt-get install -y \
-    libicu-dev libpq-dev \
+# Installer extensions PHP
+RUN apt-get update && apt-get install -y libicu-dev libpq-dev zlib1g-dev \
     && docker-php-ext-install intl pdo_pgsql \
     && pecl install redis \
     && docker-php-ext-enable redis \
     && rm -rf /var/lib/apt/lists/*
 
-# Copier les dépendances PHP et assets compilés
+# Copier code + dépendances PHP
 COPY --from=vendor /app /var/www/html
+
+# Copier build Vite
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-# Optimiser autoload et découvrir les packages
-RUN composer dump-autoload --optimize \
-    && php artisan package:discover --ansi || true
+# Optimisation autoload + découverte des packages
+RUN composer dump-autoload --optimize && \
+    php artisan package:discover --ansi || true
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html
