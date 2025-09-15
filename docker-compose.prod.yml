@@ -9,7 +9,7 @@ services:
       postgres-prod:
         condition: service_healthy
       redis-prod:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env
     networks:
@@ -52,6 +52,11 @@ services:
     container_name: redis-prod
     networks:
       - app_network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   app_network:
