@@ -1,28 +1,52 @@
-# Image PHP officielle avec FPM
-FROM php:8.4-fpm
-
-# Installer dépendances système et PHP nécessaires
-RUN apt-get update && apt-get install -y \
-    unzip git curl libicu-dev libpq-dev libonig-dev nodejs npm \
-    && pecl install redis \
-    && docker-php-ext-enable redis \
-    && docker-php-ext-install intl pdo_pgsql mbstring
+# ---- Étape vendor : installer dépendances PHP ----
+FROM php:8.4-fpm AS vendor
 
 WORKDIR /var/www/html
 
-# Copier projet
-COPY . .
+# Installer les extensions nécessaires
+RUN apt-get update && apt-get install -y \
+    unzip git curl libicu-dev libpq-dev \
+    && docker-php-ext-install intl pdo_pgsql \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
 
-# Installer Composer
+# Installer composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Installer dépendances PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
-    && composer dump-autoload --optimize \
-    && php artisan package:discover --ansi || true
+# Copier composer.json et composer.lock et installer les dépendances PHP
+COPY composer.json composer.lock ./
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
 
-# Installer dépendances JS et build assets
-RUN npm ci && npm run build
+# Copier tout le projet
+COPY . .
+
+# ---- Étape frontend : build des assets ----
+FROM node:20 AS frontend
+
+WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci
+
+COPY . .
+RUN npm run build
+
+# ---- Étape finale : image Laravel + Nginx ----
+FROM php:8.4-fpm AS prod
+
+WORKDIR /var/www/html
+
+# Installer extensions PHP nécessaires
+RUN apt-get update && apt-get install -y \
+    icu-dev libpq-dev unzip git curl \
+    && docker-php-ext-install intl pdo_pgsql \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copier projet + vendor + assets
+COPY --from=vendor /var/www/html /var/www/html
+COPY --from=frontend /app/public/build /var/www/html/public/build
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html
