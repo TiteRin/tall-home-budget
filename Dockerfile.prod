@@ -19,17 +19,32 @@ COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 # Copier projet
 WORKDIR /var/www/html
+COPY composer.json composer.lock ./
+COPY package.json package-lock.json ./
+
+# Installer dépendances
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+RUN npm ci --only=production
+
+# Copier le reste du projet
 COPY . .
 
-# Installer dépendances PHP
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# Finaliser l'installation Composer
+RUN composer dump-autoload --optimize
 
-# Installer dépendances JS et builder les assets
-RUN npm ci
+# Builder les assets
 RUN npm run build
 
+# Optimiser Laravel pour la production
+RUN php artisan config:cache || true
+RUN php artisan route:cache || true
+RUN php artisan view:cache || true
+
 # Permissions
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data /var/www/html \
+    && chmod -R 755 /var/www/html/storage \
+    && chmod -R 755 /var/www/html/bootstrap/cache
 
 EXPOSE 9000
 CMD ["php-fpm"]
+
