@@ -1,24 +1,19 @@
 services:
-  laravel:
+  laravel-preprod:
     build:
       context: .
-      dockerfile: Dockerfile
-      target: prod
+      dockerfile: Dockerfile.prod
     container_name: laravel-preprod
-    env_file: .env.preprod
+    restart: unless-stopped
     depends_on:
-      - postgres-preprod
-      - redis
+      postgres-prod:
+        condition: service_healthy
+      redis-prod:
+        condition: service_started
+    env_file:
+      - .env
     networks:
       - app_network
-    command: >
-      sh -c "
-        php artisan config:cache &&
-        php artisan route:cache &&
-        php artisan view:cache &&
-        php artisan migrate --force &&
-        php-fpm
-      "
 
   nginx:
     image: nginx:alpine
