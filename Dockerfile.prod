@@ -1,25 +1,26 @@
 # ---- Étape vendor : installer dépendances PHP ----
-FROM php:8.4-cli AS vendor
+FROM php:8.4-fpm AS vendor
 
 WORKDIR /app
 
-# Installer les extensions nécessaires
+# Installer dépendances système et extensions PHP
 RUN apt-get update && apt-get install -y \
     unzip git curl libicu-dev libpq-dev \
     && docker-php-ext-install intl pdo_pgsql \
+    && pecl install redis \
+    && docker-php-ext-enable redis \
     && rm -rf /var/lib/apt/lists/*
 
-# Installer composer
+# Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 COPY composer.json composer.lock ./
 
-# 🚀 Désactivation des scripts artisan
+# Installer les dépendances PHP
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
 
 # Copier le reste du projet
 COPY . .
-
 
 # ---- Étape frontend : build des assets ----
 FROM node:20 AS frontend
@@ -31,25 +32,26 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-
 # ---- Étape finale : image de prod Laravel ----
-FROM php:8.4-fpm-alpine AS prod
+FROM php:8.4-fpm AS prod
 
 WORKDIR /var/www/html
 
-# Installer intl, pdo_pgsql et redis
-RUN apk add --no-cache icu-dev libpq-dev \
+# Installer extensions PHP nécessaires
+RUN apt-get update && apt-get install -y \
+    libicu-dev libpq-dev \
     && docker-php-ext-install intl pdo_pgsql \
     && pecl install redis \
-    && docker-php-ext-enable redis
+    && docker-php-ext-enable redis \
+    && rm -rf /var/lib/apt/lists/*
 
-
-# Copier dépendances PHP et assets compilés
+# Copier les dépendances PHP et assets compilés
 COPY --from=vendor /app /var/www/html
 COPY --from=frontend /app/public/build /var/www/html/public/build
 
-RUN composer dump-autoload --optimize && \
-    php artisan package:discover --ansi || true
+# Optimiser autoload et découvrir les packages
+RUN composer dump-autoload --optimize \
+    && php artisan package:discover --ansi || true
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html
