@@ -1,0 +1,35 @@
+{
+    "bills": {
+        "data": [
+            {
+                "id": 2001,
+                "name": "Internet",
+                "amount": [],
+                "amount_formatted": "100,00\u00a0\u20ac",
+                "distribution_method": "equal",
+                "distribution_method_label": "50/50",
+                "member": {
+                    "id": 1001,
+                    "full_name": " "
+                },
+                "created_at": null,
+                "updated_at": null
+            }
+        ],
+        "meta": {
+            "total_count": 1,
+            "total_amount": 10000,
+            "total_amount_formatted": "100,00\u00a0\u20ac"
+        }
+    },
+    "household_summary": {
+        "data": {
+            "id": 3001,
+            "name": "GM Household",
+            "total_amount": [],
+            "total_amount_formatted": "100,00\u00a0\u20ac",
+            "default_distribution_method": "equal",
+            "default_distribution_method_label": "50/50"
+        }
+    }
+}

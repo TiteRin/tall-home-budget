@@ -2,9 +2,8 @@
 
 namespace App\Livewire;
 
+use App\Enums\DistributionMethod;
 use App\Models\Household;
-use App\Models\HouseholdMember;
-use App\DistributionMethod;
 use Livewire\Component;
 
 class HouseholdManager extends Component
@@ -36,19 +35,19 @@ class HouseholdManager extends Component
 
         $this->householdId = $household->id;
         $this->householdName = $household->name ?? '';
-        $this->hasJointAccount = $household->has_joint_account ?? false;
+        $this->hasJointAccount = $household->has_joint_account;
         $this->defaultDistributionMethod = $household->getDefaultDistributionMethod()->value;
         $this->newMemberLastName = $household->name ?? '';
 
         $this->refreshMembers();
     }
 
-    public function getHouseholdProperty(): ?Household 
+    public function getHouseholdProperty(): ?Household
     {
         return Household::find($this->householdId);
     }
 
-    public function refreshMembers() 
+    public function refreshMembers()
     {
         $household = $this->household;
         $this->householdMembers = $household ? $household->members->toArray() : [];
@@ -62,21 +61,22 @@ class HouseholdManager extends Component
 
         $household = $this->household;
         $household->name = $this->householdName;
-        $household->has_joint_account = $this->hasJointAccount; 
+        $household->has_joint_account = filter_var($this->hasJointAccount, FILTER_VALIDATE_BOOLEAN);
         $household->default_distribution_method = DistributionMethod::from($this->defaultDistributionMethod);
+
         $household->save();
 
         session()->flash('message', 'Foyer enregistré avec succès');
     }
 
-    public function addMember() 
+    public function addMember()
     {
-        if (trim($this->newMemberFirstName) === '' || trim($this->newMemberLastName) === '') {
-            session()->flash('error', 'Le prénom et le nom sont requis');
-            return;
-        }
+        $this->validate([
+            'newMemberFirstName' => 'required|string|min:2',
+            'newMemberLastName' => 'required|string|min:2',
+        ]);
 
-        $household = $this->household;  
+        $household = $this->household;
 
         $household->members()->create([
             'first_name' => $this->newMemberFirstName,
@@ -85,7 +85,7 @@ class HouseholdManager extends Component
 
         $this->newMemberFirstName = '';
         $this->newMemberLastName = $household->name ?? '';
-        
+
         $this->refreshMembers();
     }
 
@@ -103,11 +103,9 @@ class HouseholdManager extends Component
         $this->refreshMembers();
     }
 
-    public function getDistributionMethodsProperty(): array 
+    public function getDistributionMethodOptionsProperty(): array
     {
-        return collect(DistributionMethod::cases())->mapWithKeys(function (DistributionMethod $method) {
-            return [$method->value => $method->label()];
-        })->toArray();
+        return DistributionMethod::options();
     }
 
     public function render()

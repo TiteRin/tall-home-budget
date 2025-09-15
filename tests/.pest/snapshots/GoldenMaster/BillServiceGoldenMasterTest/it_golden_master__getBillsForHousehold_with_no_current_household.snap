@@ -1,0 +1,11 @@
+{
+    "bills": {
+        "data": [],
+        "meta": {
+            "total_count": 0,
+            "total_amount": 0,
+            "total_amount_formatted": "0,00\u00a0\u20ac"
+        }
+    },
+    "household_summary": null
+}

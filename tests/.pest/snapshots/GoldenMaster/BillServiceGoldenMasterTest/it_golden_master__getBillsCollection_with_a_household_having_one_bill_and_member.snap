@@ -1,0 +1,10 @@
+[
+    {
+        "id": 2001,
+        "name": "Internet",
+        "member": {
+            "id": 1001,
+            "name": "Alice"
+        }
+    }
+]
