@@ -37,9 +37,12 @@ FROM php:8.4-fpm-alpine AS prod
 
 WORKDIR /var/www/html
 
-# Installer intl et pdo_pgsql pour Postgres
+# Installer intl, pdo_pgsql et redis
 RUN apk add --no-cache icu-dev libpq-dev \
-    && docker-php-ext-install intl pdo_pgsql
+    && docker-php-ext-install intl pdo_pgsql \
+    && pecl install redis \
+    && docker-php-ext-enable redis
+
 
 # Copier dépendances PHP et assets compilés
 COPY --from=vendor /app /var/www/html
