@@ -24,7 +24,7 @@ COPY package.json package-lock.json ./
 
 # Installer dépendances
 RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
-RUN npm ci --only=production
+RUN npm ci
 
 # Copier le reste du projet
 COPY . .
@@ -35,10 +35,40 @@ RUN composer dump-autoload --optimize
 # Builder les assets
 RUN npm run build
 
+# Corriger le problème du manifest.json ET créer un script pour le faire au runtime
+RUN if [ -f "public/build/.vite/manifest.json" ]; then \
+        cp public/build/.vite/manifest.json public/build/manifest.json; \
+        echo "Manifest copié de .vite vers build"; \
+    fi
+
 # Optimiser Laravel pour la production
 RUN php artisan config:cache || true
-RUN php artisan route:cache || true
 RUN php artisan view:cache || true
+
+# Créer un script d'entrée pour initialiser Laravel au démarrage
+RUN cat > /usr/local/bin/entrypoint.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "Initialisation Laravel..."
+
+# Vérifier que les routes Livewire sont disponibles
+echo "Routes Livewire disponibles :"
+php artisan route:list | grep livewire || echo "Aucune route Livewire trouvée"
+
+# Publier les assets Livewire si nécessaire
+if [ ! -d "/var/www/html/public/vendor/livewire" ]; then
+    echo "Publication des assets Livewire..."
+    php artisan livewire:publish --assets || true
+fi
+
+echo "Laravel initialisé avec succès"
+
+# Démarrer PHP-FPM
+exec php-fpm
+EOF
+
+RUN chmod +x /usr/local/bin/entrypoint.sh
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html \
@@ -46,5 +76,5 @@ RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/bootstrap/cache
 
 EXPOSE 9000
-CMD ["php-fpm"]
+CMD ["/usr/local/bin/entrypoint.sh"]
 

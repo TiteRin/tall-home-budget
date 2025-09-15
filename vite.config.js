@@ -22,8 +22,16 @@ export default defineConfig({
         }
     },
     build: {
-        manifest: true,
+        manifest: "manifest.json",
         outDir: 'public/build',
         emptyOutDir: true,
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+                entryFileNames: `assets/[name]-[hash].js`,
+                chunkFileNames: `assets/[name]-[hash].js`,
+                assetFileNames: `assets/[name]-[hash].[ext]`
+            }
+        }
     },
 });
