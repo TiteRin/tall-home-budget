@@ -1,41 +1,28 @@
-# ---- Étape vendor : installer dépendances PHP ----
-FROM php:8.4-fpm AS prod
+# Image PHP officielle avec FPM
+FROM php:8.4-fpm
 
-WORKDIR /var/www/html
-
-# Installer extensions PHP
+# Installer dépendances système et PHP nécessaires
 RUN apt-get update && apt-get install -y \
-    git unzip curl libicu-dev libpq-dev libzip-dev \
-    && docker-php-ext-install intl pdo_pgsql zip \
+    unzip git curl libicu-dev libpq-dev libonig-dev nodejs npm \
     && pecl install redis \
     && docker-php-ext-enable redis \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install intl pdo_pgsql mbstring
 
-# Installer composer
+WORKDIR /var/www/html
+
+# Copier projet
+COPY . .
+
+# Installer Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Copier projet et installer dépendances PHP
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+# Installer dépendances PHP
+RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist \
+    && composer dump-autoload --optimize \
+    && php artisan package:discover --ansi || true
 
-COPY . .
-
-RUN composer dump-autoload --optimize && php artisan package:discover --ansi || true
-
-# ---- Étape frontend : build assets ----
-FROM node:20 AS frontend
-
-WORKDIR /app
-COPY package.json package-lock.json ./
-RUN npm ci
-
-COPY . .
-RUN npm run build
-
-# ---- Étape finale : copier assets frontend dans l'image PHP ----
-FROM prod AS final
-WORKDIR /var/www/html
-COPY --from=frontend /app/public/build /var/www/html/public/build
+# Installer dépendances JS et build assets
+RUN npm ci && npm run build
 
 # Permissions
 RUN chown -R www-data:www-data /var/www/html
