@@ -16,7 +16,7 @@ services:
       - app_network
 
 
-  nginx:
+  nginx-prod:
     image: nginx:alpine
     container_name: nginx-prod
     volumes:
@@ -42,7 +42,7 @@ services:
     networks:
       - app_network
 
-  redis:
+  redis-prod:
     image: redis:alpine
     container_name: redis-prod
     networks:

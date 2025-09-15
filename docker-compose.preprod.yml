@@ -15,7 +15,7 @@ services:
     networks:
       - app_network
 
-  nginx:
+  nginx-preprod:
     image: nginx:alpine
     container_name: nginx-preprod
     volumes:
@@ -24,7 +24,7 @@ services:
     ports:
       - "8080:80"
     depends_on:
-      - laravel-prod
+      - laravel-preprod
     networks:
       - app_network
 
@@ -41,7 +41,7 @@ services:
     networks:
       - app_network
 
-  redis:
+  redis-preprod:
     image: redis:alpine
     container_name: redis-preprod
     networks:
