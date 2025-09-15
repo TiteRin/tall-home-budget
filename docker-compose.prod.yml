@@ -25,7 +25,7 @@ services:
     ports:
       - "80:80"
     depends_on:
-      - laravel
+      - laravel-prod
     networks:
       - app_network
 
