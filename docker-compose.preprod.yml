@@ -40,6 +40,11 @@ services:
       - pg_data_preprod:/var/lib/postgresql/data
     networks:
       - app_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d tall_home_budget_preprod" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   redis-preprod:
     image: redis:alpine
