@@ -37,7 +37,7 @@ it("should return the absolute amount", function () {
     expect($balance->abs())->toEqual(new Amount(10000));
 });
 
-it("should add substrac amounts immutably", function () {
+it("should add subtract amounts immutably", function () {
     $member = Member::factory()->make(['first_name' => 'Alice']);
     $balance = new Balance($member, new Amount(10000));
 
