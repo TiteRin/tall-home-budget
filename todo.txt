@@ -12,3 +12,6 @@
 // TODO : rendre possible la suppression, mais en déplaçant les dépenses sur un autre membre du foyer
 
 
+// [x] Create a ValueObject Balance
+// [ ] Mettre la méthode "abs" sur l’objet Amount
+
