@@ -3,9 +3,11 @@
 namespace App\Services\Movement;
 
 use App\Domains\ValueObjects\Amount;
+use App\Domains\ValueObjects\Balance;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
 use App\Services\Bill\BillsCollection;
+use Illuminate\Support\Collection;
 
 class MovementsService
 {
@@ -63,6 +65,31 @@ class MovementsService
         );
     }
 
+    public function computeBalances(): Collection
+    {
+        $totalEqual = $this->bills->getTotalForDistributionMethod(DistributionMethod::EQUAL);
+        $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
+        $ratios = $this->getRatiosFromIncome();
+
+        $balances = collect();
+
+        foreach ($this->members as $member) {
+            $paid = $this->bills->getTotalForMember($member);
+            $owedEqual = new Amount($totalEqual->toCents() / count($this->members));
+            $owedProrata = new Amount($totalProrata->toCents() * $ratios[$member->id]);
+            $owed = $owedEqual->add($owedProrata);
+
+            $balances->push(
+                new Balance(
+                    $member,
+                    $paid->subtract($owed)
+                )
+            );
+        }
+
+        return $balances;
+    }
+
     public function toMovements(): array
     {
         $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
@@ -98,8 +125,6 @@ class MovementsService
         // on effectue des mouvements pour mettre la dette à zéro
         while (count($negativeDebts) > 0) {
             $currentDebt = array_pop($negativeDebts);
-
-
         }
 
 
