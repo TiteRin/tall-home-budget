@@ -191,6 +191,86 @@ describe("Example.md test", function () {
                 ->and($movements[1]->amount)->toEqual(new Amount(16600));
         });
     });
+
+    describe("Example 3 - avec compte joint, mais négatif", function () {
+
+        beforeEach(function () {
+            $household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => true]);
+
+            $memberAlice = bill_factory()->member(['first_name' => 'Alice'], $household);
+            $memberBob = bill_factory()->member(['first_name' => 'Bob'], $household);
+            $memberCharlie = bill_factory()->member(['first_name' => 'Charlie'], $household);
+
+            $loyer = bill_factory()->bill([
+                'name' => 'Loyer',
+                'amount' => 70000,
+                'distribution_method' => DistributionMethod::PRORATA,
+            ], $memberCharlie, $household);
+
+            $electricity = bill_factory()->bill([
+                'name' => 'Électricité',
+                'amount' => 9000,
+                'distribution_method' => DistributionMethod::EQUAL,
+            ], $memberAlice, $household);
+
+            $internet = bill_factory()->bill([
+                'name' => 'Internet',
+                'amount' => 3000,
+                'distribution_method' => DistributionMethod::PRORATA,
+            ], $memberBob, $household);
+
+            $veterinaire = bill_factory()->bill([
+                'name' => 'Vétérinaire',
+                'amount' => 10000,
+                'distribution_method' => DistributionMethod::PRORATA,
+                'member_id' => null
+            ], null, $household);
+
+            $members = [$memberAlice, $memberBob, $memberCharlie];
+            $bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
+
+            $incomes = [
+                $memberAlice->id => new Amount(200000),
+                $memberBob->id => new Amount(100000),
+                $memberCharlie->id => new Amount(200000),
+            ];
+
+            $this->movementService = new MovementsService($members, $bills, $incomes);
+            $this->memberAlice = $memberAlice;
+            $this->memberBob = $memberBob;
+            $this->memberCharlie = $memberCharlie;
+        });
+
+        test("computeBalances()", function () {
+            $balances = $this->movementService->computeBalances();
+
+            expect($balances)->toHaveCount(4)
+                ->and($balances[0]->member)->toBe($this->memberAlice)
+                ->and($balances[0]->amount)->toEqual(new Amount(-27200))
+                ->and($balances[1]->member)->toBe($this->memberBob)
+                ->and($balances[1]->amount)->toEqual(new Amount(-16600))
+                ->and($balances[2]->member)->toBe($this->memberCharlie)
+                ->and($balances[2]->amount)->toEqual(new Amount(33800))
+                ->and($balances[3]->member)->toBeInstanceOf(JointAccount::class)
+                ->and($balances[3]->amount)->toEqual(new Amount(10000));
+        });
+
+        test('toMovements()', function () {
+
+            $movements = $this->movementService->toMovements();
+            expect($movements)->toBeInstanceOf(Collection::class)
+                ->and($movements)->toHaveCount(3)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[0]->amount)->toEqual(new Amount(27200))
+                ->and($movements[1]->memberFrom)->toBe($this->memberBob)
+                ->and($movements[1]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[1]->amount)->toEqual(new Amount(6600))
+                ->and($movements[2]->memberFrom)->toBe($this->memberBob)
+                ->and($movements[2]->memberTo)->toBeInstanceOf(JointAccount::class)
+                ->and($movements[2]->amount)->toEqual(new Amount(10000));
+        });
+    });
 });
 
 test('should obtain the bills total amount in an array', function () {

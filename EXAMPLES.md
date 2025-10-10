@@ -66,11 +66,11 @@ Alice   : 90/3 + 830*40% => 30 + 332 => 362
 Bob     : 90/3 + 830*20% => 30 + 166 => 196
 Charlie : 90/3 + 830*40% => 30 + 332 => 362
 |--------------------------------------------------------------------------
- Dette        |  272  | 166   | -338    |    100
+Dette | 272 | 166 | -338 | -100
 
 Mouvements :
-Alice vers Compte joint : 100
-Alice vers Charlie : 172
-Bob vers Charlie : 166
+Alice vers Charlie : 272
+Bob vers Charlie : 66
+Bob vers compte joint: 100
 
 
