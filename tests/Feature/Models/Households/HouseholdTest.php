@@ -2,8 +2,10 @@
 
 namespace Tests\Unit\Models;
 
+use App\Domains\Entities\JointAccount;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Models\Household;
 
 describe('Household', function () {
 
@@ -118,8 +120,20 @@ describe('Household members', function () {
                 'amount' => 3000
             ], $this->members->last());
 
-            expect($this->household->total_amount)->toEqual(new Amount(13000));
-            expect($this->household->total_amount_formatted)->toBe((new Amount(13000))->toCurrency());
+            expect($this->household->total_amount)->toEqual(new Amount(13000))
+                ->and($this->household->total_amount_formatted)->toBe((new Amount(13000))->toCurrency());
         });
+    });
+});
+
+describe("With or without a joint account", function () {
+    it("should return a JointAccount entity", function () {
+        $household = Household::factory()->create(['has_joint_account' => true]);
+        expect($household->jointAccount())->toBeInstanceOf(JointAccount::class);
+    });
+
+    it("should return null", function () {
+        $household = Household::factory()->create(['has_joint_account' => false]);
+        expect($household->jointAccount())->toBeNull();
     });
 });

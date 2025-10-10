@@ -14,7 +14,7 @@
 
 // [x] Create a ValueObject Balance
 // [x] Mettre la méthode "abs" sur l’objet Amount
+// [x] Create an Abstract Participant to gather Member and joint account, maybe
 // [ ] MovementsService::getRatioForMember
-// [ ] Create an Abstract Participant to gather Member and joint account, maybe
 // [ ] Memoize balances
 
