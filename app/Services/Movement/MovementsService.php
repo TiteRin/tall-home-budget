@@ -71,7 +71,7 @@ class MovementsService
         $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
         $ratios = $this->getRatiosFromIncome();
 
-        $balances = collect();
+        $balances = new BalancesCollection();
 
         foreach ($this->members as $member) {
             $paid = $this->bills->getTotalForMember($member);
@@ -87,66 +87,54 @@ class MovementsService
             );
         }
 
-        $totalNotAssociated = $this->bills->getTotalForMember();
-        if ($totalNotAssociated->toCents() !== 0) {
-            $balances->push(new Balance(
-                    new Member(['first_name' => 'Compte joint']),
-                    $totalNotAssociated
+        $joint = $this->members[0]->household->jointAccount();
+        if ($joint) {
+            $balances->push(
+                new Balance(
+                    $joint,
+                    $this->bills->getTotalForMember()
                 )
             );
         }
 
-
         return $balances;
-    }
-
-    public function getCreditors(): Collection
-    {
-        return $this->computeBalances()->filter(function (Balance $balance) {
-            return $balance->isCreditor();
-        });
-    }
-
-    public function getDebitors(): Collection
-    {
-        return $this->computeBalances()->filter(function (Balance $balance) {
-            return $balance->isDebitor();
-        });
     }
 
     public function toMovements(): Collection
     {
         $movements = collect();
 
-        $creditors = $this->getCreditors();
-        $debitors = $this->getDebitors();
+        $balances = $this->computeBalances();
+        $creditors = $balances->getCreditors();
+        $debitors = $balances->getDebitors();
 
-        while (!empty($creditors) && !empty($debitors)) {
-            $creditor = $creditors->first();
-            $debitor = $debitors->first();
+        $creditor = $creditors->shift();
+        $debitor = $debitors->shift();
 
-            $amount = min(
+        while ($creditor !== null && $debitor !== null) {
+
+            $amount = new Amount(min(
                 $creditor->abs()->toCents(),
                 $debitor->abs()->toCents(),
-            );
+            ));
 
             $movements->push(
                 new Movement(
                     memberFrom: $debitor->member,
                     memberTo: $creditor->member,
-                    amount: new Amount($amount)
+                    amount: $amount
                 )
             );
 
-            $creditor->balance->subtract($amount);
-            $debitor->balance->add($amount);
+            $creditor->amount = $creditor->amount->subtract($amount);
+            $debitor->amount = $debitor->amount->add($amount);
 
-            if ($creditor->balance->toCents() === 0) {
-                $creditors->shift();
+            if ($creditor->amount->toCents() === 0) {
+                $creditor = $creditors->shift();
             }
 
-            if ($debitor->balance->toCents() === 0) {
-                $debitors->shift();
+            if ($debitor->amount->toCents() === 0) {
+                $debitor = $debitors->shift();
             }
         }
 

@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services\Movement;
 
+use App\Domains\Entities\JointAccount;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Services\Bill\BillsCollection;
@@ -30,9 +31,6 @@ test('should return a collection of movements from bills and incomes', function 
         $this->bills,
         $this->incomes,
     );
-    dump($service->getCreditors());
-    dump($service->getDebitors());
-
     expect($service->toMovements())->toBeInstanceOf(Collection::class);
 });
 
@@ -97,25 +95,25 @@ describe("Example.md test", function () {
         });
 
         test("getCreditors", function () {
-            $creditors = $this->movementService->getCreditors();
+            $creditors = $this->movementService->computeBalances()->getCreditors();
             expect($creditors)->toHaveCount(1);
         });
 
         test("getDebitors", function () {
-            $debitors = $this->movementService->getDebitors();
+            $debitors = $this->movementService->computeBalances()->getDebitors();
             expect($debitors)->toHaveCount(2);
         });
 
         test("toMovements()", function () {
 
             $movements = $this->movementService->toMovements();
-            expect($movements)->toBeArray()
+            expect($movements)->toBeInstanceOf(Collection::class)
                 ->and($movements)->toHaveCount(2)
                 ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
-                ->and($movements[0]->memberTo)->toBeNull()
+                ->and($movements[0]->memberTo)->toBeInstanceOf(JointAccount::class)
                 ->and($movements[0]->amount)->toEqual(new Amount(39000))
                 ->and($movements[1]->memberFrom)->toBe($this->memberBob)
-                ->and($movements[1]->memberTo)->toBeNull()
+                ->and($movements[1]->memberTo)->toBeInstanceOf(JointAccount::class)
                 ->and($movements[1]->amount)->toEqual(new Amount(31000));
         });
     });
