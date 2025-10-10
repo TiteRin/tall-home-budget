@@ -90,6 +90,11 @@ class Amount
         return new Amount($this->value() - $amount->value());
     }
 
+    public function abs(): int
+    {
+        return abs($this->value());
+    }
+
     public function opposite(): Amount
     {
         return new Amount(-$this->value());

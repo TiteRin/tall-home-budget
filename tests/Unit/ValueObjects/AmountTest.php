@@ -175,9 +175,14 @@ describe("manipulation methods", function () {
             ->and($amountB->subtract($amountA))->toEqual(new Amount(1000));
     });
 
+    test('should obtain the absolute amount', function () {
+        $amount = new Amount(-1000);
+        expect($amount->abs())->toBe(1000);
+    });
+
     test('should obtain a new amount from a opposite operation', function () {
         $amountA = new Amount(1000);
-        expect($amountA->opposite())->toEqual(new Amount(-1000));
-        expect($amountA->opposite()->opposite())->toEqual($amountA);
+        expect($amountA->opposite())->toEqual(new Amount(-1000))
+            ->and($amountA->opposite()->opposite())->toEqual($amountA);
     });
 });
