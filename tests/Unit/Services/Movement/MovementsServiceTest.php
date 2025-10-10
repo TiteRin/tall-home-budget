@@ -178,18 +178,18 @@ describe("Example.md test", function () {
                 ->and($balances[2]->amount)->toEqual(new Amount(33800));
         });
 
-//        test('toMovements()', function () {
-//
-//            $movements = $this->movementService->toMovements();
-//            expect($movements)->toBeArray()
-//                ->and($movements)->toHaveCount(2)
-//                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
-//                ->and($movements[0]->memberTo)->toBe($this->memberCharlie)
-//                ->and($movements[0]->amount)->toEqual(new Amount(17200))
-//                ->and($movements[1]->memberFrom)->toBe($this->memberBob)
-//                ->and($movements[1]->memberTo)->toBe($this->memberCharlie)
-//                ->and($movements[1]->amount)->toEqual(new Amount(16600));
-//        });
+        test('toMovements()', function () {
+
+            $movements = $this->movementService->toMovements();
+            expect($movements)->toBeInstanceOf(Collection::class)
+                ->and($movements)->toHaveCount(2)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[0]->amount)->toEqual(new Amount(17200))
+                ->and($movements[1]->memberFrom)->toBe($this->memberBob)
+                ->and($movements[1]->memberTo)->toBe($this->memberCharlie)
+                ->and($movements[1]->amount)->toEqual(new Amount(16600));
+        });
     });
 });
 

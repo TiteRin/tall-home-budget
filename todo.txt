@@ -17,6 +17,6 @@
 // [x] Create an Abstract Participant to gather Member and joint account, maybe
 // [ ] MovementsService::getRatioForMember
 // [ ] Memoize balances
-// [ ] BalanceCollection
-// [ ] TypedCollection
+// [x] BalanceCollection
+// [x] TypedCollection
 

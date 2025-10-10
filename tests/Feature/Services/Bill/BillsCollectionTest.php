@@ -16,20 +16,20 @@ beforeEach(function () {
 test("should initialize with empty array", function () {
     $collection = new BillsCollection([]);
 
-    expect($collection->toArray())->toBeEmpty();
+    expect($collection)->toBeEmpty();
 });
 
 test("should initialize with array of bills", function () {
     $collection = new BillsCollection(bill_factory()->bills(3, [], $this->memberAlice, $this->household));
 
-    expect($collection->toArray())->toHaveCount(3);
+    expect($collection)->toHaveCount(3);
 });
 
 test("should initialize with a collection of bills", function () {
     $bills = collect(bill_factory()->bills(3, [], $this->memberAlice, $this->household));
     $collection = new BillsCollection($bills);
 
-    expect($collection->toArray())->toHaveCount(3);
+    expect($collection)->toHaveCount(3);
 });
 
 test("should add a bill to the collection", function () {
@@ -37,7 +37,7 @@ test("should add a bill to the collection", function () {
     $collection = new BillsCollection($bills);
 
     $collection->add(bill_factory()->bill([], $this->memberBob, $this->household));
-    expect($collection->toArray())->toHaveCount(4);
+    expect($collection)->toHaveCount(4);
 });
 
 test("should not add a bill to the collection if it already exists", function () {

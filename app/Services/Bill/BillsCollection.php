@@ -6,50 +6,55 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Member;
+use App\Support\Collections\TypedCollection;
 use Exception;
-use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
-class BillsCollection
+class BillsCollection extends TypedCollection
 {
-    private Collection $bills;
-
-    public function __construct($bills = [])
-    {
-        $this->bills = collect($bills);
-    }
-
-    public function toArray(): array
-    {
-        return $this->bills->toArray();
-    }
 
     public function getTotal(): Amount
     {
-        if ($this->bills->isEmpty()) {
+        if ($this->isEmpty()) {
             return new Amount(0);
         }
 
-        return new Amount($this->bills->sum(fn($bill) => $bill->amount->value()));
+        return new Amount($this->sum(fn($bill) => $bill->amount->value()));
     }
 
     public function getTotalForDistributionMethod(DistributionMethod $distributionMethod): Amount
     {
-        return (new BillsCollection($this->bills->filter(fn($bill) => $bill->distribution_method === $distributionMethod)))->getTotal();
+        $filtered = $this->filter(function (Bill $bill) use ($distributionMethod) {
+            return $bill->distribution_method === $distributionMethod;
+        });
+
+        return $filtered->getTotal();
     }
 
     public function getTotalForMember(?Member $member = null): Amount
     {
-        return (new BillsCollection($this->bills->filter(fn($bill) => $bill->member_id === $member?->id)))->getTotal();
+        return $this->filter(fn($bill) => $bill->member_id === $member?->id)->getTotal();
     }
 
     /**
      * @throws Exception
      */
-    public function add(Bill $bill): void
+    protected function validateType($item): void
     {
-        if ($this->bills->contains('id', $bill->id)) {
-            throw new Exception('Bill already exists');
+        parent::validateType($item);
+
+        if ($this->contains('id', $item->id)) {
+            throw new InvalidArgumentException('Bill already exists');
         }
-        $this->bills->push($bill);
+    }
+
+    protected function getExpectedType(): string
+    {
+        return Bill::class;
+    }
+
+    protected function getCollectionName(): string
+    {
+        return self::class;
     }
 }
