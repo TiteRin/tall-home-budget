@@ -28,7 +28,7 @@ class Balance
 
     public function abs(): Amount
     {
-        return new Amount(abs($this->amount->toCents()));
+        return new Amount($this->amount->abs());
     }
 
     public function add(Amount $amount): Balance
