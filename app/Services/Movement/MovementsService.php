@@ -87,66 +87,69 @@ class MovementsService
             );
         }
 
-        return $balances;
-    }
-
-    public function toMovements(): array
-    {
-        $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
-        $totalEqual = $this->bills->getTotalForDistributionMethod(DistributionMethod::EQUAL);
-        $ratios = $this->getRatiosFromIncome();
-
-        $debts = array_combine(
-            array_map(function (Member $member) {
-                return $member->id;
-            }, $this->members),
-            array_map(function (Member $member) use ($totalProrata, $totalEqual, $ratios) {
-                $totalMember = $this->bills->getTotalForMember($member);
-
-                // cf. EXAMPLES.md
-                $amountProrataForMember = new Amount($totalProrata->toCents() * $ratios[$member->id]);
-                $amountEqualForMember = new Amount($totalEqual->toCents() / count($this->members));
-                $amountForMember = $amountProrataForMember->add($amountEqualForMember);
-
-                return $amountForMember->subtract($totalMember);
-            }, $this->members)
-        );
-
-        // séparer les dettes selon si elles sont positives ou négatives
-        // (retirer les dettes nulles)
-        $positiveDebts = array_filter($debts, function (Amount $amount) {
-            return $amount->toCents() > 0;
-        });
-        $negativeDebts = array_filter($debts, function (Amount $amount) {
-            return $amount->toCents() < 0;
-        });
-
-        // tant qu’on a au moins un membre avec une dette négative,
-        // on effectue des mouvements pour mettre la dette à zéro
-        while (count($negativeDebts) > 0) {
-            $currentDebt = array_pop($negativeDebts);
+        $totalNotAssociated = $this->bills->getTotalForMember();
+        if ($totalNotAssociated->toCents() !== 0) {
+            $balances->push(new Balance(
+                    new Member(['first_name' => 'Compte joint']),
+                    $totalNotAssociated
+                )
+            );
         }
 
 
-        // Si vide, tous les mouvements vont vers le compte joint
+        return $balances;
+    }
 
-        // sinon,
+    public function getCreditors(): Collection
+    {
+        return $this->computeBalances()->filter(function (Balance $balance) {
+            return $balance->isCreditor();
+        });
+    }
 
-        // si à la fin il reste des membres avec une dette négative, ils piochent dans le compte joint
-        // s’il reste des membres avec des dettes positives, ils donnent au compte joint
+    public function getDebitors(): Collection
+    {
+        return $this->computeBalances()->filter(function (Balance $balance) {
+            return $balance->isDebitor();
+        });
+    }
 
-        return array_map(
-            function (Member $member) use ($debts) {
+    public function toMovements(): Collection
+    {
+        $movements = collect();
 
-                $debt = $debts[$member->id];
+        $creditors = $this->getCreditors();
+        $debitors = $this->getDebitors();
 
-                if ($debt->toCents() > 0) {
-                    return new Movement($member, null, $debt);
-                }
+        while (!empty($creditors) && !empty($debitors)) {
+            $creditor = $creditors->first();
+            $debitor = $debitors->first();
 
-                return new Movement(null, $member, $debt);
-            },
-            $this->members
-        );
+            $amount = min(
+                $creditor->abs()->toCents(),
+                $debitor->abs()->toCents(),
+            );
+
+            $movements->push(
+                new Movement(
+                    memberFrom: $debitor->member,
+                    memberTo: $creditor->member,
+                    amount: new Amount($amount)
+                )
+            );
+
+            $creditor->balance->subtract($amount);
+            $debitor->balance->add($amount);
+
+            if ($creditor->balance->toCents() === 0) {
+                $creditors->shift();
+            }
+
+            if ($debitor->balance->toCents() === 0) {
+                $debitors->shift();
+            }
+        }
+
+        return $movements;
     }
 }
