@@ -2,29 +2,39 @@
 
 namespace App\Livewire\Home;
 
+use App\Services\Movement\MovementsService;
 use Illuminate\Contracts\View\View;
-use Livewire\Attributes\Locked;
 use Livewire\Component;
 
 class MovementsList extends Component
 {
-    #[Locked]
-    public array $members = [];
-    #[Locked]
     public array $incomes = [];
-    #[Locked]
-    public array $bills = [];
+
+    private MovementsService $service;
+
+    public function boot()
+    {
+        $this->service = MovementsService::create();
+    }
+
 
     public function render(): View
     {
-        if (count($this->members) === 0) {
+        if (!$this->service->hasMembers()) {
             return view('livewire.home.movements-list-empty');
         }
 
-        if (count($this->bills) === 0) {
+        if (!$this->service->hasBills()) {
             return view('livewire.home.movements-list-empty');
         }
 
-        return view('livewire.home.movements-list');
+        $this->service->setIncomes($this->incomes);
+        $movements = $this->service->toMovements();
+
+        if ($movements->count() === 0) {
+            return view('livewire.home.movements-list-empty');
+        }
+
+        return view('livewire.home.movements-list', compact('movements'));
     }
 }

@@ -4,8 +4,9 @@
             Mouvements
         </h2>
         <ul class="list">
-            <li>Alice</li>
-            <li>Bob</li>
+            @foreach($movements as $movement)
+                <li>{{ $movement->memberFrom->full_name }}</li>
+            @endforeach
         </ul>
     </div>
 </section>

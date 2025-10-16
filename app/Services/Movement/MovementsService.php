@@ -7,7 +7,10 @@ use App\Domains\ValueObjects\Balance;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
 use App\Services\Bill\BillsCollection;
+use App\Services\Household\HouseholdService;
+use Exception;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 class MovementsService
 {
@@ -16,14 +19,48 @@ class MovementsService
     private array $members;
 
     public function __construct(
-        array $members,
+        array  $members,
         BillsCollection $bills,
-        array           $incomes,
+        ?array $incomes = [],
     )
     {
         $this->bills = $bills;
         $this->incomes = $incomes;
         $this->members = $members;
+    }
+
+    public function hasMembers(): bool
+    {
+        return count($this->members) > 0;
+    }
+
+    public function hasBills(): bool
+    {
+        return count($this->bills) > 0;
+    }
+
+
+    public function setIncomes(array $incomes): static
+    {
+        foreach ($incomes as $member_id => $income) {
+
+            if (!array_any($this->members, function (Member $m) use ($member_id) {
+                return $m->id === $member_id;
+            })) {
+                throw new InvalidArgumentException("The Member [$member_id] is not a part of the service.");
+            }
+        }
+
+        $this->incomes = $incomes;
+        return $this;
+    }
+
+    public function setIncomeFor(Member $member, Amount $amount): static
+    {
+        $currentIncomes = $this->incomes;
+        $currentIncomes[$member->id] = $amount;
+        $this->setIncomes($currentIncomes);
+        return $this;
     }
 
     public function getTotalsAmount(): array
@@ -104,6 +141,14 @@ class MovementsService
     {
         $movements = collect();
 
+        if (!$this->hasMembers() || !$this->hasBills()) {
+            return $movements;
+        }
+
+        if (count($this->incomes) === 0) {
+            return $movements;
+        }
+
         $balances = $this->computeBalances();
         $creditors = $balances->getCreditors();
         $debitors = $balances->getDebitors();
@@ -139,5 +184,21 @@ class MovementsService
         }
 
         return $movements;
+    }
+
+    public static function create(): MovementsService
+    {
+        $householdService = new HouseholdService();
+        $currentHousehold = $householdService->getCurrentHousehold();
+
+        if ($currentHousehold === null) {
+            throw new Exception("Aucun foyer courant.");
+        }
+
+
+        $members = $currentHousehold->members->all();
+        $bills = new BillsCollection($currentHousehold->bills);
+
+        return new self($members, $bills);
     }
 }

@@ -20,6 +20,7 @@
 // [x] BalanceCollection
 // [x] TypedCollection
 // [ ] Afficher les mouvements sur l’écran d’accueil
-// [ ] MovementService::updateIncomes
-// [ ] MovementService : pouvoir récupérer les membres et les dépenses automatiquement
-// [ ] MovementServiceFactory ?
+// [x] MovementService::updateIncomes
+// [x] MovementService : pouvoir récupérer les membres et les dépenses automatiquement
+// [x] MovementServiceFactory ?
+// [ ] Create an Object (Wireable ?) MemberIncome

@@ -7,7 +7,11 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Services\Bill\BillsCollection;
 use App\Services\Movement\MovementsService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
+
+uses(RefreshDatabase::class);
 
 beforeEach(function () {
     $this->household = bill_factory()->household(['has_joint_account' => true]);
@@ -329,4 +333,34 @@ test('should obtain the ratios of incomes', function () {
         );
 });
 
+describe("Instantiation via a static method", function () {
 
+    test("should initialize with current household members and bills and no incomes", function () {
+        $service = MovementsService::create();
+
+        expect($service)->toBeInstanceOf(MovementsService::class)
+            ->and($service->toMovements())->toHaveCount(0);
+    });
+
+    test("should update incomes and have movements", function () {
+        $service = MovementsService::create();
+        $service->setIncomes($this->incomes);
+
+        expect($service->toMovements())->toHaveCount(2);
+    });
+
+    test("should add or update income for a member", function () {
+        $service = MovementsService::create();
+
+        $service->setIncomeFor($this->memberAlice, new Amount(200000));
+        $service->setIncomeFor($this->memberBob, new Amount(200000));
+
+        expect($service->toMovements())->toHaveCount(2);
+    });
+
+    test("should not be possible to set an income for a non existing member", function () {
+        $service = MovementsService::create();
+
+        $service->setIncomeFor(bill_factory()->member(), new Amount(200000));
+    })->throws(InvalidArgumentException::class);
+});
