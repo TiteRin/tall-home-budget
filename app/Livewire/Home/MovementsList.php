@@ -4,6 +4,7 @@ namespace App\Livewire\Home;
 
 use App\Services\Movement\MovementsService;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\Computed;
 use Livewire\Component;
 
 class MovementsList extends Component
@@ -17,6 +18,17 @@ class MovementsList extends Component
         $this->service = MovementsService::create();
     }
 
+    #[Computed]
+    public function movements()
+    {
+        return $this->service->toMovements();
+    }
+
+    public function updatedIncomes(): void
+    {
+        $this->service->setIncomes($this->incomes);
+    }
+
 
     public function render(): View
     {
@@ -28,13 +40,10 @@ class MovementsList extends Component
             return view('livewire.home.movements-list-empty');
         }
 
-        $this->service->setIncomes($this->incomes);
-        $movements = $this->service->toMovements();
-
-        if ($movements->count() === 0) {
+        if ($this->movements->count() === 0) {
             return view('livewire.home.movements-list-empty');
         }
 
-        return view('livewire.home.movements-list', compact('movements'));
+        return view('livewire.home.movements-list');
     }
 }
