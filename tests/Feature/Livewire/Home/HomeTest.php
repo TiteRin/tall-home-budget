@@ -36,7 +36,7 @@ describe("Basic component tests", function () {
 
     test('should have a MovementsList component', function () {
         Livewire::test(Home::class, ['household' => $this->household])
-            ->assertSeeLivewire('home.movements-list');
+            ->assertSeeLivewire('home.movements.movements-list');
     });
 });
 
@@ -96,4 +96,5 @@ describe("Event listener tests", function () {
         Livewire::test(Home::class, ['household' => $this->household])
             ->dispatch('incomeModified', memberId: 99, amount: 195000);
     })->throws(MismatchedHouseholdException::class);
+
 });

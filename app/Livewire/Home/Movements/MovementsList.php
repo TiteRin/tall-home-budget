@@ -13,7 +13,7 @@ class MovementsList extends Component
 
     private MovementsService $service;
 
-    public function boot()
+    public function boot(): void
     {
         $this->service = MovementsService::create();
     }

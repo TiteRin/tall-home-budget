@@ -144,7 +144,7 @@ describe('When incomes are edited', function () {
             ->assertSeeInOrder(["50%", "25%", "25%"]);
     });
 
-    test('shoud not display ration if not all inputs are filled', function () {
+    test('shoud not display ratio if not all inputs are filled', function () {
         Livewire::test(AccountsList::class, $this->props)
             ->set('incomes.' . $this->memberDewey->id, "500")
             ->set('incomes.' . $this->memberHuey->id, "500")
