@@ -4,7 +4,7 @@
         @livewire('home.bills-list', ['bills' => $bills])
     </div>
 
-    @livewire('home.movements-list', [
+    @livewire('home.movements.movements-list', [
         'members' => $members
     ])
 

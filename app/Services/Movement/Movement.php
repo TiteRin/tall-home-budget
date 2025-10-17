@@ -32,4 +32,9 @@ class Movement
         $this->memberTo = $memberTo;
         $this->amount = $amount;
     }
+
+    public function getId(): string
+    {
+        return "$this->memberFrom->id-$this->memberTo->id";
+    }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Home;
+namespace App\Livewire\Home\Movements;
 
 use App\Services\Movement\MovementsService;
 use Illuminate\Contracts\View\View;
@@ -33,17 +33,17 @@ class MovementsList extends Component
     public function render(): View
     {
         if (!$this->service->hasMembers()) {
-            return view('livewire.home.movements-list-empty');
+            return view('livewire.home.movements.movements-list-empty');
         }
 
         if (!$this->service->hasBills()) {
-            return view('livewire.home.movements-list-empty');
+            return view('livewire.home.movements.movements-list-empty');
         }
 
         if ($this->movements->count() === 0) {
-            return view('livewire.home.movements-list-empty');
+            return view('livewire.home.movements.movements-list-empty');
         }
 
-        return view('livewire.home.movements-list');
+        return view('livewire.home.movements.movements-list');
     }
 }

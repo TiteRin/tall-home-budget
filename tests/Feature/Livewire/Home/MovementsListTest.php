@@ -4,7 +4,7 @@ namespace Tests\Feature\Livewire\Home;
 
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Livewire\Home\MovementsList;
+use App\Livewire\Home\Movements\MovementsList;
 use App\Services\Bill\BillsCollection;
 use Livewire;
 
@@ -82,6 +82,26 @@ describe("when all is initialized", function () {
         Livewire::test(MovementsList::class)
             ->set(['incomes' => $this->incomes])
             ->assertSeeInOrder(['Alice', 'Bob']);
+    });
+
+
+    test('should display the recipients', function () {
+        Livewire::test(MovementsList::class)
+            ->set(['incomes' => $this->incomes])
+            ->assertSeeInOrder(['Compte joint', 'Compte joint']);
+    });
+
+    test('should display the amounts', function () {
+        Livewire::test(MovementsList::class)
+            ->set(['incomes' => $this->incomes])
+            ->assertSeeInOrder(['390,00', '310,00']);
+    });
+
+    test('should display all the movements', function () {
+        Livewire::test(MovementsList::class)
+            ->set(['incomes' => $this->incomes])
+            ->assertSee('Alice Doe doit 390,00 € à Compte joint')
+            ->assertSee('Bob Doe doit 310,00 € à Compte joint');
     });
 });
 
