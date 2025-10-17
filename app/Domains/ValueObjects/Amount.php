@@ -163,6 +163,10 @@ class Amount implements Wireable
             return new static((int)$value['cents']);
         }
 
-        throw new InvalidArgumentException('Cannot hydrate Amount from provided Livewire value.');
+        if (self::isValid($value)) {
+            return self::from($value);
+        }
+
+        throw new InvalidArgumentException("Cannot hydrate Amount from provided Livewire value [$value].");
     }
 }
