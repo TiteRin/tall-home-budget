@@ -7,6 +7,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Services\Bill\BillsCollection;
 use App\Services\Movement\MovementsService;
+use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -36,6 +37,28 @@ test('should return a collection of movements from bills and incomes', function 
         $this->incomes,
     );
     expect($service->toMovements())->toBeInstanceOf(Collection::class);
+});
+
+describe("Computes balances", function () {
+
+    beforeEach(function () {
+        $this->service = new MovementsService(
+            $this->members,
+            $this->bills,
+            []
+        );
+    });
+
+    test("should throw an exception if no income have been set", function () {
+        $this->service->computeBalances();
+    })->throws(Exception::class, "You need to set income for every member.");
+
+    test("should throw an exception if not every member has an income", function () {
+        $this->service
+            ->setIncomes([
+                $this->memberAlice->id => new Amount(200000),
+            ])->computeBalances();
+    })->throws(Exception::class, "You need to set income for every member.");
 });
 
 describe("Example.md test", function () {

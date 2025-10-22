@@ -2,6 +2,7 @@
 
 namespace App\Livewire;
 
+use App\Domains\ValueObjects\Amount;
 use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Household;
 use Illuminate\Contracts\View\View;
@@ -28,8 +29,9 @@ class Home extends Component
         $household = $this->household;
         $members = $this->household->members->all();
         $bills = $this->household->bills->all();
+        $incomes = $this->incomes;
 
-        return view('livewire.home.home', compact('household', 'members', 'bills'));
+        return view('livewire.home.home', compact('household', 'members', 'bills', 'incomes'));
     }
 
     /**
@@ -46,7 +48,12 @@ class Home extends Component
             return;
         }
 
-        $this->incomes[$memberId] = $amount;
+        if (!Amount::isValid($amount)) {
+            unset($this->incomes[$memberId]);
+            return;
+        }
+
+        $this->incomes[$memberId] = new Amount($amount);
     }
 
 

@@ -4,7 +4,7 @@
             Mouvements
         </h2>
         <ul class="list">
-            @foreach($this->movements as $movement)
+            @foreach($movements as $movement)
                 <livewire:home.movements.movement-item
                     :from="$movement->memberFrom"
                     :to="$movement->memberTo"

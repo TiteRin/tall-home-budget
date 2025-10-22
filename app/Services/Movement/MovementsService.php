@@ -102,8 +102,15 @@ class MovementsService
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function computeBalances(): Collection
     {
+        if (count($this->incomes) !== count($this->members)) {
+            throw new Exception("You need to set income for every member.");
+        }
+
         $totalEqual = $this->bills->getTotalForDistributionMethod(DistributionMethod::EQUAL);
         $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
         $ratios = $this->getRatiosFromIncome();
@@ -137,6 +144,9 @@ class MovementsService
         return $balances;
     }
 
+    /**
+     * @throws Exception
+     */
     public function toMovements(): Collection
     {
         $movements = collect();
@@ -145,7 +155,7 @@ class MovementsService
             return $movements;
         }
 
-        if (count($this->incomes) === 0) {
+        if (count($this->incomes) !== count($this->members)) {
             return $movements;
         }
 

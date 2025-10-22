@@ -79,27 +79,23 @@ describe("when all is initialized", function () {
 
     test("should display the members", function () {
 
-        Livewire::test(MovementsList::class)
-            ->set(['incomes' => $this->incomes])
+        Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
             ->assertSeeInOrder(['Alice Doe', 'Bob Doe']);
     });
 
 
     test('should display the recipients', function () {
-        Livewire::test(MovementsList::class)
-            ->set(['incomes' => $this->incomes])
+        Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
             ->assertSeeInOrder(['Compte joint', 'Compte joint']);
     });
 
     test('should display the amounts', function () {
-        Livewire::test(MovementsList::class)
-            ->set(['incomes' => $this->incomes])
+        Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
             ->assertSeeInOrder(['390,00', '310,00']);
     });
 
     test('should display all the movements', function () {
-        Livewire::test(MovementsList::class)
-            ->set(['incomes' => $this->incomes])
+        Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
             ->assertSee('Alice Doe doit 390,00 € à Compte joint')
             ->assertSee('Bob Doe doit 310,00 € à Compte joint');
     });
