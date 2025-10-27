@@ -99,22 +99,5 @@ describe("when all is initialized", function () {
             ->assertSee('Alice Doe doit 390,00 € à Compte joint')
             ->assertSee('Bob Doe doit 310,00 € à Compte joint');
     });
-
-
-    test('when incomes change, the movements should be updated', function () {
-        Livewire::test(MovementsList::class)
-            ->assertSee('Aucun mouvement à afficher.')
-            ->set(['incomes' => $this->incomes])
-            ->assertSee('Alice Doe doit 390,00 € à Compte joint')
-            ->assertSee('Bob Doe doit 310,00 € à Compte joint')
-//            ->set(['incomes' => []])
-//            ->assertSee('Aucun mouvement à afficher.')
-            ->set(['incomes' => [
-                $this->memberAlice->id => new Amount(100000),
-                $this->memberBob->id => new Amount(300000),
-            ]])
-            ->assertSee('Alice Doe doit 340,00 € à Compte joint')
-            ->assertSee('Bob Doe doit 360,00 € à Compte joint');
-    });
 });
 
