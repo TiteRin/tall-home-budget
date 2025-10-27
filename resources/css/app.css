@@ -12,7 +12,9 @@
 @plugin '@tailwindcss/typography';
 
 /* Import DaisyUI library */
-@plugin 'daisyui';
+@plugin 'daisyui' {
+    themes: dark --default
+}
 
 /* Remove default red box-shadow on invalid form elements */
 input:invalid, textarea:invalid, select:invalid {

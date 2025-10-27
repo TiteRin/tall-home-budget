@@ -10,43 +10,49 @@ test('should represent an amount', function () {
     expect($amount->value())->toBe(1000);
 });
 
-test('should always be positive', function () {
-    new Amount(-1);
-})->throws(InvalidArgumentException::class, 'Amount [-1] must be a positive integer');
+test('should represent a negative amount', function () {
+    $amount = new Amount(-1000);
+    expect($amount->value())->toBe(-1000);
+});
 
 test('should be equal when amounts have same value', function () {
     $amount1 = new Amount(12500);
     $amount2 = new Amount(12500);
 
-    expect($amount1->__equals($amount2))->toBeTrue();
+    expect($amount1->__equals($amount2))->toBeTrue()
+        ->and($amount1 == $amount2)->toBeTrue();
 });
 
 test('should not be equal when amounts have different values', function () {
     $amount1 = new Amount(12500);
     $amount2 = new Amount(15000);
 
-    expect($amount1->__equals($amount2))->toBeFalse();
+    expect($amount1->__equals($amount2))->toBeFalse()
+        ->and($amount1 == $amount2)->toBeFalse();
 });
 
 test('should be equal when created differently but same value', function () {
     $amount1 = new Amount(12500);
     $amount2 = Amount::from('125.00');
 
-    expect($amount1->__equals($amount2))->toBeTrue();
+    expect($amount1->__equals($amount2))->toBeTrue()
+        ->and($amount1 == $amount2)->toBeTrue();
 });
 
 test('should be equal with zero amounts', function () {
     $amount1 = new Amount(0);
     $amount2 = new Amount(0);
 
-    expect($amount1->__equals($amount2))->toBeTrue();
+    expect($amount1->__equals($amount2))->toBeTrue()
+        ->and($amount1 == $amount2)->toBeTrue();
 });
 
 test('should not be equal when one is zero and other is not', function () {
     $amount1 = new Amount(0);
     $amount2 = new Amount(100);
 
-    expect($amount1->__equals($amount2))->toBeFalse();
+    expect($amount1->__equals($amount2))->toBeFalse()
+        ->and($amount1 == $amount2)->toBeFalse();
 });
 
 test('should create an Amount from a string', function () {
@@ -121,7 +127,6 @@ describe("should not validate that string…", function () {
 
 
 describe('extraction methods', function () {
-
     test('should remove currency symbols', function () {
         expect(Amount::extractCurrencySymbols("1000€"))->toBe("1000");
     });
@@ -132,5 +137,52 @@ describe('extraction methods', function () {
 
     test('should remove thousands separator', function () {
         expect(Amount::extractThousandsSeparator("1.000.000"))->toBe("1000000");
+    });
+});
+
+describe('conversion methods', function () {
+    test('should convert to string', function () {
+        expect((string)new Amount(1000))->toBe("10,00 €");
+    });
+
+    test('should convert a negative amount to string', function () {
+        expect((string)new Amount(-1000))->toBe("-10,00 €");
+    });
+
+    test('should convert to cents', function () {
+        expect((new Amount(1000))->toCents())->toBe(1000);
+    });
+
+    test('should convert to decimal', function () {
+        expect((new Amount(1000))->toDecimal())->toBe(10.00);
+    });
+});
+
+describe("manipulation methods", function () {
+    test('should add an amount to another amount', function () {
+        $amountA = new Amount(1000);
+        $amountB = new Amount(2000);
+
+        expect($amountA->add($amountB))->toEqual(new Amount(3000))
+            ->and($amountB->add($amountA))->toEqual(new Amount(3000));
+    });
+
+    test('should obtain a new amount from a substraction', function () {
+        $amountA = new Amount(1000);
+        $amountB = new Amount(2000);
+
+        expect($amountA->subtract($amountB))->toEqual(new Amount(-1000))
+            ->and($amountB->subtract($amountA))->toEqual(new Amount(1000));
+    });
+
+    test('should obtain the absolute amount', function () {
+        $amount = new Amount(-1000);
+        expect($amount->abs())->toBe(1000);
+    });
+
+    test('should obtain a new amount from a opposite operation', function () {
+        $amountA = new Amount(1000);
+        expect($amountA->opposite())->toEqual(new Amount(-1000))
+            ->and($amountA->opposite()->opposite())->toEqual($amountA);
     });
 });

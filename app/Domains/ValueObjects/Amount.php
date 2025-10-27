@@ -4,17 +4,14 @@ namespace App\Domains\ValueObjects;
 
 use Illuminate\Support\Number;
 use InvalidArgumentException;
+use Livewire\Wireable;
 
-class Amount
+class Amount implements Wireable
 {
     private int $amount;
 
     public function __construct(int $amount)
     {
-        if ($amount < 0) {
-            throw new InvalidArgumentException("Amount [$amount] must be a positive integer");
-        }
-
         $this->amount = $amount;
     }
 
@@ -69,9 +66,39 @@ class Amount
         return Number::currency($this->amount / 100.0, in: 'EUR', locale: 'fr_FR');
     }
 
+    public function toCents(): int
+    {
+        return $this->amount;
+    }
+
+    public function toDecimal(): float
+    {
+        return $this->amount / 100.0;
+    }
+
     public function __equals(Amount $amount): bool
     {
         return $this->value() === $amount->value();
+    }
+
+    public function add(Amount $amount): Amount
+    {
+        return new Amount($this->value() + $amount->value());
+    }
+
+    public function subtract(Amount $amount): Amount
+    {
+        return new Amount($this->value() - $amount->value());
+    }
+
+    public function abs(): int
+    {
+        return abs($this->value());
+    }
+
+    public function opposite(): Amount
+    {
+        return new Amount(-$this->value());
     }
 
     public static function from(string $amount): Amount
@@ -98,5 +125,48 @@ class Amount
         $amount = self::normalizeNumericString($amount);
 
         return is_numeric($amount);
+    }
+
+    public function __toString(): string
+    {
+        return $this->toCurrency();
+    }
+
+    /**
+     * Livewire: convert the value object to a primitive payload (in cents)
+     */
+    public function toLivewire(): int|string|array
+    {
+        // Return an array as Livewire's WireableSynth expects an iterable payload
+        // Keep it explicit to avoid ambiguity with parent arrays of wireables
+        return ['cents' => $this->toCents()];
+    }
+
+    /**
+     * Livewire: restore the value object from a primitive payload
+     * @param mixed $value
+     */
+    public static function fromLivewire($value): static
+    {
+        // Accept integers or numeric strings coming from JSON transport
+        if (is_int($value)) {
+            return new static($value);
+        }
+
+        if (is_string($value) && is_numeric($value)) {
+            // Ensure we keep cents (no float involved here)
+            return new static((int)$value);
+        }
+
+        // Support array payloads like ['cents' => 1234] if ever used
+        if (is_array($value) && array_key_exists('cents', $value) && is_numeric($value['cents'])) {
+            return new static((int)$value['cents']);
+        }
+
+        if (self::isValid($value)) {
+            return self::from($value);
+        }
+
+        throw new InvalidArgumentException("Cannot hydrate Amount from provided Livewire value [$value].");
     }
 }

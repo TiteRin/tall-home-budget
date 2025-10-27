@@ -13,11 +13,3 @@ test('bill amount is an Amount object', function () {
         ->and($bill->amount->value())
         ->toBe(17900);
 });
-
-
-test('bill amount is always positive', function () {
-    $bill = new Bill();
-    $bill->amount = -17900;
-
-    $amount = $bill->amount;
-})->throws(\InvalidArgumentException::class);
