@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\Home;
 
+use App\Domains\ValueObjects\Amount;
 use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Livewire\Home;
 use Livewire;
@@ -64,15 +65,15 @@ describe("Event listener tests", function () {
             })
             ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: 210000)
             ->assertSet('incomes', function (array $incomes) {
-                return $incomes[$this->memberJohn->id] == 210000;
+                return $incomes[$this->memberJohn->id] == new Amount(210000);
             });
     });
 
     test('when an income is emptied, should remove from the incomes state', function () {
         Livewire::test(Home::class, ['household' => $this->household])
-            ->set('incomes.' . $this->memberJohn->id, 210000)
+            ->set('incomes.' . $this->memberJohn->id, new Amount(210000))
             ->assertSet('incomes', function (array $incomes) {
-                return $incomes[$this->memberJohn->id] == 210000;
+                return $incomes[$this->memberJohn->id] == new Amount(210000);
             })
             ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: null)
             ->assertSet('incomes', function (array $incomes) {
@@ -82,13 +83,13 @@ describe("Event listener tests", function () {
 
     test('when an income is modified, should edit to the incomes state', function () {
         Livewire::test(Home::class, ['household' => $this->household])
-            ->set('incomes.' . $this->memberJohn->id, 210000)
+            ->set('incomes.' . $this->memberJohn->id, new Amount(210000))
             ->assertSet('incomes', function (array $incomes) {
-                return $incomes[$this->memberJohn->id] == 210000;
+                return $incomes[$this->memberJohn->id] == new Amount(210000);
             })
             ->dispatch('incomeModified', memberId: $this->memberJohn->id, amount: 195000)
             ->assertSet('incomes', function (array $incomes) {
-                return $incomes[$this->memberJohn->id] == 195000;
+                return $incomes[$this->memberJohn->id] == new Amount(195000);
             });
     });
 
