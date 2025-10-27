@@ -19,7 +19,7 @@
 // [ ] Memoize balances
 // [x] BalanceCollection
 // [x] TypedCollection
-// [ ] Afficher les mouvements sur l’écran d’accueil
+// [x] Afficher les mouvements sur l’écran d’accueil
 // [x] MovementService::updateIncomes
 // [x] MovementService : pouvoir récupérer les membres et les dépenses automatiquement
 // [x] MovementServiceFactory ?
