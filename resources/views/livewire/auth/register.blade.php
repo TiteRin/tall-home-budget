@@ -1,86 +1,170 @@
-@section('title', 'Create a new account')
-
-<div>
-    <div class="sm:mx-auto sm:w-full sm:max-w-md">
-        <a href="{{ route('home') }}">
-            <x-logo class="w-auto h-16 mx-auto text-indigo-600" />
-        </a>
-
-        <h2 class="mt-6 text-3xl font-extrabold text-center text-gray-900 leading-9">
-            Create a new account
-        </h2>
-
-        <p class="mt-2 text-sm text-center text-gray-600 leading-5 max-w">
-            Or
-            <a href="{{ route('login') }}" class="font-medium text-indigo-600 hover:text-indigo-500 focus:outline-none focus:underline transition ease-in-out duration-150">
-                sign in to your account
-            </a>
-        </p>
-    </div>
-
-    <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div class="px-4 py-8 bg-white shadow sm:rounded-lg sm:px-10">
-            <form wire:submit.prevent="register">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 leading-5">
-                        Name
-                    </label>
-
-                    <div class="mt-1 rounded-md shadow-sm">
-                        <input wire:model.lazy="name" id="name" type="text" required autofocus class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5 @error('name') border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red @enderror" />
-                    </div>
-
-                    @error('name')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-6">
-                    <label for="email" class="block text-sm font-medium text-gray-700 leading-5">
-                        Email address
-                    </label>
-
-                    <div class="mt-1 rounded-md shadow-sm">
-                        <input wire:model.lazy="email" id="email" type="email" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5 @error('email') border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red @enderror" />
-                    </div>
-
-                    @error('email')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-6">
-                    <label for="password" class="block text-sm font-medium text-gray-700 leading-5">
-                        Password
-                    </label>
-
-                    <div class="mt-1 rounded-md shadow-sm">
-                        <input wire:model.lazy="password" id="password" type="password" required class="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5 @error('password') border-red-300 text-red-900 placeholder-red-300 focus:border-red-300 focus:ring-red @enderror" />
-                    </div>
-
-                    @error('password')
-                        <p class="mt-2 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
-
-                <div class="mt-6">
-                    <label for="password_confirmation" class="block text-sm font-medium text-gray-700 leading-5">
-                        Confirm Password
-                    </label>
-
-                    <div class="mt-1 rounded-md shadow-sm">
-                        <input wire:model.lazy="passwordConfirmation" id="password_confirmation" type="password" required class="block w-full px-3 py-2 placeholder-gray-400 border border-gray-300 appearance-none rounded-md focus:outline-none focus:ring-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
-                    </div>
-                </div>
-
-                <div class="mt-6">
-                    <span class="block w-full rounded-md shadow-sm">
-                        <button type="submit" class="flex justify-center w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:ring-indigo active:bg-indigo-700 transition duration-150 ease-in-out">
-                            Register
-                        </button>
-                    </span>
-                </div>
-            </form>
+<div class="min-h-screen flex items-center justify-center bg-base-200 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-2xl w-full space-y-8">
+        <div>
+            <h2 class="mt-6 text-center text-3xl font-extrabold">
+                Créer un compte
+            </h2>
         </div>
+
+        <form wire:submit="register" class="mt-8 space-y-6">
+            <div class="card bg-base-100 shadow-xl">
+                <div class="card-body space-y-4">
+                    <!-- Informations personnelles -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold">Vos informations</h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Prénom</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    wire:model="firstName"
+                                    class="input input-bordered @error('firstName') input-error @enderror"
+                                    placeholder="John"
+                                />
+                                @error('firstName')
+                                <label class="label">
+                                    <span class="label-text-alt text-error">{{ $message }}</span>
+                                </label>
+                                @enderror
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Nom</span>
+                                </label>
+                                <input
+                                    type="text"
+                                    wire:model="lastName"
+                                    class="input input-bordered @error('lastName') input-error @enderror"
+                                    placeholder="Doe"
+                                />
+                                @error('lastName')
+                                <label class="label">
+                                    <span class="label-text-alt text-error">{{ $message }}</span>
+                                </label>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Email</span>
+                            </label>
+                            <input
+                                type="email"
+                                wire:model="email"
+                                class="input input-bordered @error('email') input-error @enderror"
+                                placeholder="john@example.com"
+                            />
+                            @error('email')
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ $message }}</span>
+                            </label>
+                            @enderror
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Mot de passe</span>
+                                </label>
+                                <input
+                                    type="password"
+                                    wire:model="password"
+                                    class="input input-bordered @error('password') input-error @enderror"
+                                    placeholder="••••••••"
+                                />
+                                @error('password')
+                                <label class="label">
+                                    <span class="label-text-alt text-error">{{ $message }}</span>
+                                </label>
+                                @enderror
+                            </div>
+
+                            <div class="form-control">
+                                <label class="label">
+                                    <span class="label-text">Confirmer le mot de passe</span>
+                                </label>
+                                <input
+                                    type="password"
+                                    wire:model="passwordConfirmation"
+                                    class="input input-bordered"
+                                    placeholder="••••••••"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <!-- Informations du foyer -->
+                    <div class="space-y-4">
+                        <h3 class="text-lg font-semibold">Votre foyer</h3>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Nom du foyer</span>
+                            </label>
+                            <input
+                                type="text"
+                                wire:model="householdName"
+                                class="input input-bordered @error('householdName') input-error @enderror"
+                                placeholder="Famille Doe"
+                            />
+                            @error('householdName')
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ $message }}</span>
+                            </label>
+                            @enderror
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label">
+                                <span class="label-text">Méthode de calcul par défaut</span>
+                            </label>
+                            <select
+                                wire:model="defaultDistributionMethod"
+                                class="select select-bordered @error('defaultDistributionMethod') select-error @enderror"
+                            >
+                                @foreach($distributionMethods as $method)
+                                    <option value="{{ $method->value }}">{{ $method->label() }}</option>
+                                @endforeach
+                            </select>
+                            @error('defaultDistributionMethod')
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ $message }}</span>
+                            </label>
+                            @enderror
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label cursor-pointer">
+                                <span class="label-text">Compte joint</span>
+                                <input
+                                    type="checkbox"
+                                    wire:model="hasJointAccount"
+                                    class="checkbox"
+                                />
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="card-actions justify-end mt-6">
+                        <button type="submit" class="btn btn-primary">
+                            S'inscrire
+                        </button>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{{ route('login') }}" wire:navigate class="link link-primary">
+                            Déjà un compte ? Se connecter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </form>
     </div>
 </div>
