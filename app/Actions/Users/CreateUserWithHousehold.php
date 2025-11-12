@@ -1,0 +1,62 @@
+<?php
+
+namespace App\Actions\Users;
+
+use App\Models\Household;
+use App\Models\Member;
+use App\Models\User;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+
+class CreateUserWithHousehold
+{
+    /**
+     * @throws ValidationException|\Throwable
+     */
+    public function execute(array $data): User
+    {
+        $this->validate($data);
+
+        return DB::transaction(function () use ($data) {
+
+            $household = Household::create([
+                'name' => $data['household_name'],
+                'default_distribution_method' => $data['default_distribution_method'],
+                'has_joint_account' => $data['has_joint_account']
+            ]);
+
+            $member = Member::create([
+                'first_name' => $data['first_name'],
+                'last_name' => $data['last_name'],
+                'household_id' => $household->id,
+            ]);
+
+            $user = User::create([
+                'email' => $data['email'],
+                'password' => Hash::make($data['password']),
+                'member_id' => $member->id,
+            ]);
+
+            return $user;
+        });
+    }
+
+    /**
+     * @param array $data
+     * @return void
+     * @throws ValidationException
+     */
+    protected function validate(array $data): void
+    {
+        $validator = Validator::make($data, [
+            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+    }
+
+}
