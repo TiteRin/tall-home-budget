@@ -19,7 +19,7 @@ describe('CreateUserWithHousehold', function () {
             'email' => 'john@example.com',
             'password' => 'password123!',
             'household_name' => 'Doe Family',
-            'default_distribution_method' => DistributionMethod::EQUAL,
+            'default_distribution_method' => DistributionMethod::EQUAL->value,
             'has_joint_account' => false
         ];
 
@@ -42,7 +42,7 @@ describe('CreateUserWithHousehold', function () {
             'email' => 'john@example.com',
             'password' => 'password123!',
             'household_name' => 'Doe Family',
-            'default_distribution_method' => DistributionMethod::EQUAL,
+            'default_distribution_method' => DistributionMethod::EQUAL->value,
             'has_joint_account' => false
         ];
 
@@ -61,7 +61,7 @@ describe('CreateUserWithHousehold', function () {
             'email' => 'duplicate@example.com',
             'password' => 'password123!',
             'household_name' => 'Doe Family',
-            'default_distribution_method' => DistributionMethod::EQUAL,
+            'default_distribution_method' => DistributionMethod::EQUAL->value,
             'has_joint_account' => false
         ];
 
@@ -69,4 +69,53 @@ describe('CreateUserWithHousehold', function () {
 
     })->throws(ValidationException::class);
 
+    test('household has one member after creation', function () {
+        $action = new CreateUserWithHousehold();
+
+        $userData = [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'duplicate@example.com',
+            'password' => 'password123!',
+            'household_name' => 'Doe Family',
+            'default_distribution_method' => DistributionMethod::EQUAL->value,
+            'has_joint_account' => false
+        ];
+
+        $user = $action->execute($userData);
+        expect($user->member->household->members()->count())->toBeOne();
+    });
+
+    test('validates required fields', function () {
+        $action = new CreateUserWithHousehold();
+        $action->execute([]);
+    })->throws(ValidationException::class);
+
+    test('validates email format', function () {
+        $action = new CreateUserWithHousehold();
+        $userData = [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'invalid-format',
+            'password' => 'password123!',
+            'household_name' => 'Doe Family',
+            'default_distribution_method' => DistributionMethod::EQUAL->value,
+            'has_joint_account' => false
+        ];
+        $action->execute($userData);
+    })->throws(ValidationException::class);
+
+    test('validates password minimum length', function () {
+        $action = new CreateUserWithHousehold();
+        $userData = [
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@example.com',
+            'password' => 'abc',
+            'household_name' => 'Doe Family',
+            'default_distribution_method' => DistributionMethod::EQUAL->value,
+            'has_joint_account' => false
+        ];
+        $action->execute($userData);
+    })->throws(ValidationException::class);
 });

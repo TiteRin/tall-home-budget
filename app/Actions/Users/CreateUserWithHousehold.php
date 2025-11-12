@@ -51,7 +51,13 @@ class CreateUserWithHousehold
     protected function validate(array $data): void
     {
         $validator = Validator::make($data, [
+            'household_name' => ['required', 'string', 'min:3', 'max:255'],
+            'default_distribution_method' => ['required', 'string'],
+            'has_joint_account' => ['required', 'boolean'],
+            'first_name' => ['required', 'string', 'min:3', 'max:255'],
+            'last_name' => ['required', 'string', 'min:3', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'password' => ['required', 'string', 'min:8'],
         ]);
 
         if ($validator->fails()) {
