@@ -53,26 +53,30 @@
                             @enderror
                         </div>
                     </div>
-
-                    <div class="form-control">
-                        <label class="label" for="email">
-                            <span class="label-text">Email</span>
-                        </label>
-                        <input
-                            type="email"
-                            id="email"
-                            wire:model="email"
-                            class="input input-bordered @error('email') input-error @enderror"
-                            required
-                        />
-                        @error('email')
-                        <label class="label">
-                            <span class="label-text-alt text-error">{{ $message }}</span>
-                        </label>
-                        @enderror
-                    </div>
+                </div>
+                <div class="divider"></div>
+                <div class="space-y-4">
+                    <h3 class="text-lg font-semibold">Vos identifiants</h3>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control md:col-span-2">
+                            <label class="label" for="email">
+                                <span class="label-text">Email</span>
+                            </label>
+                            <input
+                                type="email"
+                                id="email"
+                                wire:model="email"
+                                class="w-full input input-bordered @error('email') input-error @enderror"
+                                required
+                            />
+                            @error('email')
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ $message }}</span>
+                            </label>
+                            @enderror
+                        </div>
+
                         <div class="form-control">
                             <label class="label" for="password">
                                 <span class="label-text">Mot de passe</span>
@@ -117,59 +121,59 @@
                 <div class="space-y-4">
                     <h3 class="text-lg font-semibold">Votre foyer</h3>
 
-                    <div class="form-control">
-                        <label class="label" for="householdName">
-                            <span class="label-text">Nom du foyer</span>
-                        </label>
-                        <input
-                            type="text"
-                            id="householdName"
-                            wire:model="householdName"
-                            class="input input-bordered @error('householdName') input-error @enderror"
-                            placeholder="Ex: Famille Dupont"
-                            required
-                        />
-                        @error('householdName')
-                        <label class="label">
-                            <span class="label-text-alt text-error">{{ $message }}</span>
-                        </label>
-                        @enderror
-                    </div>
-
-                    <div class="form-control">
-                        <label class="label" for="defaultDistributionMethod">
-                            <span class="label-text">Méthode de calcul par défaut</span>
-                        </label>
-                        <select
-                            id="defaultDistributionMethod"
-                            wire:model="defaultDistributionMethod"
-                            class="select select-bordered @error('defaultDistributionMethod') select-error @enderror"
-                            required
-                        >
-                            @foreach($distributionMethods as $method)
-                                <option value="{{ $method->value }}">{{ $method->label() }}</option>
-                            @endforeach
-                        </select>
-                        @error('defaultDistributionMethod')
-                        <label class="label">
-                            <span class="label-text-alt text-error">{{ $message }}</span>
-                        </label>
-                        @enderror
-                    </div>
-
-                    <div class="form-control">
-                        <label class="label cursor-pointer justify-start gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="form-control">
+                            <label class="label" for="householdName">
+                                <span class="label-text">Nom du foyer</span>
+                            </label>
                             <input
-                                type="checkbox"
-                                wire:model="hasJointAccount"
-                                class="checkbox"
+                                type="text"
+                                id="householdName"
+                                wire:model="householdName"
+                                class="input input-bordered @error('householdName') input-error @enderror"
+                                placeholder="Ex: Famille Dupont"
+                                required
                             />
-                            <span class="label-text">Le foyer possède un compte joint</span>
-                        </label>
+                            @error('householdName')
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ $message }}</span>
+                            </label>
+                            @enderror
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label" for="defaultDistributionMethod">
+                                <span class="label-text">Méthode de calcul par défaut</span>
+                            </label>
+                            <select
+                                id="defaultDistributionMethod"
+                                wire:model="defaultDistributionMethod"
+                                class="select select-bordered @error('defaultDistributionMethod') select-error @enderror"
+                                required
+                            >
+                                @foreach($distributionMethods as $method)
+                                    <option value="{{ $method->value }}">{{ $method->label() }}</option>
+                                @endforeach
+                            </select>
+                            @error('defaultDistributionMethod')
+                            <label class="label">
+                                <span class="label-text-alt text-error">{{ $message }}</span>
+                            </label>
+                            @enderror
+                        </div>
+
+                        <div class="form-control">
+                            <label class="label cursor-pointer justify-start gap-4">
+                                <input
+                                    type="checkbox"
+                                    wire:model="hasJointAccount"
+                                    class="checkbox"
+                                />
+                                <span class="label-text">Le foyer possède un compte joint</span>
+                            </label>
+                        </div>
                     </div>
                 </div>
-
-                <div class="divider"></div>
 
                 {{-- Actions --}}
                 <div class="space-y-4">

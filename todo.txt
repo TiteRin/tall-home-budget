@@ -23,7 +23,7 @@
 // [ ] Create an Object (Wireable ?) MemberIncome
 
 // Avant la prochaine version
-[ ] Refaire le README
+[x] Refaire le README
 
 // Prochaine version
 [ ] Authentification pour un système multi-utilisateurs/multi-tenant
