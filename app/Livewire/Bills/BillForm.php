@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire;
+namespace App\Livewire\Bills;
 
 use App\Actions\Bills\CreateBill;
 use App\Actions\Bills\UpdateBill;

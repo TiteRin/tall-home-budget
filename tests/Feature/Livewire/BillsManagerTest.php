@@ -17,7 +17,7 @@ test('should display an empty table if no bills', function () {
 
 test('should use the BillForm component to add a bill', function () {
     Livewire::test(BillsManager::class)
-        ->assertSeeLivewire('bill-form');
+        ->assertSeeLivewire('bills.bill-form');
 });
 
 describe('when there’s a list of 5 bills', function () {
@@ -217,7 +217,7 @@ describe('Édition de dépense', function () {
     test('when editing, should use a BillForm component', function () {
         $component = Livewire::test(BillsManager::class);
         $component->dispatch('editBill', billId: $this->bill->id);
-        $component->assertSeeLivewire('bill-form');
+        $component->assertSeeLivewire('bills.bill-form');
     });
 });
 

@@ -5,7 +5,7 @@ namespace Tests\Feature\Livewire\Bills\Form;
 use App\Actions\Bills\UpdateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Livewire\BillForm;
+use App\Livewire\Bills\BillForm;
 use App\Models\Bill;
 use App\Services\Household\HouseholdServiceContract;
 use Exception;

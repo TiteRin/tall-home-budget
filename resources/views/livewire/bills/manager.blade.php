@@ -19,7 +19,7 @@
         <tbody>
         @forelse($bills as $index => $bill)
             @if ($bill->id === $this->editingBillId && $this->isEditing === true)
-                @livewire('bill-form', [
+                @livewire('bills.bill-form', [
                     'householdMembers' => $this->householdMembers,
                     'hasJointAccount' => $this->hasHouseholdJointAccount,
                     'defaultDistributionMethod' => $this->defaultDistributionMethod,
@@ -37,7 +37,7 @@
         @endforelse
         </tbody>
         <tfoot>
-        @livewire('bill-form', [
+        @livewire('bills.bill-form', [
             'householdMembers' => $this->householdMembers,
             'hasJointAccount' => $this->hasHouseholdJointAccount,
             'defaultDistributionMethod' => $this->defaultDistributionMethod
