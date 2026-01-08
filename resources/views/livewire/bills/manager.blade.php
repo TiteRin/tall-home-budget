@@ -1,5 +1,5 @@
 <div>
-    <h1 class="text-2xl font-bold mb-4 bg-blue-100 p-4 rounded-lg">
+    <h1 class="text-2xl font-bold mb-4 bg-primary-content/10 p-4 rounded-lg">
         Gestion des dépenses du foyer
     </h1>
     <div id="notification-container" class="mb-4" style="display: none;">
