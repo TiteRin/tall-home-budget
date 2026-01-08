@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Home;
+namespace App\Livewire\Bills;
 
 use App\Domains\ValueObjects\Amount;
 use Illuminate\Contracts\View\View;
@@ -15,10 +15,10 @@ class BillsList extends Component
     public function render(): View
     {
         if (count($this->bills) === 0) {
-            return view('livewire.home.bills-list-empty');
+            return view('livewire.bills.bills-list-empty');
         }
 
-        return view('livewire.home.bills-list');
+        return view('livewire.bills.bills-list');
     }
 
     #[Computed]

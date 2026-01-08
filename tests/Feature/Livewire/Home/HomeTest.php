@@ -32,7 +32,7 @@ describe("Basic component tests", function () {
 
     test('should have a BillsList component', function () {
         Livewire::test(Home::class, ['household' => $this->household])
-            ->assertSeeLivewire('home.bills-list');
+            ->assertSeeLivewire('bills.bills-list');
     });
 
     test('should have a MovementsList component', function () {
