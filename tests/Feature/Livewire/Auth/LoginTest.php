@@ -1,6 +1,8 @@
 <?php
 
+use App\Enums\DistributionMethod;
 use App\Livewire\Auth\Login;
+use App\Livewire\Auth\Register;
 use App\Models\User;
 use Livewire\Livewire;
 
@@ -14,6 +16,33 @@ test('can see email and password fields', function () {
     Livewire::test(Login::class)
         ->assertSeeHtml('name="email"')
         ->assertSeeHtml('type="password"');
+});
+
+test('a user created via registration can login', function () {
+    // 1. Register a user
+    Livewire::test(Register::class)
+        ->set('firstName', 'Test')
+        ->set('lastName', 'User')
+        ->set('email', 'test-register@example.com')
+        ->set('password', 'password123!')
+        ->set('passwordConfirmation', 'password123!')
+        ->set('householdName', 'Test Household')
+        ->set('defaultDistributionMethod', DistributionMethod::EQUAL->value)
+        ->set('hasJointAccount', false)
+        ->call('register')
+        ->assertRedirect(route('login'));
+
+    $this->assertTrue(User::whereEmail('test-register@example.com')->exists());
+
+    // 2. Login with the newly registered user
+    Livewire::test(Login::class)
+        ->set('email', 'test-register@example.com')
+        ->set('password', 'password123!')
+        ->call('authenticate')
+        ->assertRedirect(route('home'));
+
+    $user = User::whereEmail('test-register@example.com')->first();
+    $this->assertAuthenticatedAs($user);
 });
 
 test('can fill fields and submit form', function () {

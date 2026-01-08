@@ -5,7 +5,6 @@ namespace App\Livewire\Auth;
 use App\Actions\Users\CreateUserWithHousehold;
 use App\Enums\DistributionMethod;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Livewire\Component;
 use Log;
@@ -62,7 +61,7 @@ class Register extends Component
                 'first_name' => $this->firstName,
                 'last_name' => $this->lastName,
                 'email' => $this->email,
-                'password' => Hash::make($this->password),
+                'password' => $this->password,
                 'household_name' => $this->householdName,
                 'default_distribution_method' => $this->defaultDistributionMethod,
                 'has_joint_account' => $this->hasJointAccount

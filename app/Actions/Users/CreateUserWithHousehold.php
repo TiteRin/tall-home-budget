@@ -6,7 +6,6 @@ use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 
@@ -35,7 +34,7 @@ class CreateUserWithHousehold
 
             $user = User::create([
                 'email' => $data['email'],
-                'password' => Hash::make($data['password']),
+                'password' => $data['password'],
                 'member_id' => $member->id,
             ]);
 
