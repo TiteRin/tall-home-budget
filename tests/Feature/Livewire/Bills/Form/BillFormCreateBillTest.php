@@ -7,7 +7,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\Bills\BillForm;
 use App\Models\Bill;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire;
@@ -19,7 +19,7 @@ beforeEach(function () {
     $this->household = bill_factory()->household(['name' => 'Test Household', 'has_joint_account' => true, 'default_distribution_method' => DistributionMethod::EQUAL]);
     $this->member = bill_factory()->member(['first_name' => 'John', 'last_name' => 'Doe'], $this->household);
 
-    $this->householdService = m::mock(HouseholdServiceContract::class);
+    $this->householdService = m::mock(CurrentHouseholdServiceContract::class);
 
 });
 
@@ -33,7 +33,7 @@ describe("when the creation succeeds", function () {
 
             private $hasBeenCalled = false;
 
-            public function __construct(readonly private HouseholdServiceContract $householdService)
+            public function __construct(readonly private CurrentHouseholdServiceContract $householdService)
             {
                 parent::__construct($this->householdService);
             }
@@ -113,13 +113,13 @@ describe("when the creation fails", function () {
 
         $this->household = bill_factory()->household(['name' => 'Test Household', 'has_joint_account' => true, 'default_distribution_method' => DistributionMethod::EQUAL]);
         $this->member = bill_factory()->member(['first_name' => 'John', 'last_name' => 'Doe'], $this->household);
-        $this->householdService = m::mock(HouseholdServiceContract::class);
+        $this->householdService = m::mock(CurrentHouseholdServiceContract::class);
 
         $this->fakeAction = new class($this->householdService) extends CreateBill {
 
             private $hasBeenCalled = false;
 
-            public function __construct(readonly private HouseholdServiceContract $householdService)
+            public function __construct(readonly private CurrentHouseholdServiceContract $householdService)
             {
                 parent::__construct($this->householdService);
             }

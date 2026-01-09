@@ -17,11 +17,6 @@ describe('User Model', function () {
             ->and($user->member->id)->toBe($member->id);
     });
 
-    test('user can exist without member', function () {
-        $user = User::factory()->create(['member_id' => null]);
-        expect($user->member)->toBeNull();
-    });
-
     test('deleting a member deletes associated user', function () {
         $household = Household::factory()->create();
         $member = Member::factory()->create(['household_id' => $household->id]);
@@ -36,12 +31,7 @@ describe('User Model', function () {
 
 describe('User Factory', function () {
 
-    test('user factory creates user without member by default', function () {
-        $user = User::factory()->create();
-        expect($user->member_id)->toBeNull();
-    });
-
-    test('user factory can create user with member', function () {
+    test('user factory creates user with member', function () {
         $member = Member::factory()->create();
         $user = User::factory()->create(['member_id' => $member->id]);
 

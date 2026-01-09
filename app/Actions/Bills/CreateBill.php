@@ -5,13 +5,13 @@ namespace App\Actions\Bills;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Exception;
 
 class CreateBill
 {
     public function __construct(
-        private HouseholdServiceContract $householdService
+        private CurrentHouseholdServiceContract $householdService
     )
     {
     }

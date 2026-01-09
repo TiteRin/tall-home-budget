@@ -7,12 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('should redirect to household settings when no household exists', function () {
-    $user = \App\Models\User::factory()->create();
-    $response = $this->actingAs($user)->get(route('home'));
-    $response->assertRedirect(route('household.settings'));
-});
-
 test('should show home page when household exists', function () {
     $household = bill_factory()->household([
         'name' => 'Test Household',

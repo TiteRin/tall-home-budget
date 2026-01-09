@@ -4,13 +4,13 @@ namespace Tests\Unit\Services\Bill;
 
 use App\Presenters\BillsOverviewPresenter;
 use App\Services\Bill\BillService;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Mockery as m;
 
 
 test("when household is null, should return an array with no bills", function () {
 
-    $householdService = m::mock(HouseholdServiceContract::class);
+    $householdService = m::mock(CurrentHouseholdServiceContract::class);
     $presenter = m::mock(BillsOverviewPresenter::class);
     $billService = new BillService(
         $householdService,

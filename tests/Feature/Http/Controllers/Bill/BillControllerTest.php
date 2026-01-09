@@ -3,7 +3,7 @@
 namespace Tests\Feature\Http\Controllers\Bills;
 
 use App\Enums\DistributionMethod;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery as m;
 
@@ -50,9 +50,9 @@ describe("Golden Master", function () {
 
     test('store should return 422 when no current household exists', function () {
         // Arrange: on force HouseholdServiceContract à renvoyer null pour l’environnement HTTP
-        $householdService = m::mock(HouseholdServiceContract::class);
+        $householdService = m::mock(CurrentHouseholdServiceContract::class);
         $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn(null);
-        app()->instance(HouseholdServiceContract::class, $householdService);
+        app()->instance(CurrentHouseholdServiceContract::class, $householdService);
 
         // Act
         $response = $this->postJson(route('bills.store'), $this->payload);

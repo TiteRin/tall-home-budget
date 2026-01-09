@@ -7,7 +7,7 @@ use App\Domains\ValueObjects\Balance;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
 use App\Services\Bill\BillsCollection;
-use App\Services\Household\HouseholdService;
+use App\Services\Household\CurrentHouseholdService;
 use Exception;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -198,7 +198,7 @@ class MovementsService
 
     public static function create(): MovementsService
     {
-        $householdService = new HouseholdService();
+        $householdService = new CurrentHouseholdService();
         $currentHousehold = $householdService->getCurrentHousehold();
 
         if ($currentHousehold === null) {
