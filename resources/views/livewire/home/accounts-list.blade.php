@@ -1,8 +1,9 @@
 <section class="card bg-base-100 shadow-xl grow"
          x-data="{
             incomes: @entangle('incomes'),
+            storageKey: 'accounts-list-incomes-{{ $household->id }}',
             init() {
-                let savedIncomes = localStorage.getItem('accounts-list-incomes');
+                let savedIncomes = localStorage.getItem(this.storageKey);
                 if (savedIncomes && (!this.incomes || Object.keys(this.incomes).length === 0)) {
                     try {
                         $wire.initIncomes(JSON.parse(savedIncomes));
@@ -13,7 +14,7 @@
 
                 this.$watch('incomes', value => {
                     if (value) {
-                        localStorage.setItem('accounts-list-incomes', JSON.stringify(value));
+                        localStorage.setItem(this.storageKey, JSON.stringify(value));
                     }
                 });
             }
