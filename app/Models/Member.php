@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Member extends Model
 {
@@ -21,6 +22,11 @@ class Member extends Model
         return $this->belongsTo(Household::class);
     }
 
+    public function user(): HasOne
+    {
+        return $this->hasOne(User::class);
+    }
+
     public function getFullNameAttribute()
     {
         return $this->first_name . ' ' . $this->last_name;
@@ -29,5 +35,10 @@ class Member extends Model
     public function isJoint(): bool
     {
         return false;
+    }
+
+    public function hasUserAccount(): bool
+    {
+        return $this->user()->exists();
     }
 }

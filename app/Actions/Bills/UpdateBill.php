@@ -6,13 +6,13 @@ use App\Domains\ValueObjects\Amount;
 use App\Exceptions\Households\InvalidHouseholdException;
 use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Bill;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class UpdateBill
 {
     public function __construct(
-        private readonly HouseholdServiceContract $householdService
+        private readonly CurrentHouseholdServiceContract $householdService
     )
     {
     }

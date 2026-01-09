@@ -1,4 +1,4 @@
-<div class="card bg-base-100 shadow-xl w-96">
+<div class="card bg-base-100 shadow-xl">
     <div class="card-body">
         <h3 class="card-title">Foyer "{{ $householdName }}"</h3>
 
@@ -25,7 +25,7 @@
                     </label>
                     <input type="text" wire:model="householdName" class="input input-bordered">
                     @error('household.name')
-                        <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
+                    <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
                     @enderror
                 </div>
                 <div class="form-control">
@@ -58,44 +58,55 @@
                 <div class="overflow-x-auto">
                     <table class="table">
                         <thead>
-                            <tr>
-                                <th>Prénom</th>
-                                <th>Nom</th>
-                                <th>Actions</th>
-                            </tr>
+                        <tr>
+                            <th>Prénom</th>
+                            <th>Nom</th>
+                            <th>Compte</th>
+                            <th>Actions</th>
+                        </tr>
                         </thead>
                         <tbody>
-                            @forelse($householdMembers as $index => $member)
-                                <tr>
-                                    <td>{{ $member['first_name'] ?? '' }}</td>
-                                    <td>{{ $member['last_name'] ?? '' }}</td>
-                                    <td>
-                                        <button wire:click="removeMember({{ $index }})"
-                                            class="btn btn-error btn-sm">
-                                            Supprimer
-                                        </button>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="text-center">Aucun membre dans le foyer</td>
-                                </tr>
-                            @endforelse
+                        @forelse($householdMembers as $index => $member)
                             <tr>
+                                <td>{{ $member['first_name'] ?? '' }}</td>
+                                <td>{{ $member['last_name'] ?? '' }}</td>
                                 <td>
-                                    <input type="text" wire:model="newMemberFirstName" placeholder="Prénom"
-                                        class="input input-bordered input-sm w-full">
+                                    @if (isset($member['user']))
+                                        <div class="badge badge-success">Actif</div>
+                                    @else
+                                        <button class="btn btn-sm btn-outline btn-primary"
+                                                onclick="navigator.clipboard.writeText('{{ $this->getInviteLink($member['id']) }}'); alert('Lien copié !')">
+                                            Inviter
+                                        </button>
+                                    @endif
                                 </td>
                                 <td>
-                                    <input type="text" wire:model="newMemberLastName" placeholder="Nom"
-                                        class="input input-bordered input-sm w-full">
-                                </td>
-                                <td>
-                                    <button wire:click="addMember" class="btn btn-primary btn-sm">
-                                        Ajouter
+                                    <button wire:click="removeMember({{ $index }})"
+                                            class="btn btn-error btn-sm">
+                                        Supprimer
                                     </button>
                                 </td>
                             </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="text-center">Aucun membre dans le foyer</td>
+                            </tr>
+                        @endforelse
+                        <tr>
+                            <td>
+                                <input type="text" wire:model="newMemberFirstName" placeholder="Prénom"
+                                       class="input input-bordered input-sm w-full">
+                            </td>
+                            <td>
+                                <input type="text" wire:model="newMemberLastName" placeholder="Nom"
+                                       class="input input-bordered input-sm w-full">
+                            </td>
+                            <td>
+                                <button wire:click="addMember" class="btn btn-primary btn-sm">
+                                    Ajouter
+                                </button>
+                            </td>
+                        </tr>
                         </tbody>
                     </table>
                 </div>

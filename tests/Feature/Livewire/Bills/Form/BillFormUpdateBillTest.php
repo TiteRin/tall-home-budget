@@ -5,9 +5,9 @@ namespace Tests\Feature\Livewire\Bills\Form;
 use App\Actions\Bills\UpdateBill;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
-use App\Livewire\BillForm;
+use App\Livewire\Bills\BillForm;
 use App\Models\Bill;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire;
@@ -119,14 +119,14 @@ describe("when the update succeeds", function () {
 
     beforeEach(function () {
 
-        $this->householdService = m::mock(HouseholdServiceContract::class);
+        $this->householdService = m::mock(CurrentHouseholdServiceContract::class);
         $this->householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($this->household);
 
         $this->fakeAction = new class($this->householdService) extends UpdateBill {
 
             private $hasBeenCalled = false;
 
-            public function __construct(readonly private HouseholdServiceContract $householdService)
+            public function __construct(readonly private CurrentHouseholdServiceContract $householdService)
             {
                 parent::__construct($this->householdService);
             }
@@ -184,14 +184,14 @@ describe("when the update fails", function () {
 
     beforeEach(function () {
 
-        $this->householdService = m::mock(HouseholdServiceContract::class);
+        $this->householdService = m::mock(CurrentHouseholdServiceContract::class);
         $this->householdService->shouldReceive('getCurrentHousehold')->never();
 
         $this->fakeAction = new class($this->householdService) extends UpdateBill {
 
             private $hasBeenCalled = false;
 
-            public function __construct(readonly private HouseholdServiceContract $householdService)
+            public function __construct(readonly private CurrentHouseholdServiceContract $householdService)
             {
                 parent::__construct($this->householdService);
             }

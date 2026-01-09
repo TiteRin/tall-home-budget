@@ -7,11 +7,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
 
-test('should redirect to household settings when no household exists', function () {
-    $response = $this->get(route('home'));
-    $response->assertRedirect(route('household.settings'));
-});
-
 test('should show home page when household exists', function () {
     $household = bill_factory()->household([
         'name' => 'Test Household',
@@ -19,7 +14,15 @@ test('should show home page when household exists', function () {
         'default_distribution_method' => DistributionMethod::EQUAL,
     ]);
 
-    $response = $this->get(route('home'));
+    $member = \App\Models\Member::factory()->create([
+        'household_id' => $household->id,
+    ]);
+
+    $user = \App\Models\User::factory()->create([
+        'member_id' => $member->id,
+    ]);
+
+    $response = $this->actingAs($user)->get(route('home'));
 
     $response->assertSuccessful();
     $response->assertViewIs('home');

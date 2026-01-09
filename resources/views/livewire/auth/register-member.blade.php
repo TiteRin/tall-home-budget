@@ -2,7 +2,7 @@
     <div class="max-w-2xl w-full space-y-8">
         <div>
             <h2 class="mt-6 text-center text-3xl font-extrabold">
-                Créer un compte
+                Rejoindre un foyer
             </h2>
             <p class="mt-2 text-center text-sm text-base-content/60">
                 Rejoignez Home Budget pour gérer votre foyer
@@ -131,14 +131,8 @@
                                 id="householdName"
                                 wire:model="householdName"
                                 class="input input-bordered @error('householdName') input-error @enderror"
-                                placeholder="Ex: Famille Dupont"
-                                required
+                                disabled
                             />
-                            @error('householdName')
-                            <label class="label">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </label>
-                            @enderror
                         </div>
 
                         <div class="form-control">
@@ -149,17 +143,12 @@
                                 id="defaultDistributionMethod"
                                 wire:model="defaultDistributionMethod"
                                 class="select select-bordered @error('defaultDistributionMethod') select-error @enderror"
-                                required
+                                disabled
                             >
                                 @foreach($distributionMethods as $method)
                                     <option value="{{ $method->value }}">{{ $method->label() }}</option>
                                 @endforeach
                             </select>
-                            @error('defaultDistributionMethod')
-                            <label class="label">
-                                <span class="label-text-alt text-error">{{ $message }}</span>
-                            </label>
-                            @enderror
                         </div>
 
                         <div class="form-control">
@@ -168,6 +157,7 @@
                                     type="checkbox"
                                     wire:model="hasJointAccount"
                                     class="checkbox"
+                                    disabled
                                 />
                                 <span class="label-text">Le foyer possède un compte joint</span>
                             </label>

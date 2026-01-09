@@ -4,10 +4,7 @@ namespace App\Services\Household;
 
 use App\Models\Household;
 
-interface HouseholdServiceContract
+interface CurrentHouseholdServiceContract
 {
-
-    public function getHousehold(int $householdId): ?Household;
-
     public function getCurrentHousehold(): ?Household;
 }

@@ -5,14 +5,14 @@ namespace App\Services\Bill;
 use App\Models\Bill as BillModel;
 use App\Models\Household;
 use App\Presenters\BillsOverviewPresenter;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Support\Collection;
 
 readonly class BillService
 {
     public function __construct(
-        protected HouseholdServiceContract $householdService,
-        protected BillsOverviewPresenter $presenter
+        protected CurrentHouseholdServiceContract $householdService,
+        protected BillsOverviewPresenter          $presenter
     ) {}
 
 

@@ -23,7 +23,13 @@
 // [ ] Create an Object (Wireable ?) MemberIncome
 
 // Avant la prochaine version
-[ ] Refaire le README
+[x] Refaire le README
 
 // Prochaine version
-[ ] Authentification pour un système multi-utilisateurs/multi-tenant
+[x] Authentification pour un système multi-utilisateurs/multi-tenant
+
+// Compte
+[ ] Suppression d’un compte
+- [ ] Supprimer un membre supprime le compte
+- [ ] Impossible de supprimer un membre si des dépenses y sont associées
+- [ ] Déplacement des dépenses avant suppression

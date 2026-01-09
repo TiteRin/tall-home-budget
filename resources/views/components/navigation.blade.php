@@ -18,6 +18,14 @@
             <li>
                 <a href="{{ route('bills') }}">Dépenses</a>
             </li>
+            @auth
+                <li>
+                    <form method="POST" action="{{ route('logout') }}" id="logout-form">
+                        @csrf
+                        <button type="submit" class="w-full text-left">Déconnexion</button>
+                    </form>
+                </li>
+            @endauth
         </ul>
     </details>
 

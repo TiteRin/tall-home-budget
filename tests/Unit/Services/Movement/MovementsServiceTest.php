@@ -5,6 +5,7 @@ namespace Tests\Unit\Services\Movement;
 use App\Domains\Entities\JointAccount;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Models\User;
 use App\Services\Bill\BillsCollection;
 use App\Services\Movement\MovementsService;
 use Exception;
@@ -28,6 +29,9 @@ beforeEach(function () {
         $this->memberAlice->id => new Amount(200000),
         $this->memberBob->id => new Amount(200000),
     ];
+
+    $user = User::factory()->create(['member_id' => $this->memberAlice->id]);
+    $this->actingAs($user);
 });
 
 test('should return a collection of movements from bills and incomes', function () {

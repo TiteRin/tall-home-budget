@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Livewire\Home;
 
-use App\Livewire\Home\BillsList;
+use App\Livewire\Bills\BillsList;
 use Livewire;
 
 test('should display the component', function () {

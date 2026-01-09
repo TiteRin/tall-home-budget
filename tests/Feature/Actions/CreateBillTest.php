@@ -5,7 +5,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Models\Household;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery as m;
 
@@ -18,7 +18,7 @@ afterEach(function () {
 test('CreateBill should create a new bill with the correct value', function () {
 
     $household = Household::factory()->create();
-    $householdService = m::mock(HouseholdServiceContract::class);
+    $householdService = m::mock(CurrentHouseholdServiceContract::class);
     $householdService->shouldReceive('getCurrentHousehold')->once()->andReturn($household);
 
     $action = new CreateBill($householdService);

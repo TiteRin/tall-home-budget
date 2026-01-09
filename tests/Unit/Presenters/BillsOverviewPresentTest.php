@@ -8,7 +8,7 @@ use App\Models\Bill as BillModel;
 use App\Models\Household as HouseholdModel;
 use App\Models\Member as MemberModel;
 use App\Presenters\BillsOverviewPresenter;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use App\Services\Household\HouseholdSummaryService;
 use Illuminate\Support\Collection;
 
@@ -39,7 +39,7 @@ describe("Golder Master", function () {
         $household->setRelation('bills', $bills);
 
         // Dummy HouseholdServiceContract pour construire HouseholdSummaryService
-        $dummyHouseholdService = new class implements HouseholdServiceContract {
+        $dummyHouseholdService = new class implements CurrentHouseholdServiceContract {
             public function getHousehold(int $householdId): ?HouseholdModel
             {
                 return null;

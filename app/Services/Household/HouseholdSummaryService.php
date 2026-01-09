@@ -7,7 +7,7 @@ use App\Models\Household;
 
 readonly class HouseholdSummaryService
 {
-    public function __construct(private HouseholdServiceContract $householdService)
+    public function __construct(private CurrentHouseholdServiceContract $householdService)
     {
     }
 
