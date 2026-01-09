@@ -1,4 +1,25 @@
-<section class="card bg-base-100 shadow-xl grow">
+<section class="card bg-base-100 shadow-xl grow"
+         x-data="{
+            incomes: @entangle('incomes'),
+            storageKey: 'accounts-list-incomes-{{ $household->id }}',
+            init() {
+                let savedIncomes = localStorage.getItem(this.storageKey);
+                if (savedIncomes && (!this.incomes || Object.keys(this.incomes).length === 0)) {
+                    try {
+                        $wire.initIncomes(JSON.parse(savedIncomes));
+                    } catch (e) {
+                        console.error('Failed to parse saved incomes', e);
+                    }
+                }
+
+                this.$watch('incomes', value => {
+                    if (value) {
+                        localStorage.setItem(this.storageKey, JSON.stringify(value));
+                    }
+                });
+            }
+         }"
+>
     <div class="card-body">
         <h2 class="card-title">
             Membres
@@ -13,23 +34,21 @@
             </thead>
             <tbody>
             @foreach($members as $member)
-                <fieldset>
-                    <tr>
-                        <td>
-                            <label class="cursor-pointer" for="income-{{ $member->id }}">
-                                {{ $member->full_name }}
-                            </label>
-                        </td>
-                        <td>
-                            <input type="text" class="input w-30" wire:model.blur="incomes.{{ $member->id }}"
-                                   id="income-{{ $member->id }}"
-                                   aria-label="Montant du revenu de {{ $member->full_name }}"/>
-                        </td>
-                        <td>
-                            {{ $this->ratioForMember($member->id)  }}
-                        </td>
-                    </tr>
-                </fieldset>
+                <tr wire:key="member-{{ $member->id }}">
+                    <td>
+                        <label class="cursor-pointer" for="income-{{ $member->id }}">
+                            {{ $member->full_name }}
+                        </label>
+                    </td>
+                    <td>
+                        <input type="text" class="input w-30" wire:model.blur="incomes.{{ $member->id }}"
+                               id="income-{{ $member->id }}"
+                               aria-label="Montant du revenu de {{ $member->full_name }}"/>
+                    </td>
+                    <td>
+                        {{ $this->ratioForMember($member->id)  }}
+                    </td>
+                </tr>
             @endforeach
             </tbody>
             <tfoot>

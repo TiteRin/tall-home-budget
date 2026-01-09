@@ -2,7 +2,9 @@
 
 namespace App\Livewire\Home;
 
+use AllowDynamicProperties;
 use App\Domains\ValueObjects\Amount;
+use App\Models\Household;
 use App\Rules\ValidAmount;
 use Exception;
 use Illuminate\View\View;
@@ -14,6 +16,8 @@ class AccountsList extends Component
     public array $members = [];
     public array $incomes = [];
 
+    public Household $household;
+
     public array $incomesInCents = [];
 
     /**
@@ -22,6 +26,7 @@ class AccountsList extends Component
     public function mount(?array $members = []): void
     {
         $this->members = $members;
+        $this->household = $this->members[0]->household;
     }
 
     public function render(): View
@@ -31,11 +36,27 @@ class AccountsList extends Component
         }
 
         $members = $this->members;
+        $household = $this->household;
 
-        return view('livewire.home.accounts-list', compact('members'));
+        return view('livewire.home.accounts-list', compact('members', 'household'));
     }
 
-    public function updatedIncomes(string $amount, int $memberId): void
+    public function updatedIncomes(mixed $amount, int $memberId): void
+    {
+        $this->saveIncome($amount, $memberId);
+    }
+
+    public function initIncomes(array $incomes): void
+    {
+        foreach ($incomes as $memberId => $amount) {
+            $this->saveIncome($amount, (int)$memberId);
+        }
+    }
+
+    /**
+     * @throws Exception
+     */
+    private function saveIncome(mixed $amount, int $memberId): void
     {
         if (empty($amount)) {
             unset($this->incomes[$memberId]);
@@ -45,13 +66,20 @@ class AccountsList extends Component
             return;
         }
 
-        $this->validateOnly('incomes.' . $memberId);
+        $this->incomes[$memberId] = $amount;
 
-        $amount = Amount::from($amount);
+        try {
+            $this->validateOnly('incomes.' . $memberId);
+        } catch (Exception $e) {
+            unset($this->incomes[$memberId]);
+            throw $e;
+        }
 
-        $this->incomes[$memberId] = $amount->toCurrency();
-        $this->incomesInCents[$memberId] = $amount->toCents();
-        $this->dispatch('incomeModified', memberId: $memberId, amount: $amount->value());
+        $amountVo = Amount::from($amount);
+
+        $this->incomes[$memberId] = $amountVo->toCurrency();
+        $this->incomesInCents[$memberId] = $amountVo->toCents();
+        $this->dispatch('incomeModified', memberId: $memberId, amount: $amountVo->value());
     }
 
     #[Computed]

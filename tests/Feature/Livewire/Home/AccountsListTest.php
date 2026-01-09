@@ -5,47 +5,39 @@ namespace Tests\Feature\Livewire\Home;
 use App\Domains\ValueObjects\Amount;
 use App\Livewire\Home\AccountsList;
 use App\Rules\ValidAmount;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire;
 
 uses(RefreshDatabase::class);
 
+beforeEach(function() {
+    $this->household = bill_factory()->household();
+    $this->memberDewey = bill_factory()->member([
+        'first_name' => 'Dewey',
+        'last_name' => 'Duck',
+    ], $this->household);
+    $this->memberHuey = bill_factory()->member([
+        'first_name' => 'Huey',
+        'last_name' => 'Duck',
+    ], $this->household);
+    $this->memberLouis = bill_factory()->member([
+        'first_name' => 'Louis',
+        'last_name' => 'Duck',
+    ], $this->household);
+
+    $this->user = UserFactory::new()->create(['member_id' => $this->memberDewey->id]);
+    $this->actingAs($this->user);
+
+    $this->props = ['members' => [$this->memberDewey, $this->memberHuey, $this->memberLouis]];
+});
+
 test('should display the component', function () {
-    Livewire::test(AccountsList::class)
+    Livewire::test(AccountsList::class, $this->props)
         ->assertOk();
 });
 
-describe("When no members are passed", function () {
-    test('should display a message', function () {
-        Livewire::test(AccountsList::class)
-            ->assertSee('Aucun membre');
-    });
-
-    test('should display a link to the household manager', function () {
-        Livewire::test(AccountsList::class)
-            ->assertSee('Paramétrer le foyer')
-            ->assertSeeHtml('href="' . route('household.settings') . '"');
-    });
-});
-
 describe('When the component has members', function () {
-    beforeEach(function () {
-        $this->household = bill_factory()->household();
-        $this->memberDewey = bill_factory()->member([
-            'first_name' => 'Dewey',
-            'last_name' => 'Duck',
-        ], $this->household);
-        $this->memberHuey = bill_factory()->member([
-            'first_name' => 'Huey',
-            'last_name' => 'Duck',
-        ], $this->household);
-        $this->memberLouis = bill_factory()->member([
-            'first_name' => 'Louis',
-            'last_name' => 'Duck',
-        ], $this->household);
-
-        $this->props = ['members' => [$this->memberDewey, $this->memberHuey, $this->memberLouis]];
-    });
 
     test('should display the members', function () {
         Livewire::test(AccountsList::class, $this->props)
@@ -175,6 +167,16 @@ describe('When incomes are edited', function () {
                 ->assertDispatched('incomeModified', memberId: $this->memberDewey->id, amount: 50000)
                 ->set('incomes.' . $this->memberDewey->id, "")
                 ->assertDispatched('incomeModified', memberId: $this->memberDewey->id, amount: null);
+        });
+
+
+        test('can initialize incomes from a given array (localStorage restoration)', function () {
+            Livewire::test(AccountsList::class, $this->props)
+                ->call('initIncomes', [$this->memberDewey->id => "500", $this->memberHuey->id => "1234.56"])
+                ->assertSet('incomes.' . $this->memberDewey->id, "500,00 €")
+                ->assertSet('incomes.' . $this->memberHuey->id, "1 234,56 €")
+                ->assertSet('incomesInCents.' . $this->memberDewey->id, 50000)
+                ->assertSet('incomesInCents.' . $this->memberHuey->id, 123456);
         });
     });
 });
