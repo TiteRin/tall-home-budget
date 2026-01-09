@@ -4,6 +4,8 @@ namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
 use App\Models\Household;
+use App\Services\Household\CurrentHouseholdService;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Livewire\Component;
 
 class HouseholdManager extends Component
@@ -21,9 +23,9 @@ class HouseholdManager extends Component
     public string $newMemberFirstName = '';
     public string $newMemberLastName = '';
 
-    public function mount()
+    public function mount(CurrentHouseholdServiceContract $currentHouseholdService)
     {
-        $household = Household::orderBy('created_at')->first();
+        $household = $currentHouseholdService->getCurrentHousehold();
 
         if (!$household) {
             $household = Household::create([
