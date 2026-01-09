@@ -2,21 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Household;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public function index(): RedirectResponse|View
+    public function index(CurrentHouseholdServiceContract $householdService): RedirectResponse|View
     {
-        $household = Household::orderBy('id')->first();
-        
+        if (Auth::guest()) {
+            return view('welcome');
+        }
+
+        $household = $householdService->getCurrentHousehold();
+
         if (!$household) {
             return redirect()->route('household.settings');
         }
-        
+
         return view('home', compact('household'));
     }
 }

@@ -23,10 +23,6 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::get('/users', function() {
-    return "Hello World !";
-});
-
 Route::controller(App\Http\Controllers\BillsController::class)->group(function() {
     Route::get('/bills', 'index')->name('bills');
     Route::get('/bills/settings', 'settings')->name('bills.settings');

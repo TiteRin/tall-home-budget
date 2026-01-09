@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Domains\Entities\JointAccount;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,5 +48,19 @@ class Household extends Model
     public function hasJointAccount(): bool
     {
         return $this->has_joint_account;
+    }
+
+    public function jointAccount(): ?JointAccount
+    {
+        if (!$this->has_joint_account) {
+            return null;
+        }
+
+        return new JointAccount(
+            [
+                'first_name' => 'Compte joint',
+                'household_id' => $this->id
+            ]
+        );
     }
 }

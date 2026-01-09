@@ -6,27 +6,14 @@ use App\Enums\DistributionMethod;
 use App\Livewire\HouseholdManager;
 use App\Models\Household;
 use App\Models\Member;
+use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
 uses(RefreshDatabase::class);
 
 describe('Initialization', function () {
-    test("when no household exists, should initialize one", function () {
-        Livewire::test(HouseholdManager::class)
-            ->assertSet('householdName', 'Mon Foyer')
-            ->assertSet('hasJointAccount', false)
-            ->assertSet('defaultDistributionMethod', DistributionMethod::EQUAL->value)
-            ->assertSet('newMemberLastName', 'Mon Foyer')
-            ->assertCount('householdMembers', 0);
-
-        // Vérifier qu'un foyer a bien été créé
-        expect(Household::count())->toBe(1);
-        $household = Household::first();
-        expect($household->name)->toBe('Mon Foyer')
-            ->and($household->has_joint_account)->toBeFalse()
-            ->and($household->default_distribution_method)->toBe(DistributionMethod::EQUAL);
-    });
 
     test("when household exists, should load existing data", function () {
         $household = Household::factory()->create([
@@ -41,6 +28,9 @@ describe('Initialization', function () {
             'last_name' => 'Dupont'
         ]);
 
+        $user = UserFactory::new()->create(['member_id' => $member->id]);
+        $this->actingAs($user);
+
         Livewire::test(HouseholdManager::class)
             ->assertSet('householdId', $household->id)
             ->assertSet('householdName', 'Famille Dupont')
@@ -48,21 +38,6 @@ describe('Initialization', function () {
             ->assertSet('defaultDistributionMethod', DistributionMethod::PRORATA->value)
             ->assertSet('newMemberLastName', 'Famille Dupont')
             ->assertCount('householdMembers', 1);
-    });
-
-    test("should load oldest household when multiple exist", function () {
-        $oldHousehold = Household::factory()->create([
-            'name' => 'Premier Foyer',
-            'created_at' => now()->subDays(2)
-        ]);
-        $newHousehold = Household::factory()->create([
-            'name' => 'Deuxième Foyer',
-            'created_at' => now()->subDays(1)
-        ]);
-
-        Livewire::test(HouseholdManager::class)
-            ->assertSet('householdId', $oldHousehold->id)
-            ->assertSet('householdName', 'Premier Foyer');
     });
 });
 
@@ -73,6 +48,10 @@ describe('Save functionality', function () {
             'has_joint_account' => false,
             'default_distribution_method' => DistributionMethod::EQUAL,
         ]);
+
+        $this->member = Member::factory()->create(['household_id' => $this->household->id]);
+        $this->user = UserFactory::new()->create(['member_id' => $this->member->id]);
+        $this->actingAs($this->user);
     });
 
     test("should update household with valid data", function () {
@@ -112,20 +91,22 @@ describe('Save functionality', function () {
 describe('Member management', function () {
     beforeEach(function () {
         $this->household = Household::factory()->create(['name' => 'Famille Test']);
+        $this->member = Member::factory()->create(['household_id' => $this->household->id]);
+        $this->user = UserFactory::new()->create(['member_id' => $this->member->id]);
+        $this->actingAs($this->user);
     });
 
     test("should add member with valid data", function () {
         Livewire::test(HouseholdManager::class)
-            ->set('householdId', $this->household->id)
             ->set('newMemberFirstName', 'Marie')
             ->set('newMemberLastName', 'Dupont')
             ->call('addMember')
             ->assertSet('newMemberFirstName', '')
             ->assertSet('newMemberLastName', 'Famille Test')
-            ->assertCount('householdMembers', 1);
+            ->assertCount('householdMembers', 2);
 
-        expect($this->household->members()->count())->toBe(1);
-        $member = $this->household->members()->first();
+        expect($this->household->members()->count())->toBe(2);
+        $member = $this->household->members()->orderBy('id', 'desc')->first();
         expect($member->first_name)->toBe('Marie')
             ->and($member->last_name)->toBe('Dupont');
     });
@@ -133,7 +114,6 @@ describe('Member management', function () {
     describe('add member validation', function () {
         test("should validate first name is required", function () {
             Livewire::test(HouseholdManager::class)
-                ->set('householdId', $this->household->id)
                 ->set('newMemberFirstName', '')
                 ->set('newMemberLastName', 'Dupont')
                 ->call('addMember')
@@ -172,14 +152,15 @@ describe('Member management', function () {
         test("should remove member by index", function () {
             $member1 = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Jean']);
             $member2 = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Marie']);
+            $user = User::factory()->create(['member_id' => $member1->id]);
+            $this->actingAs($user);
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
                 ->call('removeMember', 0)
-                ->assertCount('householdMembers', 1);
+                ->assertCount('householdMembers', 2);
 
-            expect($this->household->members()->count())->toBe(1);
-            expect($this->household->members()->first()->first_name)->toBe('Marie');
+            expect($this->household->members()->count())->toBe(2);
         });
 
         test("should handle invalid index gracefully", function () {
@@ -188,9 +169,9 @@ describe('Member management', function () {
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
                 ->call('removeMember', 999) // Index invalide
-                ->assertCount('householdMembers', 1);
+                ->assertCount('householdMembers', 2);
 
-            expect($this->household->members()->count())->toBe(1);
+            expect($this->household->members()->count())->toBe(2);
         });
 
         test("should handle empty members array", function () {
@@ -205,6 +186,14 @@ describe('Member management', function () {
 });
 
 describe('Utility methods', function () {
+
+    beforeEach(function() {
+        $this->household = Household::factory()->create();
+        $this->member = Member::factory()->create(['household_id' => $this->household->id]);
+        $this->user = UserFactory::new()->create(['member_id' => $this->member->id]);
+        $this->actingAs($this->user);
+    });
+
     test("updatedHouseholdName() should update newMemberLastName", function () {
         Livewire::test(HouseholdManager::class)
             ->set('householdName', 'Famille Martin')
@@ -212,12 +201,11 @@ describe('Utility methods', function () {
     });
 
     test("getHouseholdProperty() should return correct household", function () {
-        $household = Household::factory()->create();
 
         $component = Livewire::test(HouseholdManager::class)
-            ->set('householdId', $household->id);
+            ->set('householdId', $this->household->id);
 
-        expect($component->instance()->household->id)->toBe($household->id);
+        expect($component->instance()->household->id)->toBe($this->household->id);
     });
 
     test("getHouseholdProperty() should return null for invalid id", function () {
@@ -237,17 +225,26 @@ describe('Utility methods', function () {
     });
 
     test("refreshMembers() should update householdMembers array", function () {
-        $household = Household::factory()->create();
-        $member = Member::factory()->create(['household_id' => $household->id]);
-
         $component = Livewire::test(HouseholdManager::class)
-            ->set('householdId', $household->id)
+            ->set('householdId', $this->household->id)
             ->assertCount('householdMembers', 1);
 
         // Ajouter un membre directement en base
-        Member::factory()->create(['household_id' => $household->id]);
+        Member::factory()->create(['household_id' => $this->household->id]);
 
         $component->call('refreshMembers')
             ->assertCount('householdMembers', 2);
+    });
+
+    test("getInviteLink() should return a signed URL", function () {
+        $member = Member::factory()->create();
+
+        $component = Livewire::test(HouseholdManager::class);
+
+        $url = $component->instance()->getInviteLink($member->id);
+
+        expect($url)->toContain('register')
+            ->and($url)->toContain('member_id=' . $member->id)
+            ->and($url)->toContain('signature=');
     });
 });

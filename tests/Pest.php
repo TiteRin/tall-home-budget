@@ -41,7 +41,7 @@ expect()->extend('toBeOne', function () {
 | Par exemple : appliquer RefreshDatabase automatiquement dans certains dossiers.
 | Cela évite d’avoir à faire "uses(RefreshDatabase::class);" dans chaque fichier.
 */
-uses(RefreshDatabase::class)->in('Feature', 'Http', 'Actions', 'Livewire');
+uses(RefreshDatabase::class)->in('Feature', 'Http', 'Actions', 'Livewire', 'Unit');
 
 /*
 |--------------------------------------------------------------------------

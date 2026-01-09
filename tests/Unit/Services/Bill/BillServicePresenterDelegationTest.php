@@ -4,7 +4,7 @@ use App\Models\Bill as BillModel;
 use App\Models\Household as HouseholdModel;
 use App\Presenters\BillsOverviewPresenter;
 use App\Services\Bill\BillService;
-use App\Services\Household\HouseholdServiceContract;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery as m;
 
@@ -23,7 +23,7 @@ test('getBillsForHousehold delegates to presenter with resolved household and bi
     ]);
     $bills = BillModel::query()->where('household_id', $household->id)->with('member')->get();
 
-    $householdService = m::mock(HouseholdServiceContract::class);
+    $householdService = m::mock(CurrentHouseholdServiceContract::class);
     $householdService->shouldReceive('getHousehold')->once()->with($household->id)->andReturn($household);
 
     // Presenter mocké: on vérifie que BillService lui délègue bien

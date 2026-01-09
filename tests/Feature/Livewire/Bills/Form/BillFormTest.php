@@ -1,7 +1,7 @@
 <?php
 
 use App\Enums\DistributionMethod;
-use App\Livewire\BillForm;
+use App\Livewire\Bills\BillForm;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Mockery as m;

@@ -5,7 +5,7 @@ namespace App\Livewire;
 use App\Enums\DistributionMethod;
 use App\Models\Bill;
 use App\Services\Bill\BillService;
-use App\Services\Household\HouseholdService;
+use App\Services\Household\CurrentHouseholdService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Collection;
 use Illuminate\View\View;
@@ -14,7 +14,7 @@ use Livewire\Component;
 
 class BillsManager extends Component
 {
-    protected HouseholdService $householdService;
+    protected CurrentHouseholdService $householdService;
     protected BillService $billService;
 
     public Collection $bills;
@@ -22,7 +22,7 @@ class BillsManager extends Component
     public bool $isEditing = false;
     public ?int $editingBillId = null;
 
-    public function boot(HouseholdService $householdService, BillService $billService): void
+    public function boot(CurrentHouseholdService $householdService, BillService $billService): void
     {
         $this->householdService = $householdService;
         $this->billService = $billService;

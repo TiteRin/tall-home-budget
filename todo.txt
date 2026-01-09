@@ -2,9 +2,6 @@
 // TODO : accessibilité de BillForm (aria-labelledby entête du tableau ?)
 // TODO : Apparence du formulaire
 
-// TODO : supprimer une dépense
-// TODO : modifier une dépense
-
 // TODO : empêcher la modification du avec compte joint à sans compte joint s’il y a des dépenses existantes
 // TODO : rendre possible la modification à condition de passer les dépenses sur une personne
 // TODO : empêcher de supprimer un membre du foyer si des dépenses lui sont affectées
@@ -12,3 +9,27 @@
 // TODO : rendre possible la suppression, mais en déplaçant les dépenses sur un autre membre du foyer
 
 
+// [x] Create a ValueObject Balance
+// [x] Mettre la méthode "abs" sur l’objet Amount
+// [x] Create an Abstract Participant to gather Member and joint account, maybe
+// [ ] MovementsService::getRatioForMember
+// [ ] Memoize balances
+// [x] BalanceCollection
+// [x] TypedCollection
+// [x] Afficher les mouvements sur l’écran d’accueil
+// [x] MovementService::updateIncomes
+// [x] MovementService : pouvoir récupérer les membres et les dépenses automatiquement
+// [x] MovementServiceFactory ?
+// [ ] Create an Object (Wireable ?) MemberIncome
+
+// Avant la prochaine version
+[x] Refaire le README
+
+// Prochaine version
+[x] Authentification pour un système multi-utilisateurs/multi-tenant
+
+// Compte
+[ ] Suppression d’un compte
+- [ ] Supprimer un membre supprime le compte
+- [ ] Impossible de supprimer un membre si des dépenses y sont associées
+- [ ] Déplacement des dépenses avant suppression
