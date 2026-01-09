@@ -176,5 +176,15 @@ describe('When incomes are edited', function () {
                 ->set('incomes.' . $this->memberDewey->id, "")
                 ->assertDispatched('incomeModified', memberId: $this->memberDewey->id, amount: null);
         });
+
+
+        test('can initialize incomes from a given array (localStorage restoration)', function () {
+            Livewire::test(AccountsList::class, $this->props)
+                ->call('initIncomes', [$this->memberDewey->id => "500", $this->memberHuey->id => "1234.56"])
+                ->assertSet('incomes.' . $this->memberDewey->id, "500,00 €")
+                ->assertSet('incomes.' . $this->memberHuey->id, "1 234,56 €")
+                ->assertSet('incomesInCents.' . $this->memberDewey->id, 50000)
+                ->assertSet('incomesInCents.' . $this->memberHuey->id, 123456);
+        });
     });
 });

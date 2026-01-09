@@ -95,8 +95,8 @@ describe("when all is initialized", function () {
 
     test('should display all the movements', function () {
         Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
-            ->assertSee('Alice Doe doit 390,00 € à Compte joint')
-            ->assertSee('Bob Doe doit 310,00 € à Compte joint');
+            ->assertSeeText('Alice Doe doit mettre 390,00 € sur le compte joint')
+            ->assertSeeText('Bob Doe doit mettre 310,00 € sur le compte joint');
     });
 });
 

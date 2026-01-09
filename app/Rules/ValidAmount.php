@@ -16,7 +16,7 @@ class ValidAmount implements ValidationRule
      */
     public function validate(string $attribute, mixed $value, Closure $fail): void
     {
-        if (!Amount::isValid($value)) {
+        if (!is_string($value) || !Amount::isValid($value)) {
             $fail("The :attribute must be a valid amount.");
         }
     }

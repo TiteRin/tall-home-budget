@@ -117,8 +117,12 @@ class Amount implements Wireable
         return new Amount((int)round(floatval($amount) * 100));
     }
 
-    public static function isValid(string $amount): bool
+    public static function isValid(?string $amount): bool
     {
+        if ($amount === null) {
+            return false;
+        }
+
         $amount = self::extractCurrencySymbols($amount);
         $amount = self::extractWhiteSpaces($amount);
         $amount = self::extractThousandsSeparator($amount);

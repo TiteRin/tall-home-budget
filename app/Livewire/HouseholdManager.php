@@ -6,6 +6,7 @@ use App\Enums\DistributionMethod;
 use App\Models\Household;
 use App\Services\Household\CurrentHouseholdService;
 use App\Services\Household\CurrentHouseholdServiceContract;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
 use Livewire\Component;
@@ -27,6 +28,10 @@ class HouseholdManager extends Component
 
     public function mount(CurrentHouseholdServiceContract $currentHouseholdService)
     {
+        if (Auth::guest()) {
+            return $this->redirect(route('home'));
+        }
+
         $household = $currentHouseholdService->getCurrentHousehold();
 
         $this->householdId = $household->id;
