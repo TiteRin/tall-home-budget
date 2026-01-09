@@ -20,17 +20,21 @@ class CreateUserWithHousehold
 
         return DB::transaction(function () use ($data) {
 
-            $household = Household::create([
-                'name' => $data['household_name'],
-                'default_distribution_method' => $data['default_distribution_method'],
-                'has_joint_account' => $data['has_joint_account']
-            ]);
+            if (isset($data['member_id'])) {
+                $member = Member::findOrFail($data['member_id']);
+            } else {
+                $household = Household::create([
+                    'name' => $data['household_name'],
+                    'default_distribution_method' => $data['default_distribution_method'],
+                    'has_joint_account' => $data['has_joint_account']
+                ]);
 
-            $member = Member::create([
-                'first_name' => $data['first_name'],
-                'last_name' => $data['last_name'],
-                'household_id' => $household->id,
-            ]);
+                $member = Member::create([
+                    'first_name' => $data['first_name'],
+                    'last_name' => $data['last_name'],
+                    'household_id' => $household->id,
+                ]);
+            }
 
             $user = User::create([
                 'email' => $data['email'],

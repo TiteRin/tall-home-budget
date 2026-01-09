@@ -117,4 +117,63 @@ describe('Register component', function () {
             $this->assertGuest();
         });
     });
+
+    describe('Invite registration', function () {
+        test('it pre-fills fields when member_id is present in URL', function () {
+            $member = \App\Models\Member::factory()->create([
+                'first_name' => 'Jane',
+                'last_name' => 'Smith',
+                'household_id' => \App\Models\Household::factory()->create([
+                    'name' => 'Smith Household',
+                    'has_joint_account' => true,
+                    'default_distribution_method' => DistributionMethod::PRORATA,
+                ])->id
+            ]);
+
+            Livewire::withQueryParams(['member_id' => $member->id])
+                ->test(Register::class)
+                ->assertSet('memberId', $member->id)
+                ->assertSet('firstName', 'Jane')
+                ->assertSet('lastName', 'Smith')
+                ->assertSet('householdName', 'Smith Household')
+                ->assertSet('hasJointAccount', true)
+                ->assertSet('defaultDistributionMethod', DistributionMethod::PRORATA->value);
+        });
+
+        test('it registers a user linked to the existing member', function () {
+            Event::fake();
+
+            $member = \App\Models\Member::factory()->create([
+                'first_name' => 'Jane',
+                'last_name' => 'Smith',
+                'household_id' => \App\Models\Household::factory()->create(['name' => 'Smith Household'])->id
+            ]);
+
+            Livewire::withQueryParams(['member_id' => $member->id])
+                ->test(Register::class)
+                ->set('email', 'jane@example.com')
+                ->set('password', 'password123!')
+                ->set('passwordConfirmation', 'password123!')
+                ->call('register')
+                ->assertRedirect(route('login'));
+
+            $user = User::whereEmail('jane@example.com')->first();
+            expect($user->member_id)->toBe($member->id)
+                ->and($user->member->first_name)->toBe('Jane')
+                ->and($user->member->household->name)->toBe('Smith Household');
+
+            // Vérifier qu'on n'a pas créé un nouveau membre mais utilisé l'existant
+            expect(\App\Models\Member::where('first_name', 'Jane')->count())->toBe(1);
+
+            Event::assertDispatched(Registered::class);
+        });
+
+        test('it fails if member is already linked to a user', function () {
+            $user = User::factory()->create();
+            $member = $user->member;
+
+            $this->get(route('register', ['member_id' => $member->id]))
+                ->assertStatus(403);
+        });
+    });
 });

@@ -6,6 +6,8 @@ use App\Enums\DistributionMethod;
 use App\Models\Household;
 use App\Services\Household\CurrentHouseholdService;
 use App\Services\Household\CurrentHouseholdServiceContract;
+use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\URL;
 use Livewire\Component;
 
 class HouseholdManager extends Component
@@ -27,14 +29,6 @@ class HouseholdManager extends Component
     {
         $household = $currentHouseholdService->getCurrentHousehold();
 
-        if (!$household) {
-            $household = Household::create([
-                'name' => 'Mon Foyer',
-                'has_joint_account' => false,
-                'default_distribution_method' => DistributionMethod::EQUAL,
-            ]);
-        }
-
         $this->householdId = $household->id;
         $this->householdName = $household->name ?? '';
         $this->hasJointAccount = $household->has_joint_account;
@@ -52,7 +46,11 @@ class HouseholdManager extends Component
     public function refreshMembers()
     {
         $household = $this->household;
-        $this->householdMembers = $household ? $household->members->toArray() : [];
+        $this->householdMembers = $household ? $household->members()->with('user')->get()->toArray() : [];
+    }
+
+    public function getInviteLink($memberId) {
+        return URL::temporarySignedRoute('register', now()->addDays(7), ['member_id' => $memberId]);
     }
 
     public function save() {
