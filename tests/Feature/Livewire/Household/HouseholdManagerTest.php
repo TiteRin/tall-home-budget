@@ -6,6 +6,8 @@ use App\Enums\DistributionMethod;
 use App\Livewire\HouseholdManager;
 use App\Models\Household;
 use App\Models\Member;
+use App\Models\User;
+use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 
@@ -41,6 +43,9 @@ describe('Initialization', function () {
             'last_name' => 'Dupont'
         ]);
 
+        $user = UserFactory::new()->create(['member_id' => $member->id]);
+        $this->actingAs($user);
+
         Livewire::test(HouseholdManager::class)
             ->assertSet('householdId', $household->id)
             ->assertSet('householdName', 'Famille Dupont')
@@ -48,21 +53,6 @@ describe('Initialization', function () {
             ->assertSet('defaultDistributionMethod', DistributionMethod::PRORATA->value)
             ->assertSet('newMemberLastName', 'Famille Dupont')
             ->assertCount('householdMembers', 1);
-    });
-
-    test("should load oldest household when multiple exist", function () {
-        $oldHousehold = Household::factory()->create([
-            'name' => 'Premier Foyer',
-            'created_at' => now()->subDays(2)
-        ]);
-        $newHousehold = Household::factory()->create([
-            'name' => 'Deuxième Foyer',
-            'created_at' => now()->subDays(1)
-        ]);
-
-        Livewire::test(HouseholdManager::class)
-            ->assertSet('householdId', $oldHousehold->id)
-            ->assertSet('householdName', 'Premier Foyer');
     });
 });
 
@@ -172,6 +162,8 @@ describe('Member management', function () {
         test("should remove member by index", function () {
             $member1 = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Jean']);
             $member2 = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Marie']);
+            $user = User::factory()->create(['member_id' => $member1->id]);
+            $this->actingAs($user);
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
@@ -239,6 +231,9 @@ describe('Utility methods', function () {
     test("refreshMembers() should update householdMembers array", function () {
         $household = Household::factory()->create();
         $member = Member::factory()->create(['household_id' => $household->id]);
+        $user = User::factory()->create(['member_id' => $member->id]);
+
+        $this->actingAs($user);
 
         $component = Livewire::test(HouseholdManager::class)
             ->set('householdId', $household->id)

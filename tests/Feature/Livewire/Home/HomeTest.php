@@ -5,12 +5,16 @@ namespace Tests\Feature\Livewire\Home;
 use App\Domains\ValueObjects\Amount;
 use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Livewire\Home;
+use App\Models\User;
 use Livewire;
 
 beforeEach(function () {
     $this->household = bill_factory()->household([
         'has_joint_account' => true
     ]);
+    $this->memberJohn = bill_factory()->member(['first_name' => 'John'], $this->household);
+    $this->userJohn = User::factory()->create(['member_id' => $this->memberJohn->id]);
+    $this->actingAs($this->userJohn);
 });
 
 describe("Basic component tests", function () {
@@ -50,6 +54,9 @@ describe("Event listener tests", function () {
         $this->billInternet = bill_factory()->bill(['name' => 'Internet', 'amount' => 2999], $this->memberJohn, $this->household);
         $this->billRent = bill_factory()->bill(['name' => 'Loyer', 'amount' => 67000], null, $this->household);
         $this->billPhone = bill_factory()->bill(['name' => 'Téléphone', 'amount' => 2498], $this->memberMarie, $this->household);
+
+        $this->user = User::factory()->create(['member_id' => $this->memberJohn->id]);
+        $this->actingAs($this->user);
     });
 
     test('should listen to incomeModified event', function () {

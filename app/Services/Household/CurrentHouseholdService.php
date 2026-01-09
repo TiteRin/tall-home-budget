@@ -18,7 +18,7 @@ class CurrentHouseholdService implements CurrentHouseholdServiceContract
     public function getCurrentHousehold(): Household|null
     {
         if (!Auth::check()) {
-            return Household::orderBy('created_at')->first();
+            return null;
         }
         $user = Auth::user();
         return Household::where('id', $user->member->household_id)->first();

@@ -1,12 +1,23 @@
 <?php
 
+use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillsManager;
+use App\Models\User;
+use App\Services\Bill\BillsCollection;
+use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
 beforeEach(function () {
-    $this->household = bill_factory()->household();
+
+    $this->household = bill_factory()->household(['has_joint_account' => true]);
+    $this->memberAlice = bill_factory()->member(['first_name' => 'Alice'], $this->household);
+    $this->memberBob = bill_factory()->member(['first_name' => 'Bob'], $this->household);
+    $this->members = [$this->memberAlice, $this->memberBob];
+
+    $user = User::factory()->create(['member_id' => $this->memberAlice->id]);
+    $this->actingAs($user);
 });
 
 test('should display an empty table if no bills', function () {
@@ -88,15 +99,13 @@ test('should handle complete workflow: add bill, then delete it', function () {
 
 
 test('should return correct household members', function () {
-    $member1 = bill_factory()->member(['first_name' => 'John'], $this->household);
-    $member2 = bill_factory()->member(['first_name' => 'Jane'], $this->household);
 
     $component = Livewire::test(BillsManager::class);
 
     expect($component->get('householdMembers'))
         ->toHaveCount(2)
         ->and($component->get('householdMembers')->pluck('first_name')->toArray())
-        ->toContain('John', 'Jane');
+        ->toContain('Alice', 'Bob');
 });
 
 test('should return correct default distribution method', function () {
