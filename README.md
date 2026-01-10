@@ -17,9 +17,12 @@ Histoire d’avoir une interface un peu plus sympa qu’une feuille excel, et da
 - Calcul des mouvements
 
 ## Roadmap
-- [ ] Ajouter l’authentification
-- [ ] Ajouter la possibilité de créer plusieurs foyers
+
+- [x] Ajouter l’authentification
+- [x] Ajouter la possibilité de créer plusieurs foyers
 - [ ] Ajouter des dépenses ponctuelles (e.g. les courses)
+- [ ] Version mobile
+- [ ] Meilleure UI
 
 ## Stack
 - [TALL](https://tallstack.dev/)
