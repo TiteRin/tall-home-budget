@@ -8,8 +8,17 @@ describe("when valid data are sent to the store API", function () {
 
     beforeEach(function () {
 
-        $this->member = bill_factory()->member();
-        $this->household = $this->member->household;
+        $context = test_factory()
+            ->addHousehold()
+            ->addMember()
+            ->addUser()
+            ->build();
+
+        $this->member = $context['member'];
+        $this->household = $context['household'];
+        $this->user = $context['user'];
+
+        $this->actingAs($this->user);
 
         $this->payload = [
             'name' => 'Test bill',

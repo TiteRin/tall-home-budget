@@ -13,10 +13,11 @@
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\Support\BillFactory;
+use Tests\Support\TestFactory;
 
 pest()->extend(Tests\TestCase::class)
- // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
- ->in('Feature', 'Http', 'Unit');
+    // ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
+    ->in('Feature', 'Http', 'Unit');
 
 /*
 |--------------------------------------------------------------------------
@@ -59,7 +60,16 @@ function something()
     // ..
 }
 
+/**
+ * @return BillFactory
+ * @deprecated
+ */
 function bill_factory(): BillFactory
 {
     return new BillFactory();
+}
+
+function test_factory(): TestFactory
+{
+    return new TestFactory(new BillFactory());
 }
