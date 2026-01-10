@@ -3,6 +3,7 @@
 namespace Tests\Http\Controllers;
 
 use App\Enums\DistributionMethod;
+use App\Models\User;
 
 describe("when valid data are sent to the store API", function () {
 
@@ -10,6 +11,8 @@ describe("when valid data are sent to the store API", function () {
 
         $this->member = bill_factory()->member();
         $this->household = $this->member->household;
+        $this->user = User::factory()->create(['member_id' => $this->member->id]);
+        $this->actingAs($this->user);
 
         $this->payload = [
             'name' => 'Test bill',
