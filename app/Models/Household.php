@@ -13,11 +13,13 @@ class Household extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'has_joint_account', 'default_distribution_method'];
+    protected $fillable = ['name', 'has_joint_account', 'default_distribution_method', 'onboarding_configured_household', 'onboarding_added_bills'];
 
     protected $casts = [
         'has_joint_account' => 'boolean',
         'default_distribution_method' => DistributionMethod::class,
+        'onboarding_configured_household' => 'boolean',
+        'onboarding_added_bills' => 'boolean',
     ];
 
     public function members(): HasMany

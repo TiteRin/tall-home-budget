@@ -15,6 +15,8 @@
         </div>
     </header>
 
+    <livewire:onboarding/>
+
     <main class="px-4 py-4">
         <div class="max-w-7xl mx-auto">
             {{ $slot }}
