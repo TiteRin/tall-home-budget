@@ -9,14 +9,13 @@ describe("when valid data are sent to the store API", function () {
     beforeEach(function () {
 
         $context = test_factory()
-            ->addHousehold()
-            ->addMember()
-            ->addUser()
-            ->build();
+            ->withHousehold()
+            ->withMember()
+            ->withUser();
 
-        $this->member = $context['member'];
-        $this->household = $context['household'];
-        $this->user = $context['user'];
+        $this->member = $context->member();
+        $this->household = $context->household();
+        $this->user = $context->user();
 
         $this->actingAs($this->user);
 
