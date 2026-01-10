@@ -18,6 +18,7 @@ class ExpenseFactory extends Factory
     public function definition(): array
     {
         return [
+            'name' => $this->faker->words(3, true),
             'amount' => $this->faker->numberBetween(1000, 20000),
             'spent_at' => now(),
             'distribution_method' => DistributionMethod::EQUAL

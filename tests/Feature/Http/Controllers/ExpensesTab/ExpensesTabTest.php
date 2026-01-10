@@ -35,14 +35,17 @@ it('can create an expanse tab', function () {
 it('can create an expense linked to a tab', function () {
     $tab = ExpenseTab::factory()->create(['household_id' => $this->household->id]);
 
-    Expense::create([
+    Expense::factory()->create([
         'expense_tab_id' => $tab->id,
         'amount' => 5600,
+        'member_id' => $this->user->member->id,
+        'name' => 'Courses',
         'spent_at' => now()
     ]);
 
     $this->assertDatabaseHas('expenses', [
         'expense_tab_id' => $tab->id,
-        'amount' => 5600
+        'amount' => 5600,
+        'name' => 'Courses'
     ]);
 });
