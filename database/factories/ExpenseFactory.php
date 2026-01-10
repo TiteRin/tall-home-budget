@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\DistributionMethod;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -18,7 +19,8 @@ class ExpenseFactory extends Factory
     {
         return [
             'amount' => $this->faker->numberBetween(1000, 20000),
-            'spent_at' => now()
+            'spent_at' => now(),
+            'distribution_method' => DistributionMethod::EQUAL
         ];
     }
 }

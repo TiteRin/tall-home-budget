@@ -32,6 +32,11 @@ class Household extends Model
         return $this->hasMany(Bill::class, 'household_id');
     }
 
+    public function expenseTabs(): HasMany
+    {
+        return $this->hasMany(ExpenseTab::class, 'household_id');
+    }
+
     public function getTotalAmountAttribute(): Amount
     {
         return new Amount($this->bills->sum(fn($bill) => $bill->amount->value()) ?? 0);
