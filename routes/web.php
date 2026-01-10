@@ -1,5 +1,6 @@
 <?php
 
+use App\Enums\DistributionMethod;
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LogoutController;
 use App\Livewire\Auth\Login;
@@ -8,6 +9,8 @@ use App\Livewire\Auth\Passwords\Email;
 use App\Livewire\Auth\Passwords\Reset;
 use App\Livewire\Auth\Register;
 use App\Livewire\Auth\Verify;
+use App\Models\ExpenseTab;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -23,15 +26,33 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::controller(App\Http\Controllers\BillsController::class)->group(function() {
-    Route::get('/bills', 'index')->name('bills');
-    Route::get('/bills/settings', 'settings')->name('bills.settings');
-    Route::post('/bills', 'store')->name('bills.store');
-});
+Route::middleware('auth')->group(function () {
+    Route::controller(App\Http\Controllers\BillsController::class)->group(function () {
+        Route::get('/bills', 'index')->name('bills');
+        Route::get('/bills/settings', 'settings')->name('bills.settings');
+        Route::post('/bills', 'store')->name('bills.store');
+    });
 
-Route::get('/household/settings', function() {
-    return view('household');
-})->name('household.settings');
+    Route::get('/household/settings', function () {
+        return view('household');
+    })->name('household.settings');
+
+    Route::post('/household/settings/expense-tabs', function (Request $request) {
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'period_start_day' => 'required|integer|min:1|max:31',
+            'period_end_day' => 'required|integer|min:1|max:31',
+            'default_member_id' => 'nullable|exists:members,id',
+            'household_id' => 'required|exists:households,id',
+            'default_distribution_method' => 'nullable|in:' . implode(',', DistributionMethod::options()),
+        ]);
+
+        ExpenseTab::create($validated);
+
+        return redirect()->back();
+    })->name('expenses-tab.store');
+});
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
