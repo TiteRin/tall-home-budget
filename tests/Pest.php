@@ -60,6 +60,10 @@ function something()
     // ..
 }
 
+/**
+ * @return BillFactory
+ * @deprecated
+ */
 function bill_factory(): BillFactory
 {
     return new BillFactory();
