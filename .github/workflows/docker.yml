@@ -31,4 +31,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/titerin/laravel-app:latest
+          tags: ghcr.io/titerin/home-budget-build:latest
