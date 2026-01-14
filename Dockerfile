@@ -65,6 +65,7 @@ RUN apk add --no-cache \
         opcache \
     && rm -rf /var/cache/apk/*
 
+RUN rm -rf bootstrap/cache/*
 WORKDIR /var/www/html
 COPY . .
 COPY --from=vendor /app/vendor ./vendor
