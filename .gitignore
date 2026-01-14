@@ -45,4 +45,3 @@ sail-phpunit.sh
 
 # Coverage
 coverage/
-/composer.lock
