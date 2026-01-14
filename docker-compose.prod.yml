@@ -15,7 +15,7 @@ services:
     container_name: nginx
     restart: unless-stopped
     ports:
-      - "80:80"
+      - "127.0.0.1:8010:80"
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
       - storage:/var/www/html/storage:ro
