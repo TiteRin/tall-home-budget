@@ -49,11 +49,14 @@ jobs:
         run: cp .env.example .env
 
       - name: Install Composer dependencies
-        run: composer install --no-interaction --prefer-dist --no-progress
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
 
       - name: Clear Laravel cache
         run: |
           rm -f bootstrap/cache/*.php
+
+      - name: Discover packages
+        run: php artisan package:discover
 
       - name: Install NPM dependencies
         run: npm ci
