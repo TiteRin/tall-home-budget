@@ -7,6 +7,7 @@ services:
       - .env.prod
     volumes:
       - storage:/var/www/html/storage
+      - app-public:/var/www/html/public
     depends_on:
       - postgres
 
@@ -19,6 +20,7 @@ services:
     volumes:
       - ./docker/nginx/conf.d:/etc/nginx/conf.d:ro
       - storage:/var/www/html/storage:ro
+      - app-public:/var/www/html/public:ro
     depends_on:
       - app
 
@@ -36,3 +38,4 @@ services:
 volumes:
   storage:
   postgres-data:
+  app-public:
