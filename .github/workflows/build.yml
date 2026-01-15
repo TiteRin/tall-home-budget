@@ -24,4 +24,3 @@ jobs:
           push: true
           tags: |
             ghcr.io/titerin/home-budget-build:latest
-            ghcr.io/titerin/home-budget-build:${{ github.sha }}
