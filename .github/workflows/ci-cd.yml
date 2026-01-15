@@ -1,0 +1,24 @@
+name: ci-cd.yml
+on:
+  push:
+    branches:
+      - "**"
+  pull_request:
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+  build_and_push:
+    needs: tests
+    if: |
+      github.event_name == 'pull_request' ||
+      github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/build.yml
+  deploy:
+    needs: build_and_push
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/deploy.yml
