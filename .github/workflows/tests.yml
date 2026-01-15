@@ -1,11 +1,19 @@
 name: Run tests
 
 on:
-  workflow_call:
+  push:
+    branches-ignore:
+      - main
+      - staging
+  pull_request:
+    branches:
+      - main
+      - staging
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     services:
       postgres:
@@ -31,15 +39,32 @@ jobs:
           extensions: intl, pdo_pgsql
           coverage: none
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - run: cp .env.example .env
-      - run: composer install --no-interaction --prefer-dist --no-progress
-      - run: php artisan key:generate
+      - name: Copy .env
+        run: cp .env.example .env
 
-      - run: php artisan migrate
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress --no-scripts
+
+      - name: Clear Laravel cache
+        run: |
+          rm -f bootstrap/cache/*.php
+
+      - name: Discover packages
+        run: php artisan package:discover
+
+      - name: Install NPM dependencies
+        run: npm ci
+
+      - name: Generate key
+        run: php artisan key:generate
+
+      - name: Run migrations
+        run: php artisan migrate --env=testing
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
@@ -48,7 +73,8 @@ jobs:
           DB_USERNAME: postgres
           DB_PASSWORD: postgres
 
-      - run: php artisan test
+      - name: Run tests
+        run: php artisan test
         env:
           DB_CONNECTION: pgsql
           DB_HOST: 127.0.0.1
