@@ -20,5 +20,9 @@ jobs:
     uses: ./.github/workflows/build.yml
   deploy:
     needs: build_and_push
+    secrets:
+      SSH_HOST: ${{ secrets.SSH_HOST }}
+      SSH_USER: ${{ secrets.SSH_USER }}
+      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/deploy.yml
