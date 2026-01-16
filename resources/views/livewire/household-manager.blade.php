@@ -113,11 +113,18 @@
                                                         class="btn btn-info btn-sm">
                                                     Modifier
                                                 </button>
+                                                <button wire:click="removeMember({{ $index }})"
+                                                        class="btn btn-error btn-sm">
+                                                    Supprimer
+                                                </button>
+                                            @else
+                                                <div class="tooltip"
+                                                     data-tip="Impossible de supprimer un membre ayant un compte actif">
+                                                    <button class="btn btn-error btn-sm" disabled>
+                                                        Supprimer
+                                                    </button>
+                                                </div>
                                             @endif
-                                            <button wire:click="removeMember({{ $index }})"
-                                                    class="btn btn-error btn-sm">
-                                                Supprimer
-                                            </button>
                                         </div>
                                     </td>
                                 @endif
@@ -147,5 +154,41 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    {{-- Modale de confirmation de suppression --}}
+    <input type="checkbox" id="confirm-delete-member" class="modal-toggle" @if($memberIdToDelete) checked @endif />
+    <div class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg">Confirmer la suppression</h3>
+            <p class="py-4">Êtes-vous sûr de vouloir supprimer ce membre ?</p>
+
+            @if($impactedBillsCount > 0)
+                <div class="alert alert-warning shadow-sm mb-4 py-2">
+                    <div class="flex items-center gap-2">
+                        <x-heroicon-o-exclamation-triangle class="h-6 w-6 flex-shrink-0"/>
+                        <span>Ce membre a <strong>{{ $impactedBillsCount }}</strong> {{ $impactedBillsCount > 1 ? 'dépenses associées' : 'dépense associée' }}.</span>
+                    </div>
+                </div>
+
+                <div class="form-control mb-4">
+                    <label class="label cursor-pointer justify-start gap-4">
+                        <input type="radio" wire:model="deleteAction" value="reassign" class="radio radio-primary"/>
+                        <span
+                            class="label-text">Réaffecter les dépenses au <strong>{{ $reassignmentTarget }}</strong></span>
+                    </label>
+                    <label class="label cursor-pointer justify-start gap-4">
+                        <input type="radio" wire:model="deleteAction" value="delete_bills" class="radio radio-error"/>
+                        <span class="label-text">Supprimer également toutes les dépenses associées</span>
+                    </label>
+                </div>
+            @endif
+
+            <div class="modal-action">
+                <button wire:click="$set('memberIdToDelete', null)" class="btn btn-ghost">Annuler</button>
+                <button wire:click="performDelete" class="btn btn-error">Supprimer définitivement</button>
+            </div>
+        </div>
+        <label class="modal-backdrop" wire:click="$set('memberIdToDelete', null)">Fermer</label>
     </div>
 </div>
