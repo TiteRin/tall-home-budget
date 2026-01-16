@@ -68,24 +68,59 @@
                         <tbody>
                         @forelse($householdMembers as $index => $member)
                             <tr>
-                                <td>{{ $member['first_name'] ?? '' }}</td>
-                                <td>{{ $member['last_name'] ?? '' }}</td>
-                                <td>
-                                    @if (isset($member['user']))
-                                        <div class="badge badge-success">Actif</div>
-                                    @else
-                                        <button class="btn btn-sm btn-outline btn-primary"
-                                                onclick="navigator.clipboard.writeText('{{ $this->getInviteLink($member['id']) }}'); alert('Lien copié !')">
-                                            Inviter
-                                        </button>
-                                    @endif
-                                </td>
-                                <td>
-                                    <button wire:click="removeMember({{ $index }})"
-                                            class="btn btn-error btn-sm">
-                                        Supprimer
-                                    </button>
-                                </td>
+                                @if($editingMemberId === $member['id'])
+                                    <td>
+                                        <input type="text" wire:model="editingMemberFirstName"
+                                               class="input input-bordered input-sm w-full">
+                                        @error('editingMemberFirstName') <span
+                                            class="text-error text-xs">{{ $message }}</span> @enderror
+                                    </td>
+                                    <td>
+                                        <input type="text" wire:model="editingMemberLastName"
+                                               class="input input-bordered input-sm w-full">
+                                        @error('editingMemberLastName') <span
+                                            class="text-error text-xs">{{ $message }}</span> @enderror
+                                    </td>
+                                    <td>
+                                        <div class="badge badge-info">Édition en cours</div>
+                                    </td>
+                                    <td>
+                                        <div class="flex gap-1">
+                                            <button wire:click="updateMember" class="btn btn-success btn-sm">
+                                                Enregistrer
+                                            </button>
+                                            <button wire:click="cancelEdit" class="btn btn-ghost btn-sm">Annuler
+                                            </button>
+                                        </div>
+                                    </td>
+                                @else
+                                    <td>{{ $member['first_name'] ?? '' }}</td>
+                                    <td>{{ $member['last_name'] ?? '' }}</td>
+                                    <td>
+                                        @if (isset($member['user']))
+                                            <div class="badge badge-success">Actif</div>
+                                        @else
+                                            <button class="btn btn-sm btn-outline btn-primary"
+                                                    onclick="navigator.clipboard.writeText('{{ $this->getInviteLink($member['id']) }}'); alert('Lien copié !')">
+                                                Inviter
+                                            </button>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        <div class="flex gap-1">
+                                            @if (!isset($member['user']))
+                                                <button wire:click="editMember({{ $index }})"
+                                                        class="btn btn-info btn-sm">
+                                                    Modifier
+                                                </button>
+                                            @endif
+                                            <button wire:click="removeMember({{ $index }})"
+                                                    class="btn btn-error btn-sm">
+                                                Supprimer
+                                            </button>
+                                        </div>
+                                    </td>
+                                @endif
                             </tr>
                         @empty
                             <tr>

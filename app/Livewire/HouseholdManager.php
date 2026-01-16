@@ -4,10 +4,8 @@ namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
 use App\Models\Household;
-use App\Services\Household\CurrentHouseholdService;
 use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
 use Livewire\Component;
 
@@ -21,6 +19,11 @@ class HouseholdManager extends Component
     public string $defaultDistributionMethod = DistributionMethod::EQUAL->value;
 
     public array $householdMembers = [];
+
+    // Champs pour l'édition de membre
+    public ?int $editingMemberId = null;
+    public string $editingMemberFirstName = '';
+    public string $editingMemberLastName = '';
 
     // Champs temporaires pour ajout de membres
     public string $newMemberFirstName = '';
@@ -106,6 +109,44 @@ class HouseholdManager extends Component
         }
 
         $this->refreshMembers();
+    }
+
+    public function editMember($index)
+    {
+        $memberData = $this->householdMembers[$index] ?? null;
+
+        if ($memberData && !isset($memberData['user'])) {
+            $this->editingMemberId = $memberData['id'];
+            $this->editingMemberFirstName = $memberData['first_name'];
+            $this->editingMemberLastName = $memberData['last_name'];
+        }
+    }
+
+    public function updateMember()
+    {
+        $this->validate([
+            'editingMemberFirstName' => 'required|string|min:2',
+            'editingMemberLastName' => 'required|string|min:2',
+        ]);
+
+        $member = \App\Models\Member::find($this->editingMemberId);
+
+        if ($member && !$member->hasUserAccount()) {
+            $member->update([
+                'first_name' => $this->editingMemberFirstName,
+                'last_name' => $this->editingMemberLastName,
+            ]);
+        }
+
+        $this->cancelEdit();
+        $this->refreshMembers();
+    }
+
+    public function cancelEdit()
+    {
+        $this->editingMemberId = null;
+        $this->editingMemberFirstName = '';
+        $this->editingMemberLastName = '';
     }
 
     public function getDistributionMethodOptionsProperty(): array
