@@ -1,55 +1,78 @@
-# ---- Étape vendor : installer dépendances PHP ----
-FROM php:8.4-cli AS vendor
+##############################
+# Dépendances PHP (composer) #
+##############################
+FROM php:8.4-cli-alpine AS vendor
 
-WORKDIR /app
+# Dépendances système pour intl
+RUN apk add --no-cache \
+    icu-dev \
+    zip \
+    unzip \
+    git \
+    curl \
+    && docker-php-ext-install intl
 
-# Installer les extensions nécessaires
-RUN apt-get update && apt-get install -y \
-    unzip git curl libicu-dev libpq-dev \
-    && docker-php-ext-install intl pdo_pgsql \
-    && rm -rf /var/lib/apt/lists/*
-
-# Installer composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
+WORKDIR /app
 COPY composer.json composer.lock ./
 
-# 🚀 Désactivation des scripts artisan
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist --no-scripts
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --no-progress \
+    --optimize-autoloader \
+    --no-scripts
 
-# Copier le reste du projet
-COPY . .
 
-
-# ---- Étape frontend : build des assets ----
-FROM node:20 AS frontend
+##############################
+# Build Vite                 #
+##############################
+FROM node:25-alpine AS frontend
 
 WORKDIR /app
-COPY package.json package-lock.json ./
+
+# Cache NPM
+COPY package.json ./
+COPY package-lock.json ./
+
+RUN npm install
 RUN npm ci
 
-COPY . .
+# Code frontend uniquement
+COPY resources ./resources
+COPY vite.config.* ./
+
+# Build assets
 RUN npm run build
 
+##############################
+# Run-time PHP               #
+##############################
+FROM php:8.4-fpm-alpine AS runtime
 
-# ---- Étape finale : image de prod Laravel ----
-FROM php:8.4-fpm-alpine AS prod
+RUN apk add --no-cache \
+    icu-dev \
+    libpq-dev \
+    oniguruma-dev \
+    zip \
+    unzip \
+    && docker-php-ext-install \
+        intl \
+        pdo_pgsql \
+        mbstring \
+        opcache \
+    && rm -rf /var/cache/apk/*
 
+RUN rm -rf bootstrap/cache/*
 WORKDIR /var/www/html
+COPY . .
+COPY --from=vendor /app/vendor ./vendor
+COPY --from=frontend /app/public/build ./public/build
 
-# Installer intl et pdo_pgsql pour Postgres
-RUN apk add --no-cache icu-dev libpq-dev \
-    && docker-php-ext-install intl pdo_pgsql
-
-# Copier dépendances PHP et assets compilés
-COPY --from=vendor /app /var/www/html
-COPY --from=frontend /app/public/build /var/www/html/public/build
-
-RUN composer dump-autoload --optimize && \
-    php artisan package:discover --ansi || true
-
-# Permissions
-RUN chown -R www-data:www-data /var/www/html
+RUN chown -R www-data:www-data \
+    storage bootstrap/cache
 
 EXPOSE 9000
 CMD ["php-fpm"]

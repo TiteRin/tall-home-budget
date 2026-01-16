@@ -1,26 +1,26 @@
-name: Deploy
+name: Deploy to VPS
 
 on:
-  push:
-    branches:
-      - main
-      - develop
+  workflow_call:
+    secrets:
+      SSH_HOST:
+        required: true
+      SSH_USER:
+        required: true
+      SSH_PRIVATE_KEY:
+        required: true
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.2.0
+    steps:
+      - uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USER }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            cd ~/tall-home-budget
-            git pull origin ${{ github.ref_name }}
-            docker compose -f docker-compose.yml build laravel-${{ github.ref_name == 'main' && 'prod' || 'preprod' }}
-            docker compose -f docker-compose.yml up -d laravel-${{ github.ref_name == 'main' && 'prod' || 'preprod' }}
+            cd ~/apps/home-budget-prod
+            docker compose -f docker-compose.prod.yml pull
+            docker compose -f docker-compose.prod.yml up -d
