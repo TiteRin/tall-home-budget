@@ -4,10 +4,8 @@ namespace App\Livewire;
 
 use App\Enums\DistributionMethod;
 use App\Models\Household;
-use App\Services\Household\CurrentHouseholdService;
 use App\Services\Household\CurrentHouseholdServiceContract;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\URL;
 use Livewire\Component;
 
@@ -21,6 +19,17 @@ class HouseholdManager extends Component
     public string $defaultDistributionMethod = DistributionMethod::EQUAL->value;
 
     public array $householdMembers = [];
+
+    // Champs pour l'édition de membre
+    public ?int $editingMemberId = null;
+    public string $editingMemberFirstName = '';
+    public string $editingMemberLastName = '';
+
+    // Champs pour la suppression de membre
+    public ?int $memberIdToDelete = null;
+    public int $impactedBillsCount = 0;
+    public string $deleteAction = 'reassign'; // 'reassign' ou 'delete_bills'
+    public string $reassignmentTarget = ''; // Nom du membre ou 'compte joint'
 
     // Champs temporaires pour ajout de membres
     public string $newMemberFirstName = '';
@@ -96,16 +105,118 @@ class HouseholdManager extends Component
 
     public function removeMember($index) {
 
-        $member = $this->householdMembers[$index] ?? null;
+        $memberData = $this->householdMembers[$index] ?? null;
 
-        if ($member && isset($member['id'])) {
-            $household = $this->household;
-            if ($household) {
-                $household->members()->where('id', $member['id'])->delete();
+        if (!$memberData || isset($memberData['user'])) {
+            return;
+        }
+
+        $member = \App\Models\Member::find($memberData['id']);
+        if (!$member) return;
+
+        $this->memberIdToDelete = $member->id;
+        $this->impactedBillsCount = $member->bills()->count();
+        $this->deleteAction = 'reassign';
+
+        if ($this->hasJointAccount) {
+            $this->reassignmentTarget = 'compte joint';
+        } else {
+            $firstOtherMember = $this->household->members()
+                ->where('id', '!=', $member->id)
+                ->first();
+            $this->reassignmentTarget = $firstOtherMember ? $firstOtherMember->full_name : 'aucun (suppression forcée)';
+        }
+
+        $this->dispatch('open-modal', 'confirm-delete-member');
+    }
+
+    public function performDelete()
+    {
+        if (!$this->memberIdToDelete) return;
+
+        $member = \App\Models\Member::find($this->memberIdToDelete);
+        if (!$member || $member->hasUserAccount()) {
+            $this->memberIdToDelete = null;
+            return;
+        }
+
+        if ($this->impactedBillsCount > 0) {
+            if ($this->deleteAction === 'delete_bills') {
+                $member->bills()->delete();
+            } else {
+                // Reassign
+                $targetMemberId = null;
+                if (!$this->hasJointAccount) {
+                    $firstOtherMember = $this->household->members()
+                        ->where('id', '!=', $member->id)
+                        ->first();
+                    $targetMemberId = $firstOtherMember?->id;
+                }
+
+                $member->bills()->update(['member_id' => $targetMemberId]);
             }
         }
 
+        $member->delete();
+
+        $this->memberIdToDelete = null;
         $this->refreshMembers();
+        $this->dispatch('close-modal', 'confirm-delete-member');
+        session()->flash('message', 'Membre supprimé avec succès');
+    }
+
+    public function editMember($index)
+    {
+        $memberData = $this->householdMembers[$index] ?? null;
+
+        if (!$memberData) {
+            return;
+        }
+
+        $hasUser = isset($memberData['user']) && $memberData['user'] !== null;
+        $isCurrentUser = $memberData['id'] === Auth::user()->member_id;
+
+        $canEdit = !$hasUser || $isCurrentUser;
+
+        if ($canEdit) {
+            $this->editingMemberId = $memberData['id'];
+            $this->editingMemberFirstName = $memberData['first_name'];
+            $this->editingMemberLastName = $memberData['last_name'];
+        }
+    }
+
+    public function updateMember()
+    {
+        $this->validate([
+            'editingMemberFirstName' => 'required|string|min:2',
+            'editingMemberLastName' => 'required|string|min:2',
+        ]);
+
+        $member = \App\Models\Member::find($this->editingMemberId);
+
+        if (!$member) {
+            $this->cancelEdit();
+            return;
+        }
+
+        $canUpdate = !$member->hasUserAccount() || $member->id === Auth::user()->member_id;
+
+        if ($canUpdate) {
+            $member->update([
+                'first_name' => $this->editingMemberFirstName,
+                'last_name' => $this->editingMemberLastName,
+            ]);
+        }
+
+        $this->cancelEdit();
+        $this->refreshMembers();
+    }
+
+    public function cancelEdit()
+    {
+        $this->editingMemberId = null;
+        $this->editingMemberFirstName = '';
+        $this->editingMemberLastName = '';
     }
 
     public function getDistributionMethodOptionsProperty(): array
