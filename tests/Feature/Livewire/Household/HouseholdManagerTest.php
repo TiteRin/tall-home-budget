@@ -4,6 +4,7 @@ namespace Tests\Feature\Livewire\Household;
 
 use App\Enums\DistributionMethod;
 use App\Livewire\HouseholdManager;
+use App\Models\Bill;
 use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
@@ -190,12 +191,12 @@ describe('Member management', function () {
         test("should reassign bills to joint account by default", function () {
             $this->household->update(['has_joint_account' => true]);
             $member = Member::factory()->create(['household_id' => $this->household->id]);
-            $bill = \App\Models\Bill::factory()->create([
+            $bill = Bill::factory()->create([
                 'household_id' => $this->household->id,
                 'member_id' => $member->id,
                 'name' => 'Loyer',
                 'amount' => 1000,
-                'distribution_method' => \App\Enums\DistributionMethod::EQUAL
+                'distribution_method' => DistributionMethod::EQUAL
             ]);
 
             Livewire::test(HouseholdManager::class)
@@ -212,14 +213,14 @@ describe('Member management', function () {
 
         test("should reassign bills to first other member if no joint account", function () {
             $this->household->update(['has_joint_account' => false]);
-            // $this->member est le premier membre (index 0)
+
             $memberToDelete = Member::factory()->create(['household_id' => $this->household->id]);
-            $bill = \App\Models\Bill::factory()->create([
+            $bill = Bill::factory()->create([
                 'household_id' => $this->household->id,
                 'member_id' => $memberToDelete->id,
                 'name' => 'Courses',
                 'amount' => 100,
-                'distribution_method' => \App\Enums\DistributionMethod::EQUAL
+                'distribution_method' => DistributionMethod::EQUAL
             ]);
 
             Livewire::test(HouseholdManager::class)
@@ -234,12 +235,12 @@ describe('Member management', function () {
 
         test("should delete bills if requested", function () {
             $member = Member::factory()->create(['household_id' => $this->household->id]);
-            $bill = \App\Models\Bill::factory()->create([
+            $bill = Bill::factory()->create([
                 'household_id' => $this->household->id,
                 'member_id' => $member->id,
                 'name' => 'Netflix',
                 'amount' => 15,
-                'distribution_method' => \App\Enums\DistributionMethod::EQUAL
+                'distribution_method' => DistributionMethod::EQUAL
             ]);
 
             Livewire::test(HouseholdManager::class)
@@ -248,7 +249,7 @@ describe('Member management', function () {
                 ->set('deleteAction', 'delete_bills')
                 ->call('performDelete');
 
-            expect(\App\Models\Bill::find($bill->id))->toBeNull()
+            expect(Bill::find($bill->id))->toBeNull()
                 ->and(Member::find($member->id))->toBeNull();
         });
 
