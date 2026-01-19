@@ -169,7 +169,16 @@ class HouseholdManager extends Component
     {
         $memberData = $this->householdMembers[$index] ?? null;
 
-        if ($memberData && !isset($memberData['user'])) {
+        if (!$memberData) {
+            return;
+        }
+
+        $hasUser = isset($memberData['user']) && $memberData['user'] !== null;
+        $isCurrentUser = $memberData['id'] === Auth::user()->member_id;
+
+        $canEdit = !$hasUser || $isCurrentUser;
+
+        if ($canEdit) {
             $this->editingMemberId = $memberData['id'];
             $this->editingMemberFirstName = $memberData['first_name'];
             $this->editingMemberLastName = $memberData['last_name'];
@@ -185,7 +194,14 @@ class HouseholdManager extends Component
 
         $member = \App\Models\Member::find($this->editingMemberId);
 
-        if ($member && !$member->hasUserAccount()) {
+        if (!$member) {
+            $this->cancelEdit();
+            return;
+        }
+
+        $canUpdate = !$member->hasUserAccount() || $member->id === Auth::user()->member_id;
+
+        if ($canUpdate) {
             $member->update([
                 'first_name' => $this->editingMemberFirstName,
                 'last_name' => $this->editingMemberLastName,

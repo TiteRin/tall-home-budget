@@ -108,11 +108,14 @@
                                     </td>
                                     <td>
                                         <div class="flex gap-1">
-                                            @if (!isset($member['user']))
+                                            @if (!isset($member['user']) || $member['id'] === auth()->user()->member_id)
                                                 <button wire:click="editMember({{ $index }})"
                                                         class="btn btn-info btn-sm">
                                                     Modifier
                                                 </button>
+                                            @endif
+
+                                            @if (!isset($member['user']))
                                                 <button wire:click="removeMember({{ $index }})"
                                                         class="btn btn-error btn-sm">
                                                     Supprimer
@@ -152,6 +155,17 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+
+            {{-- Profil Utilisateur --}}
+            <div class="pt-6 border-t border-base-300 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-semibold">Mes informations personnelles</h3>
+                    <p class="text-sm text-base-content/70">Gérez votre adresse e-mail et votre mot de passe.</p>
+                </div>
+                <a href="{{ route('profile') }}" class="btn btn-outline">
+                    Modifier mon profil
+                </a>
             </div>
         </div>
     </div>

@@ -63,4 +63,8 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', LogoutController::class)
         ->name('logout');
+
+    Route::get('/profile', function () {
+        return view('profile');
+    })->name('profile');
 });

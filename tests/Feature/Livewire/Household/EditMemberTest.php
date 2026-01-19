@@ -40,6 +40,10 @@ describe('Member editing', function () {
     });
 
     test("should not start editing a member with user account", function () {
+        // On crée un autre utilisateur pour que Marie Curie ne soit pas l'utilisateur connecté
+        $otherUser = UserFactory::new()->create();
+        $this->actingAs($otherUser);
+
         Livewire::test(HouseholdManager::class)
             ->call('editMember', 1) // Index de Marie Curie
             ->assertSet('editingMemberId', null);

@@ -303,9 +303,17 @@ describe('Member editing', function () {
             ->assertSet('editingMemberLastName', 'Dupont');
     });
 
-    test("should not start editing a member with user account", function () {
+    test("should not start editing another member with user account", function () {
+        // Marie Curie est un autre utilisateur (voir setup)
+        // Mais dans le setup on actingAs($this->user) qui est lié à Marie Curie ($this->memberWithUser)
+        // Donc Marie Curie (index 1) est MOI, donc je PEUX l'éditer.
+        // Créons un TROISIÈME membre avec un utilisateur pour tester l'interdiction d'éditer UN AUTRE utilisateur.
+        $otherMemberWithUser = Member::factory()->create(['household_id' => $this->household->id]);
+        User::factory()->create(['member_id' => $otherMemberWithUser->id]);
+
         Livewire::test(HouseholdManager::class)
-            ->call('editMember', 1) // Index de Marie Curie
+            ->call('refreshMembers')
+            ->call('editMember', 2) // Index du troisième membre
             ->assertSet('editingMemberId', null);
     });
 
