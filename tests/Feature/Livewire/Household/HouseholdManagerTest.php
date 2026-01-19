@@ -149,18 +149,107 @@ describe('Member management', function () {
     });
 
     describe('remove member', function () {
-        test("should remove member by index", function () {
-            $member1 = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Jean']);
-            $member2 = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Marie']);
-            $user = User::factory()->create(['member_id' => $member1->id]);
-            $this->actingAs($user);
+        test("should show confirmation modal instead of deleting directly", function () {
+            $member = Member::factory()->create(['household_id' => $this->household->id, 'first_name' => 'Jean']);
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
-                ->call('removeMember', 0)
-                ->assertCount('householdMembers', 2);
+                ->call('removeMember', 1) // Index 1 car index 0 est $this->member
+                ->assertSet('memberIdToDelete', $member->id)
+                ->assertDispatched('open-modal', 'confirm-delete-member');
 
             expect($this->household->members()->count())->toBe(2);
+        });
+
+        test("should delete member after confirmation", function () {
+            $member = Member::factory()->create(['household_id' => $this->household->id]);
+
+            Livewire::test(HouseholdManager::class)
+                ->set('householdId', $this->household->id)
+                ->call('removeMember', 1)
+                ->call('performDelete')
+                ->assertSet('memberIdToDelete', null)
+                ->assertSee('Membre supprimé avec succès');
+
+            expect($this->household->members()->count())->toBe(1);
+        });
+
+        test("should not allow deleting member with user account", function () {
+            // $this->memberWithUser est à l'index 0 (créé dans le setup global si on était dans Member editing,
+            // mais ici on est dans Member management setup)
+            // Recréons une situation propre
+            $memberWithUser = Member::factory()->create(['household_id' => $this->household->id]);
+            User::factory()->create(['member_id' => $memberWithUser->id]);
+
+            Livewire::test(HouseholdManager::class)
+                ->set('householdId', $this->household->id)
+                ->call('removeMember', 1)
+                ->assertSet('memberIdToDelete', null);
+        });
+
+        test("should reassign bills to joint account by default", function () {
+            $this->household->update(['has_joint_account' => true]);
+            $member = Member::factory()->create(['household_id' => $this->household->id]);
+            $bill = \App\Models\Bill::factory()->create([
+                'household_id' => $this->household->id,
+                'member_id' => $member->id,
+                'name' => 'Loyer',
+                'amount' => 1000,
+                'distribution_method' => \App\Enums\DistributionMethod::EQUAL
+            ]);
+
+            Livewire::test(HouseholdManager::class)
+                ->set('householdId', $this->household->id)
+                ->call('removeMember', 1)
+                ->assertSet('impactedBillsCount', 1)
+                ->assertSet('reassignmentTarget', 'compte joint')
+                ->call('performDelete');
+
+            $bill->refresh();
+            expect($bill->member_id)->toBeNull()
+                ->and(Member::find($member->id))->toBeNull();
+        });
+
+        test("should reassign bills to first other member if no joint account", function () {
+            $this->household->update(['has_joint_account' => false]);
+            // $this->member est le premier membre (index 0)
+            $memberToDelete = Member::factory()->create(['household_id' => $this->household->id]);
+            $bill = \App\Models\Bill::factory()->create([
+                'household_id' => $this->household->id,
+                'member_id' => $memberToDelete->id,
+                'name' => 'Courses',
+                'amount' => 100,
+                'distribution_method' => \App\Enums\DistributionMethod::EQUAL
+            ]);
+
+            Livewire::test(HouseholdManager::class)
+                ->set('householdId', $this->household->id)
+                ->call('removeMember', 1)
+                ->assertSet('reassignmentTarget', $this->member->full_name)
+                ->call('performDelete');
+
+            $bill->refresh();
+            expect($bill->member_id)->toBe($this->member->id);
+        });
+
+        test("should delete bills if requested", function () {
+            $member = Member::factory()->create(['household_id' => $this->household->id]);
+            $bill = \App\Models\Bill::factory()->create([
+                'household_id' => $this->household->id,
+                'member_id' => $member->id,
+                'name' => 'Netflix',
+                'amount' => 15,
+                'distribution_method' => \App\Enums\DistributionMethod::EQUAL
+            ]);
+
+            Livewire::test(HouseholdManager::class)
+                ->set('householdId', $this->household->id)
+                ->call('removeMember', 1)
+                ->set('deleteAction', 'delete_bills')
+                ->call('performDelete');
+
+            expect(\App\Models\Bill::find($bill->id))->toBeNull()
+                ->and(Member::find($member->id))->toBeNull();
         });
 
         test("should handle invalid index gracefully", function () {
@@ -175,13 +264,88 @@ describe('Member management', function () {
         });
 
         test("should handle empty members array", function () {
+            // Ne pas supprimer $this->member car l'utilisateur connecté en dépend
+            $this->household->members()->where('id', '!=', $this->member->id)->delete();
+
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
-                ->call('removeMember', 0)
-                ->assertCount('householdMembers', 0);
-
-            expect($this->household->members()->count())->toBe(0);
+                ->call('refreshMembers')
+                ->assertCount('householdMembers', 1); // Reste $this->member
         });
+    });
+});
+
+describe('Member editing', function () {
+    beforeEach(function () {
+        $this->household = Household::factory()->create(['name' => 'Famille Test']);
+        // Membre sans utilisateur
+        $this->member = Member::factory()->create([
+            'household_id' => $this->household->id,
+            'first_name' => 'Jean',
+            'last_name' => 'Dupont'
+        ]);
+        // Membre avec utilisateur
+        $this->memberWithUser = Member::factory()->create([
+            'household_id' => $this->household->id,
+            'first_name' => 'Marie',
+            'last_name' => 'Curie'
+        ]);
+        $this->user = UserFactory::new()->create(['member_id' => $this->memberWithUser->id]);
+
+        $this->actingAs($this->user);
+    });
+
+    test("should start editing a member without user account", function () {
+        Livewire::test(HouseholdManager::class)
+            ->call('editMember', 0) // Index de Jean Dupont
+            ->assertSet('editingMemberId', $this->member->id)
+            ->assertSet('editingMemberFirstName', 'Jean')
+            ->assertSet('editingMemberLastName', 'Dupont');
+    });
+
+    test("should not start editing another member with user account", function () {
+        // Marie Curie est un autre utilisateur (voir setup)
+        // Mais dans le setup on actingAs($this->user) qui est lié à Marie Curie ($this->memberWithUser)
+        // Donc Marie Curie (index 1) est MOI, donc je PEUX l'éditer.
+        // Créons un TROISIÈME membre avec un utilisateur pour tester l'interdiction d'éditer UN AUTRE utilisateur.
+        $otherMemberWithUser = Member::factory()->create(['household_id' => $this->household->id]);
+        User::factory()->create(['member_id' => $otherMemberWithUser->id]);
+
+        Livewire::test(HouseholdManager::class)
+            ->call('refreshMembers')
+            ->call('editMember', 2) // Index du troisième membre
+            ->assertSet('editingMemberId', null);
+    });
+
+    test("should update member with valid data", function () {
+        Livewire::test(HouseholdManager::class)
+            ->call('editMember', 0)
+            ->set('editingMemberFirstName', 'Jacques')
+            ->set('editingMemberLastName', 'Martin')
+            ->call('updateMember')
+            ->assertSet('editingMemberId', null)
+            ->assertCount('householdMembers', 2);
+
+        $this->member->refresh();
+        expect($this->member->first_name)->toBe('Jacques')
+            ->and($this->member->last_name)->toBe('Martin');
+    });
+
+    test("should validate member data on update", function () {
+        Livewire::test(HouseholdManager::class)
+            ->call('editMember', 0)
+            ->set('editingMemberFirstName', '')
+            ->call('updateMember')
+            ->assertHasErrors(['editingMemberFirstName' => 'required']);
+    });
+
+    test("should cancel editing", function () {
+        Livewire::test(HouseholdManager::class)
+            ->call('editMember', 0)
+            ->call('cancelEdit')
+            ->assertSet('editingMemberId', null)
+            ->assertSet('editingMemberFirstName', '')
+            ->assertSet('editingMemberLastName', '');
     });
 });
 

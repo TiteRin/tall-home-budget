@@ -20,6 +20,9 @@
             </li>
             @auth
                 <li>
+                    <a href="{{ route('profile') }}">Mon profil</a>
+                </li>
+                <li>
                     <form method="POST" action="{{ route('logout') }}" id="logout-form">
                         @csrf
                         <button type="submit" class="w-full text-left">Déconnexion</button>
