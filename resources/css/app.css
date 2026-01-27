@@ -13,7 +13,42 @@
 
 /* Import DaisyUI library */
 @plugin 'daisyui' {
-    themes: dark --default
+    themes: corporate --default, dark
+}
+
+@plugin "daisyui/theme" {
+    name: "home";
+    default: true;
+    prefersdark: false;
+    color-scheme: "light";
+    --color-primary: #55828B;
+    --color-primary-content: oklch(98% 0.019 200.873);
+    --color-secondary: #BDD358;
+    --color-secondary-content: #303036;
+    --color-accent: #E5E059;
+    --color-accent-content: #303036;
+    --color-neutral: #303036;
+    --color-neutral-content: #F5F5F5;
+    --color-base-100: #F5F5F5;
+    --color-base-200: #EAEAEA;
+    --color-base-300: #DADADA;
+    --color-base-content: #303036;
+    --color-info: #4A90E2;
+    --color-info-content: #F5F5F5;
+    --color-success: #7FB069;
+    --color-success-content: #303036;
+    --color-warning: #E6B800;
+    --color-warning-content: #303036;
+    --color-error: #D94E41;
+    --color-error-content: #F5F5F5;
+    --radius-selector: 2rem;
+    --radius-field: 1rem;
+    --radius-box: 0.5rem;
+    --size-selector: 0.25rem;
+    --size-field: 0.25rem;
+    --border: 1px;
+    --depth: 0;
+    --noise: 0;
 }
 
 /* Remove default red box-shadow on invalid form elements */

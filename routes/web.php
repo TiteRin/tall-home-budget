@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\Auth\LogoutController;
+use App\Livewire\Admin\AdminDashboard;
 use App\Livewire\Auth\Login;
 use App\Livewire\Auth\Passwords\Confirm;
 use App\Livewire\Auth\Passwords\Email;
@@ -67,4 +68,20 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', function () {
         return view('profile');
     })->name('profile');
+});
+
+Route::get('/mentions-legales', function () {
+    return view('legal.mentions-legales');
+})->name('mentions-legales');
+
+Route::get('/cgu', function () {
+    return view('legal.cgu');
+})->name('cgu');
+
+Route::get('/confidentialite', function () {
+    return view('legal.confidentialite');
+})->name('confidentialite');
+
+Route::middleware('admin.auth')->group(function () {
+    Route::get('/admin', AdminDashboard::class)->name('admin.dashboard');
 });
