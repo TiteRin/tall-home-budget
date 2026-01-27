@@ -73,6 +73,59 @@
                     </div>
                 </form>
             </section>
+
+            {{-- Section Suppression de compte --}}
+            <section class="pt-8 border-t border-error/20">
+                <h4 class="text-lg font-semibold mb-4 text-error">Zone de danger</h4>
+                <div class="bg-error/5 border border-error/20 rounded-lg p-4">
+                    <p class="text-sm mb-4">
+                        La suppression de votre compte est irréversible.
+                        @if(\App\Models\User::whereHas('member', function($query) {
+                            $query->where('household_id', Auth::user()->member->household_id);
+                        })->count() === 1)
+                            En tant que seul utilisateur du foyer, cela supprimera également le foyer, tous ses membres
+                            et l'ensemble des dépenses associées.
+                        @else
+                            Cela supprimera uniquement votre accès utilisateur. Les autres membres du foyer conserveront
+                            leur accès et les données du foyer seront préservées.
+                        @endif
+                    </p>
+                    <button type="button" class="btn btn-error btn-outline" onclick="delete_account_modal.showModal()">
+                        Supprimer mon compte
+                    </button>
+                </div>
+            </section>
         </div>
     </div>
+
+    {{-- Modal de confirmation --}}
+    <dialog id="delete_account_modal" class="modal">
+        <div class="modal-box">
+            <h3 class="font-bold text-lg text-error">Confirmer la suppression</h3>
+            <p class="py-4">
+                Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.
+                Veuillez saisir votre mot de passe pour confirmer.
+            </p>
+
+            <form wire:submit.prevent="deleteAccount">
+                <div class="form-control w-full">
+                    <label class="label">
+                        <span class="label-text">Votre mot de passe</span>
+                    </label>
+                    <input type="password" wire:model="delete_confirm_password" class="input input-bordered w-full"
+                           required>
+                    @error('delete_confirm_password') <span
+                        class="text-error text-sm mt-1">{{ $message }}</span> @enderror
+                </div>
+
+                <div class="modal-action">
+                    <button type="button" class="btn" onclick="delete_account_modal.close()">Annuler</button>
+                    <button type="submit" class="btn btn-error">Confirmer la suppression</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
+        </form>
+    </dialog>
 </div>

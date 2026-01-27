@@ -31,6 +31,10 @@ class Login extends Component
             return;
         }
 
+        $user = Auth::user();
+        $user->last_login_at = now();
+        $user->save();
+
         return redirect()->intended(route('home'));
     }
 
