@@ -45,5 +45,3 @@ partagent les membres du foyer.
     ou futures ont un style "disabled", et l’affichage/la pagination est centrée sur les dépenses du mois en cours
 16. Il est possible de modifier une dépense à tout moment.
 17. On ne stocke jamais le résultat des calculs, tout est calculé dynamiquement.
-
-## UML
