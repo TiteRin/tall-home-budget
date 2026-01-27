@@ -43,5 +43,30 @@
                 </table>
             </div>
         </div>
+
+        <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6 mt-8">
+            <h2 class="text-2xl font-bold mb-6">Administration des Foyers</h2>
+
+            <div class="overflow-x-auto">
+                <table class="table w-full">
+                    <thead>
+                    <tr>
+                        <th>Nom du foyer</th>
+                        <th>Nombre de membres</th>
+                        <th>Nombre d'utilisateurs</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($households as $household)
+                        <tr>
+                            <td>{{ $household->name }}</td>
+                            <td>{{ $household->members_count }}</td>
+                            <td>{{ $household->users_count }}</td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </div>

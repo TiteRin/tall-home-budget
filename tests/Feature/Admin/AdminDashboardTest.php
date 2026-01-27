@@ -81,3 +81,23 @@ test('it deletes only user if other users exist in household', function () {
     $this->assertDatabaseHas('members', ['id' => $member1->id]);
     $this->assertDatabaseHas('households', ['id' => $household->id]);
 });
+
+test('it lists households with their information', function () {
+    $household = Household::factory()->create(['name' => 'Foyer Test']);
+
+    // Member with user account
+    $member1 = Member::factory()->create(['household_id' => $household->id]);
+    User::factory()->create(['member_id' => $member1->id]);
+
+    // Member without user account
+    Member::factory()->create(['household_id' => $household->id]);
+
+    Livewire::withHeaders([
+        'PHP_AUTH_USER' => 'admin',
+        'PHP_AUTH_PW' => 'password',
+    ])->test(AdminDashboard::class)
+        ->assertSee('Administration des Foyers')
+        ->assertSee('Foyer Test')
+        ->assertSee('2') // Total members
+        ->assertSee('1'); // Total users (accounts)
+});

@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Admin;
 
+use App\Models\Household;
 use App\Models\User;
 use Livewire\Component;
 
@@ -35,6 +36,9 @@ class AdminDashboard extends Component
     {
         return view('livewire.admin.admin-dashboard', [
             'users' => User::with('member.household')->latest()->get(),
+            'households' => Household::withCount(['members', 'members as users_count' => function ($query) {
+                $query->whereHas('user');
+            }])->latest()->get(),
         ])->layout('layouts.app');
     }
 }
