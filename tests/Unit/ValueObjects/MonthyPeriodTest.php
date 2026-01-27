@@ -9,7 +9,13 @@ use InvalidArgumentException;
 describe("MonthlyPeriod", function () {
 
     test("should create a MonthlyPeriod with a start and a end date", function () {
-        $monthlyPeriod = new MonthlyPeriod(CarbonImmutable::create(2025, 1, 1), CarbonImmutable::create(2025, 1, 31));
+        $from = CarbonImmutable::create(2025, 1, 1);
+        $to = CarbonImmutable::create(2025, 1, 31);
+        $monthlyPeriod = new MonthlyPeriod($from, $to);
+        expect($monthlyPeriod->getFrom())->toBeInstanceOf(CarbonImmutable::class)
+            ->and($monthlyPeriod->getFrom())->toBe($from)
+            ->and($monthlyPeriod->getTo())->toBeInstanceOf(CarbonImmutable::class)
+            ->and($monthlyPeriod->getTo())->toBe($to);
     });
 
     test("should throw an exception if end date is before start date", function () {

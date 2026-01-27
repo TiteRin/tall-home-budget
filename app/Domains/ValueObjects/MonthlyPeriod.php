@@ -24,4 +24,14 @@ class MonthlyPeriod
     {
         return $this->from->lte($date) && $this->to->gte($date);
     }
+
+    public function getFrom(): CarbonImmutable
+    {
+        return $this->from;
+    }
+
+    public function getTo(): CarbonImmutable
+    {
+        return $this->to;
+    }
 }
