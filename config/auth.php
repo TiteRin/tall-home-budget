@@ -112,4 +112,14 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Admin Authentication
+    |--------------------------------------------------------------------------
+    */
+    'admin' => [
+        'user' => env('ADMIN_USER', 'admin'),
+        'password_hash' => env('ADMIN_PASSWORD_HASH', '$2y$12$6H.lK5QJp5qF9qK5/wP/aeQ5g5.1/zO7J.JzP5qF9qK5/wP/aeQ5g'), // admin
+    ],
+
 ];
