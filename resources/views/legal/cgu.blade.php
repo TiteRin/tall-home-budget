@@ -63,6 +63,13 @@
                         localement dans le navigateur de l’utilisateur.
                     </p>
 
+                    <p>
+                        Pour plus d’informations, l’utilisateur peut consulter la
+                        <a href="{{ route('confidentialite') }}" class="underline">
+                            Politique de confidentialité
+                        </a>.
+                    </p>
+
                     <h2>
                         5. Suppression du compte
                     </h2>

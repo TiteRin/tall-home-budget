@@ -76,3 +76,7 @@ Route::get('/mentions-legales', function () {
 Route::get('/cgu', function () {
     return view('legal.cgu');
 })->name('cgu');
+
+Route::get('/confidentialite', function () {
+    return view('legal.confidentialite');
+})->name('confidentialite');

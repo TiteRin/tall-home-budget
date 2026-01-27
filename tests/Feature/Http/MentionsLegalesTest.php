@@ -26,6 +26,20 @@ describe('CGU', function () {
     });
 });
 
+describe('Confidentialités', function () {
+    test('should be accessible', function () {
+        $this->get('/confidentialite')
+            ->assertStatus(200);;
+    });
+
+    test('should display "Politique de confidentialité"', function () {
+        $this->get('/confidentialite')
+            ->assertSeeText("Politique de confidentialité");
+    });
+});
+
+
+
 describe('Footer', function () {
     test('should display legal links on home page', function () {
         $this->get("/")
