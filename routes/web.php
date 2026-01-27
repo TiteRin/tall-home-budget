@@ -68,3 +68,11 @@ Route::middleware('auth')->group(function () {
         return view('profile');
     })->name('profile');
 });
+
+Route::get('/mentions-legales', function () {
+    return view('legal.mentions-legales');
+})->name('mentions-legales');
+
+Route::get('/cgu', function () {
+    return view('legal.cgu');
+})->name('cgu');
