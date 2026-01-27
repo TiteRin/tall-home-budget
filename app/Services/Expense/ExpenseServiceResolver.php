@@ -17,9 +17,17 @@ class ExpenseServiceResolver
     public function getCurrentMonthlyPeriod(): MonthlyPeriod
     {
         $now = CarbonImmutable::now();
+        return $this->getMonthlyPeriodFor($now);
+    }
 
-        $from = CarbonImmutable::create($now->year, $now->month, $this->startDayOfTheMonth);
-        $to = CarbonImmutable::create($now->year, $now->month + 1, $this->startDayOfTheMonth - 1);
+    public function getMonthlyPeriodFor(CarbonImmutable $dateFrom): MonthlyPeriod
+    {
+        if ($dateFrom->day < $this->startDayOfTheMonth) {
+            $dateFrom = $dateFrom->copy()->subMonth();
+        }
+
+        $from = CarbonImmutable::create($dateFrom->year, $dateFrom->month, $this->startDayOfTheMonth);
+        $to = CarbonImmutable::create($dateFrom->year, $dateFrom->month + 1, $this->startDayOfTheMonth - 1);
 
         return new MonthlyPeriod($from, $to);
     }
