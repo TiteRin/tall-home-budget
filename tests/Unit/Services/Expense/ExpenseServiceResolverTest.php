@@ -18,12 +18,14 @@ describe("ExpenseServiceResolver", function () {
 
     test("given a date exactly at start, should return the current MonthlyPeriod", function () {
 
-        $dateFrom = CarbonImmutable::create(2025, 2, 5);
+        $dateFrom = CarbonImmutable::create(2025, 4, 5);
+        $expectedDateTo = CarbonImmutable::create(2025, 5, 4);
         $expenseServiceResolver = new ExpenseServiceResolver(5);
         $monthlyPeriod = $expenseServiceResolver->getMonthlyPeriodFor($dateFrom);
         expect($monthlyPeriod)->toBeInstanceOf(MonthlyPeriod::class)
             ->and($monthlyPeriod->contains($dateFrom))
-            ->and($monthlyPeriod->getFrom())->toEqual($dateFrom);
+            ->and($monthlyPeriod->getFrom())->toEqual($dateFrom)
+            ->and($monthlyPeriod->getTo())->toEqual($expectedDateTo);
     });
 
     test("given a date exactly before start, should return the previous MonthlyPeriod", function () {
@@ -35,5 +37,18 @@ describe("ExpenseServiceResolver", function () {
             ->and($monthlyPeriod->contains($dateFrom))
             ->and($monthlyPeriod->getFrom())->toEqual($expectedStart)
             ->and($monthlyPeriod->getTo())->toEqual($dateFrom);
+    });
+
+    test("given a start of MonthlyPeriod the 31th, should return the last day of the month for the end of the MonthlyPeriod", function () {
+
+        $expenseServiceResolver = new ExpenseServiceResolver(31);
+        $dateFrom = CarbonImmutable::create(2025, 1, 31);
+        $expectedStart = CarbonImmutable::create(2025, 1, 31);
+        $expectedEnd = CarbonImmutable::create(2025, 2, 28);
+        $monthlyPeriod = $expenseServiceResolver->getMonthlyPeriodFor($dateFrom);
+        expect($monthlyPeriod)->toBeInstanceOf(MonthlyPeriod::class)
+            ->and($monthlyPeriod->contains($dateFrom))
+            ->and($monthlyPeriod->getFrom())->toEqual($expectedStart)
+            ->and($monthlyPeriod->getTo())->toEqual($expectedEnd);
     });
 });
