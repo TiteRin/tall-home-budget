@@ -24,3 +24,5 @@ jobs:
             cd ~/apps/home-budget-prod
             docker compose -f docker-compose.prod.yml pull
             docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml run --rm migrate
+            docker compose -f docker-compose.prod.yml run --rm init-public
