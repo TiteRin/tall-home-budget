@@ -88,9 +88,17 @@ class MovementsService
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function getRatiosFromIncome(): array
     {
         $totalIncome = $this->getTotalIncome();
+
+        if (count($this->incomes) !== count($this->members)) {
+            throw new Exception("You need to set income for every member.");
+        }
+
         return array_combine(
             array_map(
                 function (Member $member) {
