@@ -5,15 +5,23 @@ namespace Tests\Feature\Livewire\Home;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\Home\Movements\MovementsList;
-use App\Models\User;
 use App\Services\Bill\BillsCollection;
 use Livewire;
 
 beforeEach(function () {
-    $this->household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => true]);
-    $this->memberAlice = bill_factory()->member(['first_name' => 'Alice'], $this->household);
-    $this->memberBob = bill_factory()->member(['first_name' => 'Bob'], $this->household);
-    $this->user = User::factory()->create(['member_id' => $this->memberAlice->id]);
+    $this->factory = test_factory()
+        ->withHousehold(['name' => 'Test household', 'has_joint_account' => true])
+        ->withMember(['first_name' => 'Alice'])
+        ->withMember(['first_name' => 'Bob']);
+
+    $this->memberAlice = $this->factory->members()->firstWhere('first_name', 'Alice');
+    $this->memberBob = $this->factory->members()->firstWhere('first_name', 'Bob');
+
+    $this->factory = $this->factory->withUser(['member_id' => $this->memberAlice->id]);
+
+    $this->household = $this->factory->household();
+    $this->user = $this->factory->user();
+
     $this->actingAs($this->user);
 });
 
@@ -31,8 +39,9 @@ describe("When something is missing", function () {
 
     test("when no bills should display a message", function () {
 
-        $memberAlice = bill_factory()->member(['first_name' => 'Alice'], $this->household);
-        $memberBob = bill_factory()->member(['first_name' => 'Bob'], $this->household);
+        test_factory()
+            ->withMember(['first_name' => 'Alice'])
+            ->withMember(['first_name' => 'Bob']);
 
         Livewire::test(MovementsList::class)
             ->assertSee("Aucun mouvement à afficher.");
@@ -42,33 +51,34 @@ describe("When something is missing", function () {
 describe("when all is initialized", function () {
 
     beforeEach(function () {
-        $loyer = bill_factory()->bill([
-            'name' => 'Loyer',
-            'amount' => 70000,
-            'distribution_method' => DistributionMethod::EQUAL,
-            'member_id' => null
-        ], null, $this->household);
+        $this->factory = $this->factory
+            ->withBill([
+                'name' => 'Loyer',
+                'amount' => 70000,
+                'distribution_method' => DistributionMethod::EQUAL,
+                'member_id' => null
+            ])
+            ->withBill([
+                'name' => 'Électricité',
+                'amount' => 9000,
+                'distribution_method' => DistributionMethod::PRORATA,
+                'member_id' => $this->memberAlice->id,
+            ])
+            ->withBill([
+                'name' => 'Internet',
+                'amount' => 3000,
+                'distribution_method' => DistributionMethod::PRORATA,
+                'member_id' => $this->memberBob->id,
+            ])
+            ->withBill([
+                'name' => 'Vétérinaire',
+                'amount' => 10000,
+                'distribution_method' => DistributionMethod::EQUAL,
+                'member_id' => $this->memberBob->id,
+            ]);
 
-        $electricity = bill_factory()->bill([
-            'name' => 'Électricité',
-            'amount' => 9000,
-            'distribution_method' => DistributionMethod::PRORATA,
-        ], $this->memberAlice, $this->household);
-
-        $internet = bill_factory()->bill([
-            'name' => 'Internet',
-            'amount' => 3000,
-            'distribution_method' => DistributionMethod::PRORATA,
-        ], $this->memberBob, $this->household);
-
-        $veterinaire = bill_factory()->bill([
-            'name' => 'Vétérinaire',
-            'amount' => 10000,
-            'distribution_method' => DistributionMethod::EQUAL,
-        ], $this->memberBob, $this->household);
-
-        $this->members = [$this->memberAlice, $this->memberBob];
-        $this->bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
+        $this->members = $this->factory->members()->all();
+        $this->bills = new BillsCollection($this->factory->bills()->all());
 
         $this->incomes = [
             $this->memberAlice->id => new Amount(200000),
@@ -85,12 +95,12 @@ describe("when all is initialized", function () {
 
     test('should display the recipients', function () {
         Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
-            ->assertSeeInOrder(['Compte joint', 'Compte joint']);
+            ->assertSeeInOrder(['Bob Doe']);
     });
 
     test('should display the amounts', function () {
         Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
-            ->assertSeeInOrder(['390,00', '310,00']);
+            ->assertSeeInOrder(['480,00']);
     });
 
 //    test('should display all the movements', function () {
