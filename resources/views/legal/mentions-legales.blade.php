@@ -14,7 +14,7 @@
                     <p>
                         Conformément aux dispositions de la loi n°2004-575 du 21 juin 2004
                         pour la confiance dans l’économie numérique (LCEN), il est précisé aux
-                        utilisateurs de l’application <strong>HomeBudget</strong> l’identité des
+                        utilisateurs de l’application <strong>{{ config('app.name') }}</strong> l’identité des
                         différents intervenants dans le cadre de sa réalisation et de son suivi.
                     </p>
 
@@ -23,7 +23,7 @@
                     </h2>
 
                     <p>
-                        HomeBudget est éditée à titre personnel par :
+                        {{ config('app.name') }} est éditée à titre personnel par :
                     </p>
 
                     <ul>
@@ -54,7 +54,7 @@
                     </h2>
 
                     <p>
-                        L’ensemble des contenus présents sur l’application HomeBudget
+                        L’ensemble des contenus présents sur l’application {{ config('app.name') }}
                         (code, design, logo, textes) est protégé par le droit d’auteur.
                     </p>
 

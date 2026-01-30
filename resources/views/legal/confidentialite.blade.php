@@ -13,12 +13,13 @@
 
                     <p>
                         La présente politique de confidentialité a pour objectif d’informer les utilisateurs
-                        de l’application <strong>HomeBudget</strong> sur la manière dont leurs données personnelles
+                        de l’application <strong>{{ config('app.name') }}</strong> sur la manière dont leurs données
+                        personnelles
                         sont collectées, utilisées et protégées.
                     </p>
 
                     <p>
-                        HomeBudget respecte le Règlement Général sur la Protection des Données
+                        {{ config('app.name') }} respecte le Règlement Général sur la Protection des Données
                         (<strong>RGPD – UE 2016/679</strong>).
                     </p>
 
@@ -41,7 +42,8 @@
                     </h2>
 
                     <p>
-                        Dans le cadre de l’utilisation de HomeBudget, les données suivantes peuvent être collectées :
+                        Dans le cadre de l’utilisation de {{ config('app.name') }}, les données suivantes peuvent être
+                        collectées :
                     </p>
 
                     <ul>
@@ -65,7 +67,7 @@
                     </h2>
 
                     <p>
-                        HomeBudget ne stocke pas les revenus des membres sur ses serveurs.
+                        {{ config('app.name') }} ne stocke pas les revenus des membres sur ses serveurs.
                     </p>
 
                     <p>
@@ -74,7 +76,7 @@
                     </p>
 
                     <p>
-                        Aucune donnée bancaire n’est demandée ou stockée par HomeBudget.
+                        Aucune donnée bancaire n’est demandée ou stockée par {{ config('app.name') }}.
                     </p>
 
                     <h2>
@@ -168,7 +170,7 @@
                     </h2>
 
                     <p>
-                        HomeBudget n’utilise pas de cookies publicitaires ou de suivi.
+                        {{ config('app.name') }} n’utilise pas de cookies publicitaires ou de suivi.
                     </p>
 
                     <p>
