@@ -44,6 +44,11 @@ class MovementsService
     {
         foreach ($incomes as $member_id => $income) {
 
+            if ($income === null) {
+                unset($incomes[$member_id]);
+                continue;
+            }
+
             if (!array_any($this->members, function (Member $m) use ($member_id) {
                 return $m->id === $member_id;
             })) {
@@ -136,7 +141,7 @@ class MovementsService
             $balances->push(
                 new Balance(
                     $joint,
-                    $this->bills->getTotalForMember()
+                    $this->bills->getTotalForJointAccount()
                 )
             );
         }
