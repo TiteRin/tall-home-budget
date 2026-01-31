@@ -1,18 +1,16 @@
 home-budget.titerin.ovh {
 
     root * /var/www/html/public
-
-    # Compression moderne
     encode zstd gzip
 
-    # 🔥 Assets statiques prioritaires
-    @assets path /build/* /storage/*
-    file_server @assets
-
-    # Laravel + FrankenPHP
     php_server
 
-    # Bloquer fichiers cachés sensibles (.env, .git…)
-    @hidden path_regexp hidden /\.(?!well-known).*
-    respond @hidden 403
+    file_server
+
+    # Deny access to dotfiles
+    @dotfiles {
+        path /.*
+        not path /.well-known/*
+    }
+    respond @dotfiles 403
 }
