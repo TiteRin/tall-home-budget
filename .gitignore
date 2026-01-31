@@ -29,6 +29,7 @@ Homestead.json
 .env.backup
 .env.production
 .env.prod
+.env.testing
 .phpactor.json
 auth.json
 
