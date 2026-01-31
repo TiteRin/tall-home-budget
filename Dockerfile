@@ -3,26 +3,24 @@
 ##############################
 FROM dunglas/frankenphp:php8.4-alpine AS vendor
 
-# System deps + PHP extensions required by Composer packages
 RUN apk add --no-cache \
     git unzip zip curl \
     icu-dev libpq-dev oniguruma-dev libzip-dev \
     && docker-php-ext-install \
         intl pdo_pgsql mbstring zip
 
-# Composer binary
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
-
 COPY composer.json composer.lock ./
 
-# Install vendor deps
-RUN composer install -vvv \
+# ✅ No scripts here (artisan not available yet)
+RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --no-scripts
 
 
 ##############################
@@ -49,7 +47,6 @@ RUN npm run build
 ##############################
 FROM dunglas/frankenphp:php8.4-alpine AS runtime
 
-# Runtime PHP extensions (same as vendor stage)
 RUN apk add --no-cache \
     icu-dev libpq-dev oniguruma-dev libzip-dev \
     && docker-php-ext-install \
@@ -57,17 +54,19 @@ RUN apk add --no-cache \
 
 WORKDIR /var/www/html
 
-# Copy Laravel source
+# Copy full Laravel app
 COPY . .
 
 # Inject vendor + assets
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-# Caddy config
+# Config Caddy
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
-# Laravel permissions
+# ✅ Now artisan exists → safe to run scripts
+RUN php artisan package:discover --ansi
+
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80 443
