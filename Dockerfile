@@ -18,7 +18,7 @@ WORKDIR /app
 COPY composer.json composer.lock ./
 
 # Install vendor deps
-RUN composer install \
+RUN composer install -vvv \
     --no-dev \
     --prefer-dist \
     --no-interaction \
