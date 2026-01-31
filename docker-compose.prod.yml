@@ -8,10 +8,15 @@ services:
       - .env.prod
 
     ports:
-      - "127.0.0.1:8010:80"
+      - "80:80"
+      - "443:443"
 
     volumes:
       - storage:/var/www/html/storage
+
+      # ✅ Certificats TLS persistants
+      - caddy-data:/data
+      - caddy-config:/config
 
     depends_on:
       postgres:
@@ -49,3 +54,7 @@ services:
 volumes:
   storage:
   postgres-data:
+
+  # ✅ Obligatoire pour HTTPS
+  caddy-data:
+  caddy-config:
