@@ -13,7 +13,8 @@
 
                     <p>
                         Les présentes Conditions Générales d’Utilisation ont pour objet de définir
-                        les modalités d’accès et d’utilisation de l’application <strong>HomeBudget</strong>.
+                        les modalités d’accès et d’utilisation de l’application
+                        <strong>{{ config('app.name') }}</strong>.
                     </p>
 
                     <h2>
@@ -21,7 +22,7 @@
                     </h2>
 
                     <p>
-                        HomeBudget est une application permettant aux utilisateurs de gérer leurs
+                        {{ config('app.name') }} est une application permettant aux utilisateurs de gérer leurs
                         dépenses personnelles et catégories associées.
                     </p>
 
@@ -30,7 +31,7 @@
                     </h2>
 
                     <p>
-                        L’accès à HomeBudget nécessite la création d’un compte utilisateur.
+                        L’accès à {{ config('app.name') }} nécessite la création d’un compte utilisateur.
                         L’utilisateur s’engage à fournir des informations exactes lors de son inscription.
                     </p>
 
@@ -39,7 +40,7 @@
                     </h2>
 
                     <p>
-                        HomeBudget est proposé à titre d’outil d’organisation.
+                        {{ config('app.name') }} est proposé à titre d’outil d’organisation.
                         L’éditeur ne garantit pas l’exactitude des résultats ou calculs produits
                         par l’utilisateur.
                     </p>
@@ -54,7 +55,7 @@
                     </h2>
 
                     <p>
-                        HomeBudget collecte uniquement les données nécessaires à la création du compte
+                        {{ config('app.name') }} collecte uniquement les données nécessaires à la création du compte
                         (nom, prénom, email, mot de passe chiffré).
                     </p>
 

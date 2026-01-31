@@ -8,8 +8,7 @@
                 <livewire:home.movements.movement-item
                     :from="$movement->memberFrom"
                     :to="$movement->memberTo"
-                    :amount="$movement->amount"
-                    :key="$movement->getId()"/>
+                    :amount="$movement->amount"/>
             @endforeach
         </ul>
     </div>

@@ -10,13 +10,14 @@
     "license": "MIT",
     "require": {
         "php": "^8.4",
+        "ext-intl": "*",
         "blade-ui-kit/blade-heroicons": "^2.6",
         "blade-ui-kit/blade-icons": "^1.8",
         "laravel-frontend-presets/tall": "^9.1",
         "laravel/framework": "^12.0",
+        "laravel/octane": "^2.13",
         "laravel/tinker": "^2.10.1",
-        "livewire/livewire": "^3.6",
-        "ext-intl": "*"
+        "livewire/livewire": "^3.6"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

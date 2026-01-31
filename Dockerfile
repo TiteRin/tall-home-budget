@@ -1,7 +1,7 @@
 ##############################
 # Dépendances PHP (composer) #
 ##############################
-FROM php:8.4-cli-alpine AS vendor
+FROM dunglas/frankenphp AS vendor
 
 # Dépendances système pour intl
 RUN apk add --no-cache \

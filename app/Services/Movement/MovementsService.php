@@ -44,6 +44,11 @@ class MovementsService
     {
         foreach ($incomes as $member_id => $income) {
 
+            if ($income === null) {
+                unset($incomes[$member_id]);
+                continue;
+            }
+
             if (!array_any($this->members, function (Member $m) use ($member_id) {
                 return $m->id === $member_id;
             })) {
@@ -83,9 +88,17 @@ class MovementsService
         );
     }
 
+    /**
+     * @throws Exception
+     */
     public function getRatiosFromIncome(): array
     {
         $totalIncome = $this->getTotalIncome();
+
+        if (count($this->incomes) !== count($this->members)) {
+            throw new Exception("You need to set income for every member.");
+        }
+
         return array_combine(
             array_map(
                 function (Member $member) {
@@ -136,7 +149,7 @@ class MovementsService
             $balances->push(
                 new Balance(
                     $joint,
-                    $this->bills->getTotalForMember()
+                    $this->bills->getTotalForJointAccount()
                 )
             );
         }

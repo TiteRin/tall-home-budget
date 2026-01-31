@@ -1,10 +1,11 @@
 services:
     laravel.test:
         build:
-            context: './vendor/laravel/sail/runtimes/8.4'
-            dockerfile: Dockerfile
+            context: .
+            dockerfile: docker/frankenphp/Dockerfile.dev
             args:
                 WWWGROUP: '${WWWGROUP}'
+                WWWUSER: '${WWWUSER}'
         image: 'sail-8.4/app'
         extra_hosts:
             - 'host.docker.internal:host-gateway'
@@ -18,6 +19,7 @@ services:
             IGNITION_LOCAL_SITES_PATH: '${PWD}'
         volumes:
             - '.:/var/www/html'
+            - './docker/frankenphp/Caddyfile:/etc/frankenphp/Caddyfile:ro'
         networks:
             - sail
         depends_on:

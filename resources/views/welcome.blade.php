@@ -5,8 +5,8 @@
         class="relative min-h-screen bg-base-200 bg-center sm:flex sm:justify-center sm:items-center selection:bg-primary selection:text-primary-content">
         <div class="p-6 mx-auto max-w-7xl lg:p-8">
             <div class="flex flex-col items-center">
-                <h1 class="text-6xl font-bold text-base-content mb-4">
-                    Home Budget
+                <h1 class="text-6xl font-bold text-base-content mb-4 cedarville-cursive-regular">
+                    {{ config('app.name') }}
                 </h1>
                 <p class="text-xl text-base-content/70 text-center mb-8">
                     Gérez votre budget domestique en toute simplicité. Ajoutez vos dépenses mensuelles une seule fois,

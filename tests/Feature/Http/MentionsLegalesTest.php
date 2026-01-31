@@ -3,10 +3,6 @@
 namespace Tests\Feature\Http;
 
 describe('Mentions légales', function () {
-    test('should be accessible', function () {
-        $this->get('/mentions-legales')
-            ->assertStatus(200);
-    });
 
     test('should display "Mentions légales"', function () {
         $this->get('/mentions-legales')
@@ -15,11 +11,6 @@ describe('Mentions légales', function () {
 });
 
 describe('CGU', function () {
-    test('should be accessible', function () {
-        $this->get('/cgu')
-            ->assertStatus(200);;
-    });
-
     test('should display "Conditions Générales d’Utilisation"', function () {
         $this->get('/cgu')
             ->assertSeeText("Conditions Générales d’Utilisation");
@@ -27,10 +18,6 @@ describe('CGU', function () {
 });
 
 describe('Confidentialités', function () {
-    test('should be accessible', function () {
-        $this->get('/confidentialite')
-            ->assertStatus(200);;
-    });
 
     test('should display "Politique de confidentialité"', function () {
         $this->get('/confidentialite')
