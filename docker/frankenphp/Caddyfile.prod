@@ -1,0 +1,16 @@
+home-budget.titerin.ovh {
+
+    root * /var/www/html/public
+    encode zstd gzip
+
+    php_server
+
+    file_server
+
+    # Deny access to dotfiles
+    @dotfiles {
+        path /.*
+        not path /.well-known/*
+    }
+    respond @dotfiles 403
+}
