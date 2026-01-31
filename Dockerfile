@@ -1,16 +1,13 @@
 ##############################
-# Dépendances PHP (composer) #
+# Stage 1 — Composer vendor  #
 ##############################
-FROM dunglas/frankenphp AS vendor
+FROM dunglas/frankenphp:latest AS vendor
 
-# Dépendances système pour intl
-RUN apk add --no-cache \
-    icu-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-install intl
+RUN apt-get update && apt-get install -y \
+    git unzip zip curl \
+    libicu-dev libpq-dev libonig-dev \
+    && docker-php-ext-install intl pdo_pgsql mbstring \
+    && rm -rf /var/lib/apt/lists/*
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
@@ -21,58 +18,48 @@ RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
-    --no-progress \
-    --optimize-autoloader \
-    --no-scripts
+    --optimize-autoloader
 
 
 ##############################
-# Build Vite                 #
+# Stage 2 — Frontend build   #
 ##############################
-FROM node:25-alpine AS frontend
+FROM node:20-alpine AS frontend
 
 WORKDIR /app
 
-# Cache NPM
-COPY package.json ./
-COPY package-lock.json ./
-
-RUN npm install
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Code frontend uniquement
 COPY resources ./resources
+COPY public ./public
 COPY vite.config.* ./
+COPY tailwind.config.* ./
+COPY postcss.config.* ./
 
-# Build assets
 RUN npm run build
 
-##############################
-# Run-time PHP               #
-##############################
-FROM php:8.4-fpm-alpine AS runtime
 
-RUN apk add --no-cache \
-    icu-dev \
-    libpq-dev \
-    oniguruma-dev \
-    zip \
-    unzip \
-    && docker-php-ext-install \
-        intl \
-        pdo_pgsql \
-        mbstring \
-        opcache \
-    && rm -rf /var/cache/apk/*
+##############################
+# Stage 3 — Runtime FrankenPHP
+##############################
+FROM dunglas/frankenphp:latest AS runtime
 
-RUN rm -rf bootstrap/cache/*
+RUN apt-get update && apt-get install -y \
+    libicu-dev libpq-dev libonig-dev \
+    && docker-php-ext-install intl pdo_pgsql mbstring opcache \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /var/www/html
+
 COPY . .
+
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-RUN chown -R www-data:www-data \
-    storage bootstrap/cache
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-EXPOSE 9000
-CMD ["php-fpm"]
+EXPOSE 80
+
+COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]
