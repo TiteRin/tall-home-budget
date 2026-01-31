@@ -46,3 +46,7 @@ sail-phpunit.sh
 
 # Coverage
 coverage/
+
+**/caddy
+frankenphp
+frankenphp-worker.php
