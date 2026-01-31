@@ -31,9 +31,14 @@ class BillsCollection extends TypedCollection
         return $filtered->getTotal();
     }
 
-    public function getTotalForMember(?Member $member = null): Amount
+    public function getTotalForMember(Member $member): Amount
     {
-        return $this->filter(fn($bill) => $bill->member_id === $member?->id)->getTotal();
+        return $this->filter(fn($bill) => $bill->member_id === $member->id)->getTotal();
+    }
+
+    public function getTotalForJointAccount(): Amount
+    {
+        return $this->filter(fn($bill) => $bill->member_id === null)->getTotal();
     }
 
     /**

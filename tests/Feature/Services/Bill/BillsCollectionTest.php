@@ -85,6 +85,6 @@ describe("Summarization", function () {
 
         expect($collection->getTotalForMember($this->memberAlice))->toEqual(new Amount(3000))
             ->and($collection->getTotalForMember($this->memberBob))->toEqual(new Amount(10000))
-            ->and($collection->getTotalForMember(null))->toEqual(new Amount(67000));
+            ->and($collection->getTotalForJointAccount())->toEqual(new Amount(67000));
     });
 });

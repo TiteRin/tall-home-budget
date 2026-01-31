@@ -21,7 +21,6 @@ class MovementsList extends Component
 
     public function render(): View
     {
-
         if (!$this->service->hasMembers()) {
             return view('livewire.home.movements.movements-list-empty');
         }

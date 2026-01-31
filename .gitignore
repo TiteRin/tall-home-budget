@@ -29,6 +29,7 @@ Homestead.json
 .env.backup
 .env.production
 .env.prod
+.env.testing
 .phpactor.json
 auth.json
 
@@ -45,3 +46,7 @@ sail-phpunit.sh
 
 # Coverage
 coverage/
+
+**/caddy
+frankenphp
+frankenphp-worker.php

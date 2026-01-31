@@ -5,7 +5,7 @@
                 Créer un compte
             </h2>
             <p class="mt-2 text-center text-sm text-base-content/60">
-                Rejoignez Home Budget pour gérer votre foyer
+                Rejoignez {{ config('app.name') }} pour gérer votre foyer
             </p>
         </div>
 

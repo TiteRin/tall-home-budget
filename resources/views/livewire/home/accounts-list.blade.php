@@ -1,18 +1,18 @@
 <section class="card bg-base-100 shadow-xl grow"
          x-data="{
-            incomes: @entangle('incomes'),
+            incomesInCents: @entangle('incomesInCents'),
             storageKey: 'accounts-list-incomes-{{ $household->id }}',
             init() {
                 let savedIncomes = localStorage.getItem(this.storageKey);
-                if (savedIncomes && (!this.incomes || Object.keys(this.incomes).length === 0)) {
+                if (savedIncomes && (!this.incomesInCents || Object.keys(this.incomesInCents).length === 0)) {
                     try {
-                        $wire.initIncomes(JSON.parse(savedIncomes));
+                        $wire.initIncomes(JSON.parse(savedIncomes), true);
                     } catch (e) {
                         console.error('Failed to parse saved incomes', e);
                     }
                 }
 
-                this.$watch('incomes', value => {
+                this.$watch('incomesInCents', value => {
                     if (value) {
                         localStorage.setItem(this.storageKey, JSON.stringify(value));
                     }
