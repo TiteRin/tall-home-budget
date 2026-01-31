@@ -1,0 +1,19 @@
+FROM dunglas/frankenphp:latest
+
+ARG WWWUSER=1000
+ARG WWWGROUP=1000
+
+# Install deps
+RUN apt-get update && apt-get install -y \
+    bash curl git unzip zip \
+    libicu-dev libpq-dev libonig-dev \
+    && docker-php-ext-install \
+        intl pdo_pgsql mbstring opcache \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
+# ✅ Create sail user (required!)
+RUN groupadd --force -g ${WWWGROUP} sail \
+    && useradd -ms /bin/bash --no-user-group -g ${WWWGROUP} -u ${WWWUSER} sail
+
+WORKDIR /var/www/html
