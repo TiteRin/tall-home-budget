@@ -3,14 +3,21 @@
 ##############################
 FROM dunglas/frankenphp:php8.4-alpine AS vendor
 
+# System deps + PHP extensions required by Composer packages
 RUN apk add --no-cache \
-    git unzip zip curl
+    git unzip zip curl \
+    icu-dev libpq-dev oniguruma-dev libzip-dev \
+    && docker-php-ext-install \
+        intl pdo_pgsql mbstring zip
 
+# Composer binary
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
+
 COPY composer.json composer.lock ./
 
+# Install vendor deps
 RUN composer install \
     --no-dev \
     --prefer-dist \
@@ -42,25 +49,25 @@ RUN npm run build
 ##############################
 FROM dunglas/frankenphp:php8.4-alpine AS runtime
 
-# Extensions Laravel nécessaires
+# Runtime PHP extensions (same as vendor stage)
 RUN apk add --no-cache \
-    icu-dev libpq-dev oniguruma-dev \
+    icu-dev libpq-dev oniguruma-dev libzip-dev \
     && docker-php-ext-install \
-        intl pdo_pgsql mbstring opcache
+        intl pdo_pgsql mbstring opcache zip
 
 WORKDIR /var/www/html
 
-# Code Laravel
+# Copy Laravel source
 COPY . .
 
-# Dépendances PHP + assets buildés
+# Inject vendor + assets
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-# Config Caddy
+# Caddy config
 COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
-# Permissions Laravel
+# Laravel permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
 EXPOSE 80 443
