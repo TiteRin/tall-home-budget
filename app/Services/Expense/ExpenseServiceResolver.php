@@ -30,11 +30,17 @@ class ExpenseServiceResolver
             $dateFrom = $dateFrom->copy()->subMonth();
         }
 
+        $endDayOfTheMonth = $this->startDayOfTheMonth - 1;
         $currentMonth = $dateFrom->copy()->startOfMonth();
         $nextMonth = $currentMonth->copy()->addMonth();
 
+        if ($endDayOfTheMonth < 1) {
+            $nextMonth = $currentMonth->copy();
+            $endDayOfTheMonth = $nextMonth->daysInMonth();
+        }
+
         $from = CarbonImmutable::create($currentMonth->year, $currentMonth->month, $this->startDayOfTheMonth);
-        $to = CarbonImmutable::create($nextMonth->year, $nextMonth->month, $this->startDayOfTheMonth - 1);
+        $to = CarbonImmutable::create($nextMonth->year, $nextMonth->month, $endDayOfTheMonth);
 
         if ($to->month !== $nextMonth->month) {
             $to = CarbonImmutable::create($nextMonth->year, $nextMonth->month, $nextMonth->daysInMonth());
