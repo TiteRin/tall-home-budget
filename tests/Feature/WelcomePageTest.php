@@ -6,7 +6,7 @@ test('welcome page displays app content and navigation buttons', function () {
     $response = $this->get('/');
 
     $response->assertStatus(200);
-    $response->assertSee('apla');
+    $response->assertSee(config('app.name'));
     $response->assertSee('Gérez votre budget domestique en toute simplicité');
     $response->assertSee('Créer un compte');
     $response->assertSee('Se connecter');
