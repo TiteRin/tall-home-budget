@@ -2,7 +2,6 @@
 
 namespace App\Livewire\Home;
 
-use AllowDynamicProperties;
 use App\Domains\ValueObjects\Amount;
 use App\Models\Household;
 use App\Rules\ValidAmount;
@@ -46,17 +45,17 @@ class AccountsList extends Component
         $this->saveIncome($amount, $memberId);
     }
 
-    public function initIncomes(array $incomes): void
+    public function initIncomes(array $incomes, bool $inCents = false): void
     {
         foreach ($incomes as $memberId => $amount) {
-            $this->saveIncome($amount, (int)$memberId);
+            $this->saveIncome($amount, (int)$memberId, $inCents);
         }
     }
 
     /**
      * @throws Exception
      */
-    private function saveIncome(mixed $amount, int $memberId): void
+    private function saveIncome(mixed $amount, int $memberId, bool $inCents = false): void
     {
         if (empty($amount)) {
             unset($this->incomes[$memberId]);
@@ -68,14 +67,16 @@ class AccountsList extends Component
 
         $this->incomes[$memberId] = $amount;
 
-        try {
-            $this->validateOnly('incomes.' . $memberId);
-        } catch (Exception $e) {
-            unset($this->incomes[$memberId]);
-            throw $e;
+        if (!$inCents) {
+            try {
+                $this->validateOnly('incomes.' . $memberId);
+            } catch (Exception $e) {
+                unset($this->incomes[$memberId]);
+                throw $e;
+            }
         }
 
-        $amountVo = Amount::from($amount);
+        $amountVo = $inCents ? new Amount((int)$amount) : Amount::from($amount);
 
         $this->incomes[$memberId] = $amountVo->toCurrency();
         $this->incomesInCents[$memberId] = $amountVo->toCents();

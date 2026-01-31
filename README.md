@@ -1,4 +1,4 @@
-# Home Budget [![CI/CD](https://github.com/TiteRin/tall-home-budget/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/TiteRin/tall-home-budget/actions/workflows/ci-cd.yml)
+# APLA [![CI/CD](https://github.com/TiteRin/tall-home-budget/actions/workflows/ci-cd.yml/badge.svg?branch=main)](https://github.com/TiteRin/tall-home-budget/actions/workflows/ci-cd.yml)
 Un outil pour visualiser les charges du foyer et calculer la part de chacun
 
 ## Pourquoi ?

@@ -172,7 +172,7 @@ describe('When incomes are edited', function () {
 
         test('can initialize incomes from a given array (localStorage restoration)', function () {
             Livewire::test(AccountsList::class, $this->props)
-                ->call('initIncomes', [$this->memberDewey->id => "500", $this->memberHuey->id => "1234.56"])
+                ->call('initIncomes', [$this->memberDewey->id => "50000", $this->memberHuey->id => "123456"], true)
                 ->assertSet('incomes.' . $this->memberDewey->id, "500,00 €")
                 ->assertSet('incomes.' . $this->memberHuey->id, "1 234,56 €")
                 ->assertSet('incomesInCents.' . $this->memberDewey->id, 50000)

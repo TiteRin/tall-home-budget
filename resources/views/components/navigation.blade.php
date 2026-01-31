@@ -1,7 +1,7 @@
 <div class="flex justify-between items-center w-full">
     <h1 class="text-lg sm:text-xl md:text-2xl font-bold truncate">
         <a href="{{ route('home') }}">
-            Home Budget
+            {{ config('app.name') }}
         </a>
     </h1>
 
