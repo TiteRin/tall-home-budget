@@ -21,8 +21,8 @@
         <tr>
             <td>{{ $expense->name }}</td>
             <td>{{ $expense->amount }}</td>
-            <td>{{ $expense->date }}</td>
-            <td>{{ $expense->distribution_method }}</td>
+            <td>{{ $expense->spent_on->format('d/m/Y') }}</td>
+            <td>{{ $expense->distribution_method->label() }}</td>
             <td>{{ $expense->member->full_name }}</td>
         </tr>
     @endforeach
@@ -34,4 +34,10 @@
         </tr>
     @endif
     </tbody>
+    <tfoot>
+    <livewire:expense-tabs.expense-form
+        :expense-tab-id="$expenseTabId"
+        :household-members="\App\Models\ExpenseTab::find($expenseTabId)->household->members"
+    />
+    </tfoot>
 </table>

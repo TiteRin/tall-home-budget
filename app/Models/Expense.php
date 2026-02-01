@@ -24,7 +24,8 @@ class Expense extends Model
 
     protected $casts = [
         'distribution_method' => DistributionMethod::class,
-        'amount' => AmountCast::class
+        'amount' => AmountCast::class,
+        'spent_on' => 'immutable_datetime'
     ];
 
     public function member()

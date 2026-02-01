@@ -4,6 +4,7 @@ namespace App\Livewire\ExpenseTabs;
 
 use App\Models\Expense;
 use Illuminate\Support\Collection;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ExpensesTable extends Component
@@ -12,6 +13,12 @@ class ExpensesTable extends Component
     private Collection $expenses;
 
     public function boot()
+    {
+        $this->refreshExpenses();
+    }
+
+    #[On('refresh-expenses-table')]
+    public function refreshExpenses()
     {
         $this->expenses = Expense::where('expense_tab_id', $this->expenseTabId)
             ->with('member')

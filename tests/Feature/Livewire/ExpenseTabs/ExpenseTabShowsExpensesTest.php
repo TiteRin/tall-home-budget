@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\ExpenseTabs;
 
+use App\Enums\DistributionMethod;
 use App\Livewire\ExpenseTabs\ExpensesTable;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
@@ -46,5 +47,23 @@ describe("Expense Tab shows a list of expenses", function () {
             ->assertSeeText('Expense 7')
             ->assertSeeText('Expense 8')
             ->assertSeeText('Expense 9');
+    });
+
+    test("should show date in DD/MM/YYYY format and distribution method with capital letter", function () {
+        $expenseTab = ExpenseTab::factory()->create([
+            'household_id' => $this->factory->household()->id,
+        ]);
+
+        $expense = Expense::factory()->create([
+            'expense_tab_id' => $expenseTab->id,
+            'name' => 'Pizza Night',
+            'spent_on' => '2026-02-01',
+            'distribution_method' => DistributionMethod::EQUAL,
+            'member_id' => $this->factory->members()->first()->id,
+        ]);
+
+        Livewire::test(ExpensesTable::class, ['expenseTabId' => $expenseTab->id])
+            ->assertSee('01/02/2026')
+            ->assertSee(DistributionMethod::EQUAL->label());
     });
 });
