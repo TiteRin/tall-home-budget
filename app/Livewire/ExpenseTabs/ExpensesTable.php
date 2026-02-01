@@ -21,9 +21,6 @@ class ExpensesTable extends Component
     public function render()
     {
         $expenses = $this->expenses;
-        if ($expenses->isEmpty()) {
-            return view('livewire.expense-tabs.expenses-empty');
-        }
         return view('livewire.expense-tabs.expenses-table', compact('expenses'));
     }
 }

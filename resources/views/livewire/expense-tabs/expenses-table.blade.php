@@ -26,5 +26,12 @@
             <td>{{ $expense->member->full_name }}</td>
         </tr>
     @endforeach
+    @if ($expenses->isEmpty())
+        <tr>
+            <td colspan="5" class="text-center">
+                Aucune dépense
+            </td>
+        </tr>
+    @endif
     </tbody>
 </table>
