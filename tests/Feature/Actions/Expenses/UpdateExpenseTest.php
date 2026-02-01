@@ -9,6 +9,7 @@ use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
 use App\Models\Household;
+use App\Models\Member;
 use App\Services\Household\CurrentHouseholdService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -92,6 +93,24 @@ describe("Mise à jour de dépenses", function () {
             $this->expense->id,
             [
                 'expense_tab_id' => $expenseTabB->id
+            ]
+        );
+    })->throws(MismatchedHouseholdException::class);
+
+    test("should not be possible to move to another household’s member", function () {
+        $service = new CurrentHouseholdService();
+        $updateExpense = new UpdateExpense($service);
+
+        $date = CarbonImmutable::now()->subDay();
+
+        $memberB = Member::factory()->create([
+            'household_id' => Household::factory()
+        ]);
+
+        $updateExpense->handle(
+            $this->expense->id,
+            [
+                'member_id' => $memberB->id
             ]
         );
     })->throws(MismatchedHouseholdException::class);
