@@ -3,6 +3,7 @@
 namespace Tests\Feature\Livewire\ExpenseTabs;
 
 use App\Livewire\ExpenseTabs\ExpenseTabForm;
+use App\Models\ExpenseTab;
 use Livewire\Livewire;
 
 describe('Expense Tab Form', function () {
@@ -26,7 +27,7 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class)
                 ->set('newName', '')
                 ->set('newStartDay', 5)
-                ->call('saveExpenseTab')
+                ->call('submitForm')
                 ->assertHasErrors(['newName' => 'required']);
         });
 
@@ -34,7 +35,7 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class)
                 ->set('newName', 'Groceries')
                 ->set('newStartDay', 45)
-                ->call('saveExpenseTab')
+                ->call('submitForm')
                 ->assertHasErrors(['newStartDay' => 'max']);
         });
 
@@ -42,7 +43,7 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class)
                 ->set('newName', 'Groceries')
                 ->set('newStartDay', 0)
-                ->call('saveExpenseTab')
+                ->call('submitForm')
                 ->assertHasErrors(['newStartDay' => 'min']);
         });
 
@@ -57,7 +58,7 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class)
                 ->set('newName', 'Groceries')
                 ->set('newStartDay', '')
-                ->call('saveExpenseTab')
+                ->call('submitForm')
                 ->assertSet('newStartDay', 1);
         });
     });
@@ -68,7 +69,7 @@ describe('Expense Tab Form', function () {
             $this->livewire = Livewire::test(ExpenseTabForm::class)
                 ->set('newName', 'Groceries')
                 ->set('newStartDay', 5)
-                ->call('saveExpenseTab');
+                ->call('submitForm');
         });
 
         test('should create a new expense tab', function () {
@@ -96,6 +97,40 @@ describe('Expense Tab Form', function () {
 
     describe("When editing a tab", function () {
 
+        beforeEach(function () {
+
+            $this->currentExpenseTab = ExpenseTab::factory()->create([
+                'household_id' => $this->factory->household()->id,
+                'name' => 'Grocerie',
+                'from_day' => 5
+            ]);
+        });
+
+        test("should display the editing tab info", function () {
+            Livewire::test(ExpenseTabForm::class, ['currentExpenseTabId' => $this->currentExpenseTab->id])
+                ->assertSet('newName', 'Grocerie')
+                ->assertSet('newStartDay', 5);
+        });
+
+        test("should save the new information", function () {
+            Livewire::test(ExpenseTabForm::class, ['currentExpenseTabId' => $this->currentExpenseTab->id])
+                ->set('newName', 'Groceries')
+                ->call('submitForm');
+
+            $this->assertDatabaseHas('expense_tabs',
+                [
+                    'id' => $this->currentExpenseTab->id,
+                    'name' => 'Groceries',
+                ]);
+        });
+
+        test('should dispatch an event', function () {
+
+            Livewire::test(ExpenseTabForm::class, ['currentExpenseTabId' => $this->currentExpenseTab->id])
+                ->set('newName', 'Groceries')
+                ->call('submitForm')
+                ->assertDispatched('expenseTabUpdated');
+        });
     });
 });
 
