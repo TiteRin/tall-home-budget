@@ -62,7 +62,7 @@ class ExpenseTabForm extends Component
                 $this->newStartDay
             );
             $this->reset(['newName', 'newStartDay']);
-            $this->dispatch('expenseTabCreated', $expenseTab);
+            $this->dispatch('refresh-expense-tabs', $expenseTab);
         } catch (Exception $e) {
             dump($e);
         }
@@ -79,7 +79,7 @@ class ExpenseTabForm extends Component
                 ]
             );
 
-            $this->dispatch('expenseTabUpdated', $expenseTab);
+            $this->dispatch('refresh-expense-tabs', $expenseTab);
         } catch (Exception $e) {
             dump($e);
         }

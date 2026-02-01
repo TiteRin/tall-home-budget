@@ -91,7 +91,7 @@ describe('Expense Tab Form', function () {
 
         test('should dispatch an event', function () {
             $this->livewire->assertHasNoErrors()
-                ->assertDispatched('expenseTabCreated');
+                ->assertDispatched('refresh-expense-tabs');
         });
     });
 
@@ -129,7 +129,7 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class, ['currentExpenseTabId' => $this->currentExpenseTab->id])
                 ->set('newName', 'Groceries')
                 ->call('submitForm')
-                ->assertDispatched('expenseTabUpdated');
+                ->assertDispatched('refresh-expense-tabs');
         });
     });
 });
