@@ -50,7 +50,6 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class)
                 ->set('newName', 'Groceries')
                 ->set('newStartDay', 5.5)
-                ->call('saveExpenseTab')
                 ->assertSet('newStartDay', 5);
         });
 
@@ -65,6 +64,34 @@ describe('Expense Tab Form', function () {
 
     describe("When creating a new tab", function () {
 
+        beforeEach(function () {
+            $this->livewire = Livewire::test(ExpenseTabForm::class)
+                ->set('newName', 'Groceries')
+                ->set('newStartDay', 5)
+                ->call('saveExpenseTab');
+        });
+
+        test('should create a new expense tab', function () {
+            $this->livewire->assertHasNoErrors();
+            $this->assertDatabaseHas('expense_tabs',
+                [
+                    'household_id' => $this->factory->household()->id,
+                    'name' => 'Groceries',
+                    'from_day' => 5
+                ]);
+        });
+
+        test('should reset the form', function () {
+            $this->livewire->assertHasNoErrors()
+                ->assertSet('newName', '')
+                ->assertSet('newStartDay', 1);
+        });
+
+
+        test('should dispatch an event', function () {
+            $this->livewire->assertHasNoErrors()
+                ->assertDispatched('expenseTabCreated');
+        });
     });
 
     describe("When editing a tab", function () {
