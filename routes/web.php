@@ -30,6 +30,10 @@ Route::controller(App\Http\Controllers\BillsController::class)->group(function()
     Route::post('/bills', 'store')->name('bills.store');
 });
 
+Route::controller(App\Http\Controllers\ExpenseTabsController::class)->group(function () {
+    Route::get('/expense-tabs', 'index')->name('expense-tabs.index');
+});
+
 Route::get('/household/settings', function() {
     return view('household');
 })->name('household.settings');
