@@ -17,7 +17,8 @@ class ExpenseTabFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => $this->faker->words(2, true),
+            'from_day' => $this->faker->numberBetween(1, 31)
         ];
     }
 }
