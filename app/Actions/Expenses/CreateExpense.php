@@ -7,15 +7,18 @@ use App\Enums\DistributionMethod;
 use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
+use App\Models\Household;
 use App\Models\Member;
 use App\Services\Household\CurrentHouseholdServiceContract;
 use Carbon\CarbonImmutable;
 
 class CreateExpense
 {
+    private Household $currentHousehold;
 
     public function __construct(CurrentHouseholdServiceContract $householdService)
     {
+        $this->currentHousehold = $householdService->getCurrentHousehold();
     }
 
     public function handle(
@@ -31,7 +34,12 @@ class CreateExpense
         $member = Member::findOrFail($memberId);
         $expenseTab = ExpenseTab::findOrFail($expenseTabId);
 
-        if ($member->household_id !== $expenseTab->household_id) {
+        if (!$member || !$expenseTab) {
+            throw new \InvalidArgumentException('Member or expense tab not found');
+        }
+
+        if ($member->household_id !== $this->currentHousehold->id ||
+            $expenseTab->household_id !== $this->currentHousehold->id) {
             throw new MismatchedHouseholdException();
         }
 
