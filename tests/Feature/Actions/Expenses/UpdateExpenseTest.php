@@ -5,8 +5,10 @@ namespace Tests\Feature\Actions\Expenses;
 use App\Actions\Expenses\UpdateExpense;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Exceptions\Households\MismatchedHouseholdException;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
+use App\Models\Household;
 use App\Services\Household\CurrentHouseholdService;
 use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -75,4 +77,22 @@ describe("Mise à jour de dépenses", function () {
             ]
         );
     })->throws(ModelNotFoundException::class);
+
+    test("should not be possible to move to another household’s expense tab", function () {
+        $service = new CurrentHouseholdService();
+        $updateExpense = new UpdateExpense($service);
+
+        $date = CarbonImmutable::now()->subDay();
+
+        $expenseTabB = ExpenseTab::factory()->create([
+            'household_id' => Household::factory()
+        ]);
+
+        $updateExpense->handle(
+            $this->expense->id,
+            [
+                'expense_tab_id' => $expenseTabB->id
+            ]
+        );
+    })->throws(MismatchedHouseholdException::class);
 });
