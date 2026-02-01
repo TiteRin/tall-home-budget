@@ -2,32 +2,46 @@
 
 namespace App\Livewire\ExpenseTabs;
 
+use App\Domains\ValueObjects\Amount;
 use App\Models\Expense;
-use Illuminate\Support\Collection;
+use App\Models\ExpenseTab;
+use App\Services\Expense\ExpenseServiceResolver;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 class ExpensesTable extends Component
 {
-    public int $expenseTabId;
-    private Collection $expenses;
+    use WithPagination;
 
-    public function boot()
-    {
-        $this->refreshExpenses();
-    }
+    public int $expenseTabId;
 
     #[On('refresh-expenses-table')]
     public function refreshExpenses()
     {
-        $this->expenses = Expense::where('expense_tab_id', $this->expenseTabId)
-            ->with('member')
-            ->get();
+        $this->resetPage();
     }
 
     public function render()
     {
-        $expenses = $this->expenses;
-        return view('livewire.expense-tabs.expenses-table', compact('expenses'));
+        $expenseTab = ExpenseTab::find($this->expenseTabId);
+        $expenses = Expense::where('expense_tab_id', $this->expenseTabId)
+            ->with('member')
+            ->orderBy('spent_on', 'desc')
+            ->paginate(15);
+
+        $expenseSolver = new ExpenseServiceResolver($expenseTab->from_day);
+        $monthyPeriod = $expenseSolver->getCurrentMonthlyPeriod();
+
+        $currentPeriodStart = $monthyPeriod->getFrom();
+        $currentPeriodEnd = $monthyPeriod->getTo();
+
+        $totalAmount = Expense::where('expense_tab_id', $this->expenseTabId)
+            ->where('spent_on', '>=', $currentPeriodStart)
+            ->where('spent_on', '<=', $currentPeriodEnd)
+            ->get()
+            ->reduce(fn($carry, $expense) => $carry->add($expense->amount), new Amount(0));
+
+        return view('livewire.expense-tabs.expenses-table', compact('expenses', 'currentPeriodStart', 'currentPeriodEnd', 'totalAmount'));
     }
 }
