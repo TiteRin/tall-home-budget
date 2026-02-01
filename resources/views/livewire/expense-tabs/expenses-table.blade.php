@@ -1,4 +1,4 @@
-<table>
+<table class="table">
     <thead>
     <th>
         Dépense

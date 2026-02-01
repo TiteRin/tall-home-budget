@@ -14,6 +14,8 @@
         </label>
         <div class="tab-content bg-base-100 border-base-300 p-6">
             <livewire:expense-tabs.expense-tab-form :currentExpenseTabId="$tab->id"/>
+            <div class="divider">Mes dépenses</div>
+            <livewire:expense-tabs.expenses-table :expenseTabId="$tab->id"/>
         </div>
     @endforeach
 </div>
