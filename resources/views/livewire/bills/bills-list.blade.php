@@ -1,12 +1,12 @@
 <section class="card bg-base-100 shadow-xl grow w-1/3">
     <div class="card-body">
         <h2 class="card-title mb-4">
-            Dépenses
+            Charges et Dépenses
         </h2>
         <table class="table table-zebra">
             <thead>
             <tr>
-                <th>Dépense</th>
+                <th>Charge</th>
                 <th>Montant</th>
             </tr>
             </thead>

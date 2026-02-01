@@ -84,7 +84,7 @@
                             $query->where('household_id', Auth::user()->member->household_id);
                         })->count() === 1)
                             En tant que seul utilisateur du foyer, cela supprimera également le foyer, tous ses membres
-                            et l'ensemble des dépenses associées.
+                            et l'ensemble des charges et dépenses associées.
                         @else
                             Cela supprimera uniquement votre accès utilisateur. Les autres membres du foyer conserveront
                             leur accès et les données du foyer seront préservées.

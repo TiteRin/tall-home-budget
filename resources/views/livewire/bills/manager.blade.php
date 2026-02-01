@@ -1,6 +1,6 @@
 <div>
     <h1 class="text-2xl font-bold mb-4 bg-primary-content/10 p-4 rounded-lg">
-        Gestion des dépenses du foyer
+        Gestion des charges du foyer
     </h1>
     <div id="notification-container" class="mb-4" style="display: none;">
         <div id="notification" class="alert p-4 mb-4 text-sm rounded-lg"></div>
@@ -31,7 +31,7 @@
         @empty
             <tr>
                 <td colspan="6">
-                    Aucune dépense
+                    Aucune charge
                 </td>
             </tr>
         @endforelse

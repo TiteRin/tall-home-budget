@@ -13,12 +13,12 @@ test('should display the component', function () {
 describe("no bills are passed", function () {
     test('should display a message', function () {
         Livewire::test(BillsList::class)
-            ->assertSee("Aucune dépense");
+            ->assertSee("Aucune charge");
     });
 
     test('should display a link to the bills manager', function () {
         Livewire::test(BillsList::class)
-            ->assertSee("Paramétrer les dépenses")
+            ->assertSee("Paramétrer les charges")
             ->assertSeeHtml('href="' . route('bills.settings') . '"');
     });
 });

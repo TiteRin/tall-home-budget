@@ -23,7 +23,7 @@
 
                     <p>
                         {{ config('app.name') }} est une application permettant aux utilisateurs de gérer leurs
-                        dépenses personnelles et catégories associées.
+                        charges et dépenses personnelles et catégories associées.
                     </p>
 
                     <h2>

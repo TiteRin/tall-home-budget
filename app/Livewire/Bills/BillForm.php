@@ -105,7 +105,7 @@ class BillForm extends Component
     protected function validationAttributes(): array
     {
         return [
-            'newName' => 'Nouvelle dépense',
+            'newName' => 'Nouvelle charge',
             'newAmount' => 'Montant',
             'newDistributionMethod' => 'Méthode de distribution',
             'newMemberId' => 'Membre du foyer'
