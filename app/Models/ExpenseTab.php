@@ -18,4 +18,9 @@ class ExpenseTab extends Model
     {
         return $this->belongsTo(Household::class, 'household_id');
     }
+
+    public function expenses()
+    {
+        return $this->hasMany(Expense::class);
+    }
 }

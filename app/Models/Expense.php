@@ -26,4 +26,14 @@ class Expense extends Model
         'distribution_method' => DistributionMethod::class,
         'amount' => AmountCast::class
     ];
+
+    public function member()
+    {
+        return $this->belongsTo(Member::class);
+    }
+
+    public function expenseTab()
+    {
+        return $this->belongsTo(ExpenseTab::class);
+    }
 }
