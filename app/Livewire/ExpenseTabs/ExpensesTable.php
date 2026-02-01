@@ -8,11 +8,12 @@ use App\Models\ExpenseTab;
 use App\Services\Expense\ExpenseServiceResolver;
 use Livewire\Attributes\On;
 use Livewire\Component;
+use Livewire\WithoutUrlPagination;
 use Livewire\WithPagination;
 
 class ExpensesTable extends Component
 {
-    use WithPagination;
+    use WithPagination, WithoutUrlPagination;
 
     public int $expenseTabId;
 
@@ -20,6 +21,11 @@ class ExpensesTable extends Component
     public function refreshExpenses()
     {
         $this->resetPage();
+    }
+
+    public function updatedPaginators($page, $pageName)
+    {
+        $this->dispatch('expenses-table-page-updated', page: $page, tabId: $this->expenseTabId);
     }
 
     public function render()

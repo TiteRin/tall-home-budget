@@ -1,4 +1,18 @@
-<div>
+<div
+    x-data="{
+        page: localStorage.getItem('expenses_table_page_{{ $expenseTabId }}') || 1
+    }"
+    x-init="
+        if (page > 1) {
+            $wire.gotoPage(page);
+        }
+    "
+    @expenses-table-page-updated.window="
+        if ($event.detail.tabId == {{ $expenseTabId }}) {
+            localStorage.setItem('expenses_table_page_{{ $expenseTabId }}', $event.detail.page)
+        }
+    "
+>
     <table class="table table-zebra">
         <thead>
         <th>
