@@ -4,8 +4,7 @@
         Nouvel onglet de dépense
     </label>
     <div class="tab-content bg-base-100 border-base-300 p-6">
-        Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aut debitis eos et iste odit, officiis reiciendis?
-        Animi architecto ex fugit labore magnam optio quibusdam sequi! Atque hic provident quam soluta.
+        <livewire:expense-tabs.expense-tab-form/>
     </div>
 
     @foreach ($expenseTabs as $tab)
