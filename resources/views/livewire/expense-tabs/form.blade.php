@@ -4,7 +4,11 @@
             <span class="label-text font-medium">Nom</span>
         </label>
         <div class="md:col-span-2">
-            <input type="text" class="input validator" placeholder="Courses, Animaux, Travaux, etc." required>
+            <input type="text"
+                   class="input validator"
+                   placeholder="Courses, Animaux, Travaux, etc."
+                   wire:model="newName"
+                   required>
             <p class="label text-sm">Il s’agit du nom qui sera affiché sur la page principal et dans les lignes de
                 charges</p>
         </div>
@@ -16,7 +20,13 @@
         </label>
         <div class="md:col-span-2">
             La période démarre le
-            <input type="number" class="input validator w-20" placeholder="1" required min="1" max="31" size="2"/>
+            <input type="number"
+                   class="input validator w-20"
+                   placeholder="1"
+                   wire:model="newStartDay"
+                   required
+                   min="1" max="31"
+            />
             du mois.
             <p class="label text-sm">Il s’agit du jour du mois à partir duquel les dépenses seront comptabilisées</p>
         </div>
