@@ -36,7 +36,9 @@
                 @foreach($this->expenseTabs as $tab)
                     <tr>
                         <td>
-                            {{ $tab->name }}
+                            <a href="{{ route('expense-tabs.index', ['tab' => $tab->id]) }}">
+                                {{ $tab->name }}
+                            </a>
                         </td>
                         <td>
 

@@ -29,9 +29,10 @@ class Home extends Component
         $household = $this->household;
         $members = $this->household->members->all();
         $bills = $this->household->bills->all();
+        $expenseTabs = $this->household->expenseTabs->all();
         $incomes = $this->incomes;
 
-        return view('livewire.home.home', compact('household', 'members', 'bills', 'incomes'));
+        return view('livewire.home.home', compact('household', 'members', 'bills', 'expenseTabs', 'incomes'));
     }
 
     /**

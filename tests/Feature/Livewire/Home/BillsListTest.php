@@ -122,4 +122,14 @@ describe("When the household has expenses", function () {
         Livewire::test(BillsList::class, $this->props)
             ->assertSee('Groceries');
     });
+
+    test('should display the Expense Tab as a link', function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSeeHtmlInOrder([">", "Groceries", "</a>"]);
+    });
+
+    test('should link to the ExpenseTab index with the correct tab ID', function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSeeHtml('href="' . route('expense-tabs.index', ['tab' => $this->expenseTabGroceries->id]) . '"');
+    });
 });
