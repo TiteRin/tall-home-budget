@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\Home;
 
+use App\Domains\ValueObjects\Amount;
 use App\Livewire\Bills\BillsList;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
@@ -110,7 +111,8 @@ describe("When the household has expenses", function () {
             ->create([
                 'expense_tab_id' => $this->expenseTabGroceries->id,
                 'member_id' => $this->factory->members()->random()->id,
-                'spent_on' => now()->subDays(random_int(-5, 5))
+                'spent_on' => now()->subDays(random_int(0, 10)),
+                'amount' => new Amount(1000)
             ]);
 
         $this->totalAmount = ExpenseCollection::from($this->expenses)->sum();
@@ -131,5 +133,10 @@ describe("When the household has expenses", function () {
     test('should link to the ExpenseTab index with the correct tab ID', function () {
         Livewire::test(BillsList::class, $this->props)
             ->assertSeeHtml('href="' . route('expense-tabs.index', ['tab' => $this->expenseTabGroceries->id]) . '"');
+    });
+
+    test('should display the total for the current monthly period', function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSee("100,00 €");
     });
 });

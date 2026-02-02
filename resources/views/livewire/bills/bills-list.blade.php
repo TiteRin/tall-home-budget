@@ -41,7 +41,7 @@
                             </a>
                         </td>
                         <td>
-
+                            {{ $tab->totalAmountForCurrentPeriod()->toCurrency() }}
                         </td>
                     </tr>
                 @endforeach
