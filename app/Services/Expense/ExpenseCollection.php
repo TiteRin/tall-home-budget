@@ -5,26 +5,12 @@ namespace App\Services\Expense;
 use App\Domains\ValueObjects\Amount;
 use App\Domains\ValueObjects\MonthlyPeriod;
 use App\Models\Expense;
-use Illuminate\Support\Collection;
+use App\Support\Collections\TypedCollection;
 
-class ExpenseCollection extends Collection
+class ExpenseCollection extends TypedCollection
 {
     private ?MonthlyPeriod $monthlyPeriod = null;
 
-    public function __construct(array $expenses)
-    {
-        foreach ($expenses as $expense) {
-            if (!$expense instanceof Expense) {
-                throw new \InvalidArgumentException('All elements must be instances of Expense');
-            }
-        }
-        parent::__construct($expenses);
-    }
-
-    public static function from(Collection $expenses): self
-    {
-        return new self($expenses->all());
-    }
 
     public function forMonthlyPeriod(MonthlyPeriod $monthlyPeriod)
     {
@@ -55,4 +41,14 @@ class ExpenseCollection extends Collection
         return $amount;
     }
 
+
+    protected function getExpectedType(): string
+    {
+        return Expense::class;
+    }
+
+    protected function getCollectionName(): string
+    {
+        return self::class;
+    }
 }
