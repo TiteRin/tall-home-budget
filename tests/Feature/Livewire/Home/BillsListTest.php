@@ -115,7 +115,7 @@ describe("When the household has expenses", function () {
                 'amount' => new Amount(1000)
             ]);
 
-        $this->totalAmount = ExpenseCollection::from($this->expenses)->sum();
+        $this->totalAmount = ExpenseCollection::from($this->expenses)->getTotal();
 
         $this->props = ['expenseTabs' => [$this->expenseTabGroceries]];
     });

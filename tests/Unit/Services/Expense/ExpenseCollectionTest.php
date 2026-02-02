@@ -30,6 +30,6 @@ describe("ExpenseCollection", function () {
     test('sum should return the total amount of expenses', function () {
 
         $expenseCollection = ExpenseCollection::from($this->expenses);
-        expect($expenseCollection->sum())->toEqual(new Amount(100000));
+        expect($expenseCollection->getTotal())->toEqual(new Amount(100000));
     });
 });

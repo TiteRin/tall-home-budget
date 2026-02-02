@@ -29,7 +29,7 @@ class ExpenseTab extends Model
 
     public function totalAmount(): Amount
     {
-        return ExpenseCollection::from($this->expenses)->sum();
+        return ExpenseCollection::from($this->expenses)->getTotal();
     }
 
 
@@ -40,6 +40,6 @@ class ExpenseTab extends Model
 
         return ExpenseCollection::from($this->expenses)
             ->forMonthlyPeriod($currentMonthlyPeriod)
-            ->sum();
+            ->getTotal();
     }
 }
