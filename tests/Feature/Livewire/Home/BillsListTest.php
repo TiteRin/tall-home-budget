@@ -3,6 +3,9 @@
 namespace Tests\Feature\Livewire\Home;
 
 use App\Livewire\Bills\BillsList;
+use App\Models\Expense;
+use App\Models\ExpenseTab;
+use App\Services\Expense\ExpenseCollection;
 use Livewire;
 
 test('should display the component', function () {
@@ -85,3 +88,38 @@ describe('When the component has bills', function () {
     });
 });
 
+
+describe("When the household has expenses", function () {
+
+    beforeEach(function () {
+        $this->factory = test_factory()
+            ->withHousehold(['name' => 'Duck'])
+            ->withMember(['first_name' => 'Daisy'])
+            ->withMember(['first_name' => 'Donald'])
+            ->withUser();
+
+        $this->actingAs($this->factory->user());
+
+        $this->expenseTabGroceries = ExpenseTab::factory()->create([
+            'household_id' => $this->factory->household()->id,
+            'name' => 'Groceries',
+            'from_day' => 5
+        ]);
+
+        $this->expenses = Expense::factory()->count(10)
+            ->create([
+                'expense_tab_id' => $this->expenseTabGroceries->id,
+                'member_id' => $this->factory->members()->random()->id,
+                'spent_on' => now()->subDays(random_int(-5, 5))
+            ]);
+
+        $this->totalAmount = ExpenseCollection::from($this->expenses)->sum();
+
+        $this->props = ['expenseTabs' => [$this->expenseTabGroceries]];
+    });
+
+    test("should display the Expense Tab in the bills list", function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSee('Groceries');
+    });
+});

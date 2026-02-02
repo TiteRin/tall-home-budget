@@ -11,16 +11,40 @@
             </tr>
             </thead>
             <tbody>
-            @foreach($bills as $bill)
+            @if (count($bills) > 0)
+                @foreach($bills as $bill)
+                    <tr>
+                        <td>
+                            {{ $bill->name }}
+                        </td>
+                        <td>
+                            {{ $bill->amount->toCurrency() }}
+                        </td>
+                    </tr>
+                @endforeach
+            @else
                 <tr>
-                    <td>
-                        {{ $bill->name }}
-                    </td>
-                    <td>
-                        {{ $bill->amount->toCurrency() }}
+                    <td colspan="2">
+                        <a href="{{ route('bills.settings') }}" class="btn btn-primary">
+                            Paramétrer les charges
+                        </a>
                     </td>
                 </tr>
-            @endforeach
+            @endif
+
+            @if (count($this->expenseTabs) > 0)
+                @foreach($this->expenseTabs as $tab)
+                    <tr>
+                        <td>
+                            {{ $tab->name }}
+                        </td>
+                        <td>
+
+                        </td>
+                    </tr>
+                @endforeach
+            @endif
+
             </tbody>
             <tfoot>
             <tr>

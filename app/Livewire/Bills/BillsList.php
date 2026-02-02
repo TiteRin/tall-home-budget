@@ -11,10 +11,11 @@ class BillsList extends Component
 {
 
     public array $bills = [];
+    public array $expenseTabs = [];
 
     public function render(): View
     {
-        if (count($this->bills) === 0) {
+        if (count($this->bills) === 0 && count($this->expenseTabs) === 0) {
             return view('livewire.bills.bills-list-empty');
         }
 
