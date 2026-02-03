@@ -2,6 +2,7 @@
 
 namespace App\Services\Expense;
 
+use App\Domains\ValueObjects\Amount;
 use App\Domains\ValueObjects\MonthlyPeriod;
 use App\Models\ExpenseTab;
 use Carbon\CarbonImmutable;
@@ -48,5 +49,15 @@ class ExpenseTabResolver
         }
 
         return new MonthlyPeriod($from, $to);
+    }
+
+    public function getExpensesFor(MonthlyPeriod $monthlyPeriod): ExpensesCollection
+    {
+        return ExpensesCollection::from($this->expenseTab->expenses)->forMonthlyPeriod($monthlyPeriod);
+    }
+
+    public function getTotalAmountFor(MonthlyPeriod $monthlyPeriod): Amount
+    {
+        return $this->getExpensesFor($monthlyPeriod)->getTotal();
     }
 }

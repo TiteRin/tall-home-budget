@@ -2,7 +2,6 @@
 
 namespace App\Livewire\ExpenseTabs;
 
-use App\Domains\ValueObjects\Amount;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
 use App\Services\Expense\ExpenseTabResolver;
@@ -36,17 +35,13 @@ class ExpensesTable extends Component
             ->orderBy('spent_on', 'desc')
             ->paginate(15);
 
-        $expenseSolver = new ExpenseTabResolver($expenseTab);
-        $monthlyPeriod = $expenseSolver->getCurrentMonthlyPeriod();
+        $expenseTabResolver = new ExpenseTabResolver($expenseTab);
+        $monthlyPeriod = $expenseTabResolver->getCurrentMonthlyPeriod();
 
         $currentPeriodStart = $monthlyPeriod->getFrom();
         $currentPeriodEnd = $monthlyPeriod->getTo();
+        $totalAmount = $expenseTabResolver->getTotalAmountFor($monthlyPeriod);
 
-        $totalAmount = Expense::where('expense_tab_id', $this->expenseTabId)
-            ->where('spent_on', '>=', $currentPeriodStart)
-            ->where('spent_on', '<=', $currentPeriodEnd)
-            ->get()
-            ->reduce(fn($carry, $expense) => $carry->add($expense->amount), new Amount(0));
 
         return view('livewire.expense-tabs.expenses-table', compact('expenses', 'currentPeriodStart', 'currentPeriodEnd', 'totalAmount'));
     }
