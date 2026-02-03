@@ -55,6 +55,11 @@ class Amount implements Wireable
         return str_replace(",", ".", $amount);
     }
 
+    public static function zero(): Amount
+    {
+        return new Amount(0);
+    }
+
     public function value(): int
     {
         return $this->amount;
