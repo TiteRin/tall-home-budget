@@ -3,15 +3,16 @@
 namespace App\Services\Expense;
 
 use App\Domains\ValueObjects\MonthlyPeriod;
+use App\Models\ExpenseTab;
 use Carbon\CarbonImmutable;
 
-class ExpenseServiceResolver
+class ExpenseTabResolver
 {
-    private int $startDayOfTheMonth;
 
-    public function __construct(int $startDayOfTheMonth)
+    public function __construct(
+        protected readonly ExpenseTab $expenseTab)
     {
-        $this->startDayOfTheMonth = $startDayOfTheMonth;
+        ;
     }
 
     public function getCurrentMonthlyPeriod(): MonthlyPeriod
@@ -26,11 +27,11 @@ class ExpenseServiceResolver
         // Grmbl Path : la période commence au 5, on veut la période qui correspond au 4 du mois => mois précédent
         // Argh Path : la période commence au 31, on veut la période qui correspond au 31, mais qui s’arrête au dernier jour du mois suivant => mois en cours
 
-        if ($dateFrom->day < $this->startDayOfTheMonth) {
+        if ($dateFrom->day < $this->expenseTab->from_day) {
             $dateFrom = $dateFrom->copy()->subMonth();
         }
 
-        $endDayOfTheMonth = $this->startDayOfTheMonth - 1;
+        $endDayOfTheMonth = $this->expenseTab->from_day - 1;
         $currentMonth = $dateFrom->copy()->startOfMonth();
         $nextMonth = $currentMonth->copy()->addMonth();
 
@@ -39,7 +40,7 @@ class ExpenseServiceResolver
             $endDayOfTheMonth = $nextMonth->daysInMonth();
         }
 
-        $from = CarbonImmutable::create($currentMonth->year, $currentMonth->month, $this->startDayOfTheMonth);
+        $from = CarbonImmutable::create($currentMonth->year, $currentMonth->month, $this->expenseTab->from_day);
         $to = CarbonImmutable::create($nextMonth->year, $nextMonth->month, $endDayOfTheMonth);
 
         if ($to->month !== $nextMonth->month) {

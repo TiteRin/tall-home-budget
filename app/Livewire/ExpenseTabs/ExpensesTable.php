@@ -5,7 +5,7 @@ namespace App\Livewire\ExpenseTabs;
 use App\Domains\ValueObjects\Amount;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
-use App\Services\Expense\ExpenseServiceResolver;
+use App\Services\Expense\ExpenseTabResolver;
 use Livewire\Attributes\On;
 use Livewire\Component;
 use Livewire\WithoutUrlPagination;
@@ -36,7 +36,7 @@ class ExpensesTable extends Component
             ->orderBy('spent_on', 'desc')
             ->paginate(15);
 
-        $expenseSolver = new ExpenseServiceResolver($expenseTab->from_day);
+        $expenseSolver = new ExpenseTabResolver($expenseTab->from_day);
         $monthyPeriod = $expenseSolver->getCurrentMonthlyPeriod();
 
         $currentPeriodStart = $monthyPeriod->getFrom();

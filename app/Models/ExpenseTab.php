@@ -4,7 +4,7 @@ namespace App\Models;
 
 use App\Domains\ValueObjects\Amount;
 use App\Services\Expense\ExpensesCollection;
-use App\Services\Expense\ExpenseServiceResolver;
+use App\Services\Expense\ExpenseTabResolver;
 use Database\Factories\ExpenseTabFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -42,7 +42,7 @@ class ExpenseTab extends Model
 
     public function getExpensesForCurrentPeriod(): ExpensesCollection
     {
-        $resolver = new ExpenseServiceResolver($this->from_day);
+        $resolver = new ExpenseTabResolver($this->from_day);
         $currentMonthlyPeriod = $resolver->getCurrentMonthlyPeriod();
 
         return ExpensesCollection::from($this->expenses)

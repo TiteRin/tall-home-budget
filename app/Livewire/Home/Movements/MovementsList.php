@@ -7,7 +7,7 @@ use App\Domains\Converters\ChargesAssembler;
 use App\Domains\Converters\ExpenseToChargeConverter;
 use App\Services\Bill\BillsCollection;
 use App\Services\Expense\ExpensesCollection;
-use App\Services\Expense\ExpenseServiceResolver;
+use App\Services\Expense\ExpenseTabResolver;
 use App\Services\Household\CurrentHouseholdServiceContract;
 use App\Services\Movement\MovementsService;
 use Illuminate\Contracts\View\View;
@@ -31,7 +31,7 @@ class MovementsList extends Component
         $expensesCollection = new ExpensesCollection();
 
         foreach ($currentHousehold->expenseTabs() as $expenseTab) {
-            $expenseTabResolver = new ExpenseServiceResolver($expenseTab->from_day);
+            $expenseTabResolver = new ExpenseTabResolver($expenseTab->from_day);
             $monthlyPeriod = $expenseTabResolver->getCurrentMonthlyPeriod();
 
             $expensesCollection->push(
