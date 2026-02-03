@@ -19,12 +19,27 @@ beforeEach(function () {
     $this->household = bill_factory()->household(['has_joint_account' => true]);
     $this->memberAlice = bill_factory()->member(['first_name' => 'Alice'], $this->household);
     $this->memberBob = bill_factory()->member(['first_name' => 'Bob'], $this->household);
-    $this->members = [$this->memberAlice, $this->memberBob];
+
+    $this->members = collect([$this->memberAlice, $this->memberBob]);
+
     $this->bills = new BillsCollection([
-        bill_factory()->bill(['name' => 'Bill 1', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA], $this->memberAlice, $this->household),
-        bill_factory()->bill(['name' => 'Bill 2', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA], $this->memberBob, $this->household),
-        bill_factory()->bill(['name' => 'Bill 3', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA, 'member_id' => null], null, $this->household),
+        bill_factory()->bill(
+            ['name' => 'Bill 1', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA],
+            $this->memberAlice,
+            $this->household
+        ),
+        bill_factory()->bill(
+            ['name' => 'Bill 2', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA],
+            $this->memberBob,
+            $this->household
+        ),
+        bill_factory()->bill(
+            ['name' => 'Bill 3', 'amount' => 10000, 'distribution_method' => DistributionMethod::PRORATA, 'member_id' => null],
+            null,
+            $this->household
+        ),
     ]);
+
     $this->incomes = [
         $this->memberAlice->id => new Amount(200000),
         $this->memberBob->id => new Amount(200000),
@@ -35,41 +50,44 @@ beforeEach(function () {
 });
 
 test('should return a collection of movements from bills and incomes', function () {
-    $service = new MovementsService(
-        $this->members,
-        $this->bills,
-        $this->incomes,
-    );
+    $service = MovementsService::create()
+        ->withMembers($this->members)
+        ->withBills($this->bills)
+        ->setIncomeFor($this->memberAlice, $this->incomes[$this->memberAlice->id])
+        ->setIncomeFor($this->memberBob, $this->incomes[$this->memberBob->id]);
+
     expect($service->toMovements())->toBeInstanceOf(Collection::class);
 });
 
-describe("Computes balances", function () {
+describe('Validation around incomes', function () {
+    test('toMovements should throw if no income have been set', function () {
+        $service = MovementsService::create()
+            ->withMembers($this->members)
+            ->withBills($this->bills);
 
-    beforeEach(function () {
-        $this->service = new MovementsService(
-            $this->members,
-            $this->bills,
-            []
-        );
-    });
+        $service->toMovements();
+    })->throws(Exception::class, 'You need to set incomes for every member.');
 
-    test("should throw an exception if no income have been set", function () {
-        $this->service->computeBalances();
-    })->throws(Exception::class, "You need to set income for every member.");
+    test('toMovements should throw if not every member has an income', function () {
+        $service = MovementsService::create()
+            ->withMembers($this->members)
+            ->withBills($this->bills)
+            ->setIncomeFor($this->memberAlice, new Amount(200000));
 
-    test("should throw an exception if not every member has an income", function () {
-        $this->service
-            ->setIncomes([
-                $this->memberAlice->id => new Amount(200000),
-            ])->computeBalances();
-    })->throws(Exception::class, "You need to set income for every member.");
+        $service->toMovements();
+    })->throws(Exception::class, 'You need to set incomes for every member.');
+
+    test('should not be possible to set an income for a non existing member', function () {
+        $service = MovementsService::create()
+            ->withMembers($this->members)
+            ->withBills($this->bills);
+
+        $service->setIncomeFor(bill_factory()->member(), new Amount(200000));
+    })->throws(InvalidArgumentException::class);
 });
 
-describe("Example.md test", function () {
-
-    describe("Example 1", function () {
-
-
+describe('Example.md scenarios (via toMovements only)', function () {
+    describe('Example 1', function () {
         beforeEach(function () {
             $household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => true]);
 
@@ -80,7 +98,7 @@ describe("Example.md test", function () {
                 'name' => 'Loyer',
                 'amount' => 70000,
                 'distribution_method' => DistributionMethod::EQUAL,
-                'member_id' => null
+                'member_id' => null,
             ], null, $household);
 
             $electricity = bill_factory()->bill([
@@ -101,43 +119,22 @@ describe("Example.md test", function () {
                 'distribution_method' => DistributionMethod::EQUAL,
             ], $memberBob, $household);
 
-            $members = [$memberAlice, $memberBob];
+            $members = collect([$memberAlice, $memberBob]);
             $bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
 
-            $incomes = [
-                $memberAlice->id => new Amount(200000),
-                $memberBob->id => new Amount(100000),
-            ];
+            $this->movementService = MovementsService::create()
+                ->withMembers($members)
+                ->withBills($bills)
+                ->setIncomeFor($memberAlice, new Amount(200000))
+                ->setIncomeFor($memberBob, new Amount(100000));
 
-            $this->movementService = new MovementsService($members, $bills, $incomes);
             $this->memberAlice = $memberAlice;
             $this->memberBob = $memberBob;
         });
 
-        test("computeBalance()", function () {
-            $balances = $this->movementService->computeBalances();
-
-            expect($balances)->toHaveCount(3)
-                ->and($balances[0]->member)->toBe($this->memberAlice)
-                ->and($balances[0]->amount)->toEqual(new Amount(-39000))
-                ->and($balances[1]->member)->toBe($this->memberBob)
-                ->and($balances[1]->amount)->toEqual(new Amount(-31000))
-                ->and($balances[2]->amount)->toEqual(new Amount((70000)));
-        });
-
-        test("getCreditors", function () {
-            $creditors = $this->movementService->computeBalances()->getCreditors();
-            expect($creditors)->toHaveCount(1);
-        });
-
-        test("getDebitors", function () {
-            $debitors = $this->movementService->computeBalances()->getDebitors();
-            expect($debitors)->toHaveCount(2);
-        });
-
-        test("toMovements()", function () {
-
+        test('toMovements()', function () {
             $movements = $this->movementService->toMovements();
+
             expect($movements)->toBeInstanceOf(Collection::class)
                 ->and($movements)->toHaveCount(2)
                 ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
@@ -149,8 +146,7 @@ describe("Example.md test", function () {
         });
     });
 
-    describe("Example 2", function () {
-
+    describe('Example 2', function () {
         beforeEach(function () {
             $household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => false]);
 
@@ -182,36 +178,24 @@ describe("Example.md test", function () {
                 'distribution_method' => DistributionMethod::PRORATA,
             ], $memberAlice, $household);
 
-            $members = [$memberAlice, $memberBob, $memberCharlie];
+            $members = collect([$memberAlice, $memberBob, $memberCharlie]);
             $bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
 
-            $incomes = [
-                $memberAlice->id => new Amount(200000),
-                $memberBob->id => new Amount(100000),
-                $memberCharlie->id => new Amount(200000),
-            ];
+            $this->movementService = MovementsService::create()
+                ->withMembers($members)
+                ->withBills($bills)
+                ->setIncomeFor($memberAlice, new Amount(200000))
+                ->setIncomeFor($memberBob, new Amount(100000))
+                ->setIncomeFor($memberCharlie, new Amount(200000));
 
-            $this->movementService = new MovementsService($members, $bills, $incomes);
             $this->memberAlice = $memberAlice;
             $this->memberBob = $memberBob;
             $this->memberCharlie = $memberCharlie;
         });
 
-        test("computeBalances()", function () {
-            $balances = $this->movementService->computeBalances();
-
-            expect($balances)->toHaveCount(3)
-                ->and($balances[0]->member)->toBe($this->memberAlice)
-                ->and($balances[0]->amount)->toEqual(new Amount(-17200))
-                ->and($balances[1]->member)->toBe($this->memberBob)
-                ->and($balances[1]->amount)->toEqual(new Amount(-16600))
-                ->and($balances[2]->member)->toBe($this->memberCharlie)
-                ->and($balances[2]->amount)->toEqual(new Amount(33800));
-        });
-
         test('toMovements()', function () {
-
             $movements = $this->movementService->toMovements();
+
             expect($movements)->toBeInstanceOf(Collection::class)
                 ->and($movements)->toHaveCount(2)
                 ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
@@ -223,8 +207,7 @@ describe("Example.md test", function () {
         });
     });
 
-    describe("Example 3 - avec compte joint, mais négatif", function () {
-
+    describe('Example 3 - avec compte joint, mais négatif', function () {
         beforeEach(function () {
             $household = bill_factory()->household(['name' => 'Test household', 'has_joint_account' => true]);
 
@@ -254,41 +237,27 @@ describe("Example.md test", function () {
                 'name' => 'Vétérinaire',
                 'amount' => 10000,
                 'distribution_method' => DistributionMethod::PRORATA,
-                'member_id' => null
+                'member_id' => null,
             ], null, $household);
 
-            $members = [$memberAlice, $memberBob, $memberCharlie];
+            $members = collect([$memberAlice, $memberBob, $memberCharlie]);
             $bills = new BillsCollection([$loyer, $electricity, $internet, $veterinaire]);
 
-            $incomes = [
-                $memberAlice->id => new Amount(200000),
-                $memberBob->id => new Amount(100000),
-                $memberCharlie->id => new Amount(200000),
-            ];
+            $this->movementService = MovementsService::create()
+                ->withMembers($members)
+                ->withBills($bills)
+                ->setIncomeFor($memberAlice, new Amount(200000))
+                ->setIncomeFor($memberBob, new Amount(100000))
+                ->setIncomeFor($memberCharlie, new Amount(200000));
 
-            $this->movementService = new MovementsService($members, $bills, $incomes);
             $this->memberAlice = $memberAlice;
             $this->memberBob = $memberBob;
             $this->memberCharlie = $memberCharlie;
         });
 
-        test("computeBalances()", function () {
-            $balances = $this->movementService->computeBalances();
-
-            expect($balances)->toHaveCount(4)
-                ->and($balances[0]->member)->toBe($this->memberAlice)
-                ->and($balances[0]->amount)->toEqual(new Amount(-27200))
-                ->and($balances[1]->member)->toBe($this->memberBob)
-                ->and($balances[1]->amount)->toEqual(new Amount(-16600))
-                ->and($balances[2]->member)->toBe($this->memberCharlie)
-                ->and($balances[2]->amount)->toEqual(new Amount(33800))
-                ->and($balances[3]->member)->toBeInstanceOf(JointAccount::class)
-                ->and($balances[3]->amount)->toEqual(new Amount(10000));
-        });
-
         test('toMovements()', function () {
-
             $movements = $this->movementService->toMovements();
+
             expect($movements)->toBeInstanceOf(Collection::class)
                 ->and($movements)->toHaveCount(3)
                 ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
@@ -304,90 +273,46 @@ describe("Example.md test", function () {
     });
 });
 
-test('should obtain the bills total amount in an array', function () {
-    $service = new MovementsService(
-        $this->members,
-        $this->bills,
-        $this->incomes,
-    );
+describe('Income helpers', function () {
+    test('should obtain the total of incomes', function () {
+        $service = MovementsService::create()
+            ->withMembers($this->members)
+            ->withBills($this->bills)
+            ->setIncomeFor($this->memberAlice, new Amount(200000))
+            ->setIncomeFor($this->memberBob, new Amount(200000));
 
-    $totals = $service->getTotalsAmount();
-    expect($totals)->toBeArray()
-        ->and($totals)->toHaveCount(3)
-        ->and($totals)->toMatchArray(
-            [
-                'total' => new Amount(30000),
-                'prorata' => new Amount(30000),
-                'equal' => new Amount(0),
-            ]
-        );
-});
+        $totalIncome = $service->getTotalIncome();
 
-test("should obtain the total of incomes", function () {
-    $service = new MovementsService(
-        $this->members,
-        $this->bills,
-        [
-            $this->memberAlice->id => new Amount(200000),
-            $this->memberBob->id => new Amount(200000),
-        ],
-    );
+        expect($totalIncome)->toBeInstanceOf(Amount::class)
+            ->and($totalIncome)->toEqual(new Amount(400000));
+    });
 
-    $totalIncome = $service->getTotalIncome();
-    expect($totalIncome)->toBeInstanceOf(Amount::class)
-        ->and($totalIncome)->toEqual(new Amount(400000));;
-});
+    test('should obtain the ratios of incomes', function () {
+        $service = MovementsService::create()
+            ->withMembers($this->members)
+            ->withBills($this->bills)
+            ->setIncomeFor($this->memberAlice, new Amount(200000))
+            ->setIncomeFor($this->memberBob, new Amount(200000));
 
-test('should obtain the ratios of incomes', function () {
-    $service = new MovementsService(
-        $this->members,
-        $this->bills,
-        [
-            $this->memberAlice->id => new Amount(200000),
-            $this->memberBob->id => new Amount(200000),
-        ],
-    );
+        $ratios = $service->getRatiosFromIncome();
 
-    $ratios = $service->getRatiosFromIncome();
-
-    expect($ratios)->toBeArray()
-        ->and($ratios)->toHaveCount(2)
-        ->and($ratios)->toMatchArray(
-            [
+        expect($ratios)->toBeArray()
+            ->and($ratios)->toHaveCount(2)
+            ->and($ratios)->toMatchArray([
                 $this->memberAlice->id => 0.5,
                 $this->memberBob->id => 0.5,
-            ]
-        );
-});
-
-describe("Instantiation via a static method", function () {
-
-    test("should initialize with current household members and bills and no incomes", function () {
-        $service = MovementsService::create();
-
-        expect($service)->toBeInstanceOf(MovementsService::class)
-            ->and($service->toMovements())->toHaveCount(0);
+            ]);
     });
 
-    test("should update incomes and have movements", function () {
-        $service = MovementsService::create();
-        $service->setIncomes($this->incomes);
+    test('removeIncomeFor should make ratios fail again', function () {
+        $service = MovementsService::create()
+            ->withMembers($this->members)
+            ->withBills($this->bills)
+            ->setIncomeFor($this->memberAlice, new Amount(200000))
+            ->setIncomeFor($this->memberBob, new Amount(200000));
 
-        expect($service->toMovements())->toHaveCount(2);
-    });
+        $service = $service->removeIncomeFor($this->memberBob);
 
-    test("should add or update income for a member", function () {
-        $service = MovementsService::create();
-
-        $service->setIncomeFor($this->memberAlice, new Amount(200000));
-        $service->setIncomeFor($this->memberBob, new Amount(200000));
-
-        expect($service->toMovements())->toHaveCount(2);
-    });
-
-    test("should not be possible to set an income for a non existing member", function () {
-        $service = MovementsService::create();
-
-        $service->setIncomeFor(bill_factory()->member(), new Amount(200000));
-    })->throws(InvalidArgumentException::class);
+        $service->getRatiosFromIncome();
+    })->throws(Exception::class, 'You need to set incomes for every member.');
 });
