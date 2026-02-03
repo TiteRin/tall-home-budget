@@ -37,10 +37,10 @@ class ExpensesTable extends Component
             ->paginate(15);
 
         $expenseSolver = new ExpenseTabResolver($expenseTab);
-        $monthyPeriod = $expenseSolver->getCurrentMonthlyPeriod();
+        $monthlyPeriod = $expenseSolver->getCurrentMonthlyPeriod();
 
-        $currentPeriodStart = $monthyPeriod->getFrom();
-        $currentPeriodEnd = $monthyPeriod->getTo();
+        $currentPeriodStart = $monthlyPeriod->getFrom();
+        $currentPeriodEnd = $monthlyPeriod->getTo();
 
         $totalAmount = Expense::where('expense_tab_id', $this->expenseTabId)
             ->where('spent_on', '>=', $currentPeriodStart)
