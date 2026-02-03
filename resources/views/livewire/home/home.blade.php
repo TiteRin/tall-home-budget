@@ -6,7 +6,7 @@
 
     @livewire('home.movements.movements-list', [
         'incomes' => $incomes
-    ])
+    ], key('movements-list'))
 
     @livewire('home.general-information', ['household' => $household])
 </div>

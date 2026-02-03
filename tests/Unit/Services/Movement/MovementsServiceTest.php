@@ -53,36 +53,20 @@ test('should return a collection of movements from bills and incomes', function 
     $service = MovementsService::create()
         ->withMembers($this->members)
         ->withBills($this->bills)
-        ->setIncomeFor($this->memberAlice, $this->incomes[$this->memberAlice->id])
-        ->setIncomeFor($this->memberBob, $this->incomes[$this->memberBob->id]);
+        ->withIncomeFor($this->memberAlice, $this->incomes[$this->memberAlice->id])
+        ->withIncomeFor($this->memberBob, $this->incomes[$this->memberBob->id]);
 
     expect($service->toMovements())->toBeInstanceOf(Collection::class);
 });
 
 describe('Validation around incomes', function () {
-    test('toMovements should throw if no income have been set', function () {
-        $service = MovementsService::create()
-            ->withMembers($this->members)
-            ->withBills($this->bills);
-
-        $service->toMovements();
-    })->throws(Exception::class, 'You need to set incomes for every member.');
-
-    test('toMovements should throw if not every member has an income', function () {
-        $service = MovementsService::create()
-            ->withMembers($this->members)
-            ->withBills($this->bills)
-            ->setIncomeFor($this->memberAlice, new Amount(200000));
-
-        $service->toMovements();
-    })->throws(Exception::class, 'You need to set incomes for every member.');
 
     test('should not be possible to set an income for a non existing member', function () {
         $service = MovementsService::create()
             ->withMembers($this->members)
             ->withBills($this->bills);
 
-        $service->setIncomeFor(bill_factory()->member(), new Amount(200000));
+        $service->withIncomeFor(bill_factory()->member(), new Amount(200000));
     })->throws(InvalidArgumentException::class);
 });
 
@@ -125,8 +109,8 @@ describe('Example.md scenarios (via toMovements only)', function () {
             $this->movementService = MovementsService::create()
                 ->withMembers($members)
                 ->withBills($bills)
-                ->setIncomeFor($memberAlice, new Amount(200000))
-                ->setIncomeFor($memberBob, new Amount(100000));
+                ->withIncomeFor($memberAlice, new Amount(200000))
+                ->withIncomeFor($memberBob, new Amount(100000));
 
             $this->memberAlice = $memberAlice;
             $this->memberBob = $memberBob;
@@ -184,9 +168,9 @@ describe('Example.md scenarios (via toMovements only)', function () {
             $this->movementService = MovementsService::create()
                 ->withMembers($members)
                 ->withBills($bills)
-                ->setIncomeFor($memberAlice, new Amount(200000))
-                ->setIncomeFor($memberBob, new Amount(100000))
-                ->setIncomeFor($memberCharlie, new Amount(200000));
+                ->withIncomeFor($memberAlice, new Amount(200000))
+                ->withIncomeFor($memberBob, new Amount(100000))
+                ->withIncomeFor($memberCharlie, new Amount(200000));
 
             $this->memberAlice = $memberAlice;
             $this->memberBob = $memberBob;
@@ -246,9 +230,9 @@ describe('Example.md scenarios (via toMovements only)', function () {
             $this->movementService = MovementsService::create()
                 ->withMembers($members)
                 ->withBills($bills)
-                ->setIncomeFor($memberAlice, new Amount(200000))
-                ->setIncomeFor($memberBob, new Amount(100000))
-                ->setIncomeFor($memberCharlie, new Amount(200000));
+                ->withIncomeFor($memberAlice, new Amount(200000))
+                ->withIncomeFor($memberBob, new Amount(100000))
+                ->withIncomeFor($memberCharlie, new Amount(200000));
 
             $this->memberAlice = $memberAlice;
             $this->memberBob = $memberBob;
@@ -278,8 +262,8 @@ describe('Income helpers', function () {
         $service = MovementsService::create()
             ->withMembers($this->members)
             ->withBills($this->bills)
-            ->setIncomeFor($this->memberAlice, new Amount(200000))
-            ->setIncomeFor($this->memberBob, new Amount(200000));
+            ->withIncomeFor($this->memberAlice, new Amount(200000))
+            ->withIncomeFor($this->memberBob, new Amount(200000));
 
         $totalIncome = $service->getTotalIncome();
 
@@ -291,8 +275,8 @@ describe('Income helpers', function () {
         $service = MovementsService::create()
             ->withMembers($this->members)
             ->withBills($this->bills)
-            ->setIncomeFor($this->memberAlice, new Amount(200000))
-            ->setIncomeFor($this->memberBob, new Amount(200000));
+            ->withIncomeFor($this->memberAlice, new Amount(200000))
+            ->withIncomeFor($this->memberBob, new Amount(200000));
 
         $ratios = $service->getRatiosFromIncome();
 
@@ -308,8 +292,8 @@ describe('Income helpers', function () {
         $service = MovementsService::create()
             ->withMembers($this->members)
             ->withBills($this->bills)
-            ->setIncomeFor($this->memberAlice, new Amount(200000))
-            ->setIncomeFor($this->memberBob, new Amount(200000));
+            ->withIncomeFor($this->memberAlice, new Amount(200000))
+            ->withIncomeFor($this->memberBob, new Amount(200000));
 
         $service = $service->removeIncomeFor($this->memberBob);
 

@@ -90,7 +90,7 @@ class MovementsService
         return count($this->expenses) > 0;
     }
 
-    public function setIncomeFor(Member $member, Amount $amount)
+    public function withIncomeFor(Member $member, Amount $amount): MovementsService
     {
         if (!$this->members->contains('id', $member->id)) {
             throw new InvalidArgumentException();
@@ -121,6 +121,31 @@ class MovementsService
             $this->bills,
             $this->expenses,
             $currentIncomes
+        );
+    }
+
+    public function withIncomes(array $incomes): MovementsService
+    {
+
+        foreach ($incomes as $member_id => $income) {
+
+            if ($income === null) {
+                unset($incomes[$member_id]);
+                continue;
+            }
+
+            if (!array_any($this->members->all(), function (Member $m) use ($member_id) {
+                return $m->id === $member_id;
+            })) {
+                throw new InvalidArgumentException("The Member [$member_id] is not a part of the service.");
+            }
+        }
+
+        return new self(
+            $this->members,
+            $this->bills,
+            $this->expenses,
+            $incomes
         );
     }
 
@@ -165,7 +190,7 @@ class MovementsService
     public function toMovements(): Collection
     {
         if (count($this->incomes) !== count($this->members)) {
-            throw new Exception("You need to set incomes for every member.");
+            return collect();
         }
 
         $member = $this->members->first();
@@ -179,6 +204,8 @@ class MovementsService
             $household->jointAccount()
         );
     }
+
+    // Income => (Member, Amount) ??
 
     public static function create(): MovementsService
     {

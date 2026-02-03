@@ -82,7 +82,7 @@ describe("when all is initialized", function () {
 
         $this->incomes = [
             $this->memberAlice->id => new Amount(200000),
-            $this->memberBob->id => new Amount(100000),
+            $this->memberBob->id => new Amount(100000)
         ];
     });
 

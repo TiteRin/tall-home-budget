@@ -4,11 +4,13 @@
             Mouvements
         </h2>
         <ul class="list">
-            @foreach($movements as $movement)
+            @foreach($movements as $index => $movement)
                 <livewire:home.movements.movement-item
                     :from="$movement->memberFrom"
                     :to="$movement->memberTo"
-                    :amount="$movement->amount"/>
+                    :amount="$movement->amount"
+                    :key="$movement->getId()"
+                />
             @endforeach
         </ul>
     </div>
