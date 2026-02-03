@@ -31,7 +31,7 @@ class MovementsList extends Component
         $expensesCollection = new ExpensesCollection();
 
         foreach ($currentHousehold->expenseTabs() as $expenseTab) {
-            $expenseTabResolver = new ExpenseTabResolver($expenseTab->from_day);
+            $expenseTabResolver = new ExpenseTabResolver($expenseTab);
             $monthlyPeriod = $expenseTabResolver->getCurrentMonthlyPeriod();
 
             $expensesCollection->push(

@@ -36,7 +36,7 @@ class ExpensesTable extends Component
             ->orderBy('spent_on', 'desc')
             ->paginate(15);
 
-        $expenseSolver = new ExpenseTabResolver($expenseTab->from_day);
+        $expenseSolver = new ExpenseTabResolver($expenseTab);
         $monthyPeriod = $expenseSolver->getCurrentMonthlyPeriod();
 
         $currentPeriodStart = $monthyPeriod->getFrom();

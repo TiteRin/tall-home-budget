@@ -42,7 +42,7 @@ class ExpenseTab extends Model
 
     public function getExpensesForCurrentPeriod(): ExpensesCollection
     {
-        $resolver = new ExpenseTabResolver($this->from_day);
+        $resolver = new ExpenseTabResolver($this);
         $currentMonthlyPeriod = $resolver->getCurrentMonthlyPeriod();
 
         return ExpensesCollection::from($this->expenses)
