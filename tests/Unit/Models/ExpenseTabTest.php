@@ -53,6 +53,6 @@ describe("Expense Tab", function () {
         $expenseTab->setRelation('expenses', $allExpenses);
 
         expect($expenseTab->totalAmount())->toEqual(new Amount(10000))
-            ->and($expenseTab->totalAmountForCurrentPeriod())->toEqual(new Amount(5000));
+            ->and($expenseTab->getTotalAmountForCurrentPeriod())->toEqual(new Amount(5000));
     });
 });

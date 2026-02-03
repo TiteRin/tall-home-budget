@@ -4,6 +4,6 @@
         @livewire('home.movements.movements-list', ['incomes' => $incomes], key('movements-list'))
     </div>
 
-    @livewire('bills.bills-list', ['bills' => $bills, 'expenseTabs' => $expenseTabs])
+    @livewire('bills.bills-list', ['bills' => $bills, 'expenseTabs' => $expenseTabs, 'members' => $members])
     @livewire('home.general-information', ['household' => $household])
 </div>

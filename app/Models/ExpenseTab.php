@@ -33,13 +33,19 @@ class ExpenseTab extends Model
     }
 
 
-    public function totalAmountForCurrentPeriod(): Amount
+    public function getTotalAmountForCurrentPeriod(): Amount
+    {
+        return $this->getExpensesForCurrentPeriod()
+            ->getTotal();
+    }
+
+
+    public function getExpensesForCurrentPeriod(): ExpensesCollection
     {
         $resolver = new ExpenseServiceResolver($this->from_day);
         $currentMonthlyPeriod = $resolver->getCurrentMonthlyPeriod();
 
         return ExpensesCollection::from($this->expenses)
-            ->forMonthlyPeriod($currentMonthlyPeriod)
-            ->getTotal();
+            ->forMonthlyPeriod($currentMonthlyPeriod);
     }
 }

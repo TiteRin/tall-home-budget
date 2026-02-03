@@ -7,6 +7,11 @@
             <thead>
             <tr>
                 <th>Charge</th>
+                @foreach ($this->members as $member)
+                    <th>
+                        {{ $member->full_name }}
+                    </th>
+                @endforeach
                 <th>Montant</th>
             </tr>
             </thead>
@@ -17,9 +22,18 @@
                         <td>
                             {{ $bill->name }}
                         </td>
-                        <td>
+                        @foreach ($this->members as $member)
+                            <td>
+                                @if ($bill->member_id === $member->id)
+                                    {{ $bill->amount }}
+                                @else
+                                    -
+                                @endif
+                            </td>
+                        @endforeach
+                        <th>
                             {{ $bill->amount->toCurrency() }}
-                        </td>
+                        </th>
                     </tr>
                 @endforeach
             @else
@@ -40,8 +54,13 @@
                                 {{ $tab->name }}
                             </a>
                         </td>
+                        @foreach ($this->members as $member)
+                            <td>
+                                {{ $tab->getExpensesForCurrentPeriod()->getTotalForMember($member) }}
+                            </td>
+                        @endforeach
                         <td>
-                            {{ $tab->totalAmountForCurrentPeriod()->toCurrency() }}
+                            {{ $tab->getTotalAmountForCurrentPeriod()->toCurrency() }}
                         </td>
                     </tr>
                 @endforeach
@@ -50,8 +69,13 @@
             </tbody>
             <tfoot>
             <tr>
-                <td>Total</td>
-                <td>{{ $this->totalAmount() }}</td>
+                <th>Total</th>
+                @foreach ($this->members as $member)
+                    <th>
+                        {{ $this->totalAmountForMember($member) }}
+                    </th>
+                @endforeach
+                <th>{{ $this->totalAmount() }}</th>
             </tr>
             </tfoot>
         </table>
