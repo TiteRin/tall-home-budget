@@ -1,4 +1,4 @@
-<section class="card bg-base-100 shadow-xl grow w-1/3">
+<section class="card bg-base-100 shadow-xl grow w-full$">
     <div class="card-body">
         <h2 class="card-title mb-4">
             Charges et Dépenses
