@@ -6,7 +6,7 @@ use App\Domains\ValueObjects\Amount;
 use App\Livewire\Bills\BillsList;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
-use App\Services\Expense\ExpenseCollection;
+use App\Services\Expense\ExpensesCollection;
 use Livewire;
 
 test('should display the component', function () {
@@ -115,7 +115,7 @@ describe("When the household has expenses", function () {
                 'amount' => new Amount(1000)
             ]);
 
-        $this->totalAmount = ExpenseCollection::from($this->expenses)->getTotal();
+        $this->totalAmount = ExpensesCollection::from($this->expenses)->getTotal();
 
         $this->props = ['expenseTabs' => [$this->expenseTabGroceries]];
     });

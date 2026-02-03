@@ -8,6 +8,7 @@ use App\Enums\DistributionMethod;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Household extends Model
 {
@@ -35,6 +36,11 @@ class Household extends Model
     public function expenseTabs(): HasMany
     {
         return $this->hasMany(ExpenseTab::class, 'household_id');
+    }
+
+    public function expenses(): HasManyThrough
+    {
+        return $this->hasManyThrough(Expense::class, ExpenseTab::class, 'household_id', 'expense_tab_id', 'id', 'id');
     }
 
     public function getTotalAmountAttribute(): Amount

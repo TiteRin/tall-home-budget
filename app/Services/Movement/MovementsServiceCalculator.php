@@ -8,18 +8,18 @@ use App\Domains\ValueObjects\Balance;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
 use App\Services\Bill\BillsCollection;
-use App\Services\Expense\ExpenseCollection;
+use App\Services\Expense\ExpensesCollection;
 use Illuminate\Support\Collection;
 
 class MovementsServiceCalculator
 {
 
     private function __construct(
-        protected Collection        $members,
-        protected BillsCollection   $bills,
-        protected ExpenseCollection $expenses,
-        protected array             $ratios,
-        protected ?JointAccount     $jointAccount
+        protected Collection         $members,
+        protected BillsCollection    $bills,
+        protected ExpensesCollection $expenses,
+        protected array              $ratios,
+        protected ?JointAccount      $jointAccount
     )
     {
         // Vérifier que bills et members sont synchronisés
@@ -82,11 +82,11 @@ class MovementsServiceCalculator
     }
 
     public static function compute(
-        Collection        $members,
-        BillsCollection   $bills,
-        ExpenseCollection $expenses,
-        array             $ratios,
-        ?JointAccount     $jointAccount
+        Collection         $members,
+        BillsCollection    $bills,
+        ExpensesCollection $expenses,
+        array              $ratios,
+        ?JointAccount      $jointAccount
     ): Collection
     {
         $calculator = new self($members, $bills, $expenses, $ratios, $jointAccount);

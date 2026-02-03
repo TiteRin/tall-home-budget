@@ -5,7 +5,7 @@ namespace Tests\Services\Expense;
 use App\Domains\ValueObjects\Amount;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
-use App\Services\Expense\ExpenseCollection;
+use App\Services\Expense\ExpensesCollection;
 
 describe("ExpenseCollection", function () {
 
@@ -29,7 +29,7 @@ describe("ExpenseCollection", function () {
 
     test('sum should return the total amount of expenses', function () {
 
-        $expenseCollection = ExpenseCollection::from($this->expenses);
+        $expenseCollection = ExpensesCollection::from($this->expenses);
         expect($expenseCollection->getTotal())->toEqual(new Amount(100000));
     });
 });

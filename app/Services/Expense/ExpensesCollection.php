@@ -9,7 +9,7 @@ use App\Models\Expense;
 use App\Models\Member;
 use App\Support\Collections\TypedCollection;
 
-class ExpenseCollection extends TypedCollection
+class ExpensesCollection extends TypedCollection
 {
     public function forMonthlyPeriod(MonthlyPeriod $monthlyPeriod)
     {

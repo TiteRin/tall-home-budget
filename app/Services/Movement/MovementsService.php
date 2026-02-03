@@ -3,10 +3,11 @@
 namespace App\Services\Movement;
 
 use App\Domains\ValueObjects\Amount;
+use App\Domains\ValueObjects\ChargesCollection;
 use App\Models\Expense;
 use App\Models\Member;
 use App\Services\Bill\BillsCollection;
-use App\Services\Expense\ExpenseCollection;
+use App\Services\Expense\ExpensesCollection;
 use Exception;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
@@ -16,10 +17,11 @@ class MovementsService
     private array $movements;
 
     private function __construct(
-        protected ?Collection        $members = new Collection(),
-        protected ?BillsCollection   $bills = new BillsCollection(),
-        protected ?ExpenseCollection $expenses = new ExpenseCollection(),
-        protected ?array             $incomes = []
+        protected ?Collection         $members = new Collection(),
+        protected ?BillsCollection    $bills = new BillsCollection(),
+        protected ?ExpensesCollection $expenses = new ExpensesCollection(),
+        protected ?ChargesCollection  $charges = new ChargesCollection(),
+        protected ?array              $incomes = []
     )
     {
         ;
@@ -31,6 +33,7 @@ class MovementsService
             $members,
             $this->bills,
             $this->expenses,
+            $this->charges,
             $this->incomes
         );
     }
@@ -41,26 +44,40 @@ class MovementsService
             $this->members,
             $bills,
             $this->expenses,
+            $this->charges,
             $this->incomes
         );
     }
 
-    public function withExpenses(ExpenseCollection $expenses)
+    public function withExpenses(ExpensesCollection $expenses)
     {
         return new self(
             $this->members,
             $this->bills,
             $expenses,
+            $this->charges,
             $this->incomes
         );
     }
 
-    public function addExpenses(ExpenseCollection $expenses)
+    public function withCharges(ChargesCollection $charges)
+    {
+        return new self(
+            $this->members,
+            $this->bills,
+            $this->expenses,
+            $charges,
+            $this->incomes
+        );
+    }
+
+    public function addExpenses(ExpensesCollection $expenses)
     {
         return new self(
             $this->members,
             $this->bills,
             $this->expenses->merge($expenses),
+            $this->charges,
             $this->incomes
         );
     }
@@ -71,6 +88,7 @@ class MovementsService
             $this->members,
             $this->bills,
             $this->expenses->add($expense),
+            $this->charges,
             $this->incomes
         );
     }
@@ -103,6 +121,7 @@ class MovementsService
             $this->members,
             $this->bills,
             $this->expenses,
+            $this->charges,
             $currentIncomes
         );
     }
@@ -120,6 +139,7 @@ class MovementsService
             $this->members,
             $this->bills,
             $this->expenses,
+            $this->charges,
             $currentIncomes
         );
     }
@@ -145,6 +165,7 @@ class MovementsService
             $this->members,
             $this->bills,
             $this->expenses,
+            $this->charges,
             $incomes
         );
     }

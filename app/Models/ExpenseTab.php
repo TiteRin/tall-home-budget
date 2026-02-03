@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Domains\ValueObjects\Amount;
-use App\Services\Expense\ExpenseCollection;
+use App\Services\Expense\ExpensesCollection;
 use App\Services\Expense\ExpenseServiceResolver;
 use Database\Factories\ExpenseTabFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -29,7 +29,7 @@ class ExpenseTab extends Model
 
     public function totalAmount(): Amount
     {
-        return ExpenseCollection::from($this->expenses)->getTotal();
+        return ExpensesCollection::from($this->expenses)->getTotal();
     }
 
 
@@ -38,7 +38,7 @@ class ExpenseTab extends Model
         $resolver = new ExpenseServiceResolver($this->from_day);
         $currentMonthlyPeriod = $resolver->getCurrentMonthlyPeriod();
 
-        return ExpenseCollection::from($this->expenses)
+        return ExpensesCollection::from($this->expenses)
             ->forMonthlyPeriod($currentMonthlyPeriod)
             ->getTotal();
     }
