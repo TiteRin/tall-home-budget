@@ -3,6 +3,7 @@
 namespace App\Livewire\ExpenseTabs;
 
 use App\Actions\Expenses\CreateExpense;
+use App\Actions\Expenses\DeleteExpense;
 use App\Actions\Expenses\UpdateExpense;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
@@ -164,8 +165,27 @@ class ExpenseForm extends Component
             $this->dispatch('expense-has-been-updated');
             $this->dispatch('refresh-expenses-table');
             $this->dispatch('notify', type: 'success', message: 'Dépense mise à jour avec succès');
+            $this->expense = null;
+            $this->resetFormFields();
         } catch (Exception $e) {
             $this->dispatch('notify', type: 'error', message: 'Une erreur est survenue.', details: $e->getMessage());
+        }
+    }
+
+    public function deleteExpense(DeleteExpense $deleteExpense): void
+    {
+        if (!$this->expense) {
+            return;
+        }
+
+        try {
+            $deleteExpense->handle($this->expense->id);
+            $this->dispatch('refresh-expenses-table');
+            $this->dispatch('notify', type: 'success', message: 'Dépense supprimée avec succès');
+            $this->expense = null;
+            $this->resetFormFields();
+        } catch (Exception $e) {
+            $this->dispatch('notify', type: 'error', message: 'Une erreur est survenue lors de la suppression.', details: $e->getMessage());
         }
     }
 

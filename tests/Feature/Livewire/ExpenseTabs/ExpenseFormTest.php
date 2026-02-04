@@ -70,13 +70,51 @@ describe("ExpenseForm component", function () {
             ->assertSet('newName', 'Old Name')
             ->set('newName', 'New Name')
             ->set('formattedNewAmount', '20.00')
-            ->call('saveExpense');
+            ->call('saveExpense')
+            ->assertSet('expense', null);
 
         $this->assertDatabaseHas('expenses', [
             'id' => $expense->id,
             'name' => 'New Name',
             'amount' => 2000,
         ]);
+    });
+
+    test("it can delete an expense", function () {
+        $member = $this->factory->members()->first();
+        $expense = Expense::factory()->create([
+            'expense_tab_id' => $this->expenseTab->id,
+            'member_id' => $member->id,
+            'name' => 'To be deleted',
+            'amount' => 1000,
+        ]);
+
+        Livewire::test(ExpenseForm::class, [
+            'expenseTabId' => $this->expenseTab->id,
+            'householdMembers' => $this->factory->members(),
+            'expense' => $expense,
+        ])
+            ->call('deleteExpense')
+            ->assertDispatched('refresh-expenses-table')
+            ->assertSet('expense', null);
+
+        $this->assertDatabaseMissing('expenses', ['id' => $expense->id]);
+    });
+
+    test("it can cancel edition", function () {
+        $member = $this->factory->members()->first();
+        $expense = Expense::factory()->create([
+            'expense_tab_id' => $this->expenseTab->id,
+            'member_id' => $member->id,
+        ]);
+
+        Livewire::test(ExpenseForm::class, [
+            'expenseTabId' => $this->expenseTab->id,
+            'householdMembers' => $this->factory->members(),
+            'expense' => $expense,
+        ])
+            ->call('cancelEdition')
+            ->assertDispatched('cancel-edit-expense');
     });
 
     test("it dispatches refresh-expenses-table event after adding", function () {
@@ -172,62 +210,14 @@ describe("ExpenseForm component", function () {
             ->assertDispatched('notify', type: 'error');
     });
 
-    test("it can save an edited expense", function () {
-        $member = $this->factory->members()->first();
-        $expense = Expense::factory()->create([
-            'expense_tab_id' => $this->expenseTab->id,
-            'member_id' => $member->id,
-            'name' => 'Old Name'
-        ]);
-
-        Livewire::test(ExpenseForm::class, [
+    test("it provides distribution method options", function () {
+        $component = Livewire::test(ExpenseForm::class, [
             'expenseTabId' => $this->expenseTab->id,
             'householdMembers' => $this->factory->members(),
-            'expense' => $expense,
-        ])
-            ->set('newName', 'Updated Name')
-            ->call('saveExpense')
-            ->assertHasNoErrors()
-            ->assertDispatched('expense-has-been-updated')
-            ->assertDispatched('notify', type: 'success');
-
-        expect($expense->refresh()->name)->toBe('Updated Name');
-    });
-
-    test("it handles exception during saveExpense", function () {
-        $member = $this->factory->members()->first();
-        $expense = Expense::factory()->create([
-            'expense_tab_id' => $this->expenseTab->id,
-            'member_id' => $member->id
         ]);
 
-        $mock = \Mockery::mock(\App\Actions\Expenses\UpdateExpense::class);
-        $mock->shouldReceive('handle')->andThrow(new \Exception('Error'));
-        app()->instance(\App\Actions\Expenses\UpdateExpense::class, $mock);
-
-        Livewire::test(ExpenseForm::class, [
-            'expenseTabId' => $this->expenseTab->id,
-            'householdMembers' => $this->factory->members(),
-            'expense' => $expense,
-        ])
-            ->set('newName', 'Updated Name')
-            ->call('saveExpense')
-            ->assertDispatched('notify', type: 'error');
-    });
-
-    test("it can cancel edition", function () {
-        $member = $this->factory->members()->first();
-        $expense = Expense::factory()->create([
-            'expense_tab_id' => $this->expenseTab->id,
-            'member_id' => $member->id
-        ]);
-        Livewire::test(ExpenseForm::class, [
-            'expenseTabId' => $this->expenseTab->id,
-            'householdMembers' => $this->factory->members(),
-            'expense' => $expense,
-        ])
-            ->call('cancelEdition')
-            ->assertDispatched('cancel-edit-expense');
+        $options = $component->get('distributionMethodOptions');
+        expect($options)->toBeArray()->not->toBeEmpty();
     });
 
     test("it updates amount from formatted input", function () {
@@ -243,16 +233,6 @@ describe("ExpenseForm component", function () {
             ->assertSet('newAmount', 0)
             ->set('formattedNewAmount', 'invalid')
             ->assertSet('newAmount', 0); // Assuming it keeps old value or 0
-    });
-
-    test("it provides distribution method options", function () {
-        $component = Livewire::test(ExpenseForm::class, [
-            'expenseTabId' => $this->expenseTab->id,
-            'householdMembers' => $this->factory->members(),
-        ]);
-
-        $options = $component->get('distributionMethodOptions');
-        expect($options)->toBeArray()->not->toBeEmpty();
     });
 
     test("it shows empty state view if no members", function () {

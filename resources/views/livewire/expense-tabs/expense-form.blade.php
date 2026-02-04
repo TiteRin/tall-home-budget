@@ -68,8 +68,16 @@
     </td>
     <td>
         @if ($this->expense)
-            <button class="btn btn-primary w-full" wire:click.prevent="saveExpense" type="button">Sauvegarder</button>
-            <button class="btn w-full" wire:click.prevent="cancelEdition" type="button">Annuler</button>
+            <div class="flex flex-col gap-1">
+                <button class="btn btn-primary btn-sm" wire:click.prevent="saveExpense" type="button">Sauvegarder
+                </button>
+                <button class="btn btn-error btn-sm"
+                        wire:confirm="Êtes-vous sûr de vouloir supprimer cette dépense ?"
+                        wire:click.prevent="deleteExpense"
+                        type="button">Supprimer
+                </button>
+                <button class="btn btn-sm" wire:click.prevent="cancelEdition" type="button">Annuler</button>
+            </div>
         @else
             <button class="btn btn-primary w-full" wire:click.prevent="addExpense" type="button">Ajouter</button>
         @endif

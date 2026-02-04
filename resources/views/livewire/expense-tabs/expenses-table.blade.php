@@ -36,14 +36,26 @@
         </thead>
         <tbody>
         @foreach($expenses as $expense)
-            <tr @class(['opacity-50' => !$expense->spent_on->between($currentPeriodStart, $currentPeriodEnd)])>
-                <td>{{ $expense->spent_on->format('d/m/Y') }}</td>
-                <td>{{ $expense->name }}</td>
-                <td>{{ $expense->distribution_method->label() }}</td>
-                <td>{{ $expense->member->full_name }}</td>
-                <td>{{ $expense->amount }}</td>
-                <td></td>
-            </tr>
+            @if($editingExpenseId === $expense->id)
+                <livewire:expense-tabs.expense-form
+                    :expense="$expense"
+                    :expense-tab-id="$expenseTabId"
+                    :household-members="\App\Models\ExpenseTab::find($expenseTabId)->household->members"
+                    wire:key="edit-expense-{{ $expense->id }}"
+                />
+            @else
+                <tr @class(['opacity-50' => !$expense->spent_on->between($currentPeriodStart, $currentPeriodEnd)])>
+                    <td>{{ $expense->spent_on->format('d/m/Y') }}</td>
+                    <td>{{ $expense->name }}</td>
+                    <td>{{ $expense->distribution_method->label() }}</td>
+                    <td>{{ $expense->member->full_name }}</td>
+                    <td>{{ $expense->amount }}</td>
+                    <td>
+                        <button class="btn btn-ghost btn-xs" wire:click="editExpense({{ $expense->id }})">Modifier
+                        </button>
+                    </td>
+                </tr>
+            @endif
         @endforeach
         @if ($expenses->isEmpty())
             <tr>

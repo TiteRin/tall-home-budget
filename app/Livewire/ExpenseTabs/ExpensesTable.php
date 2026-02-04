@@ -15,6 +15,7 @@ class ExpensesTable extends Component
     use WithPagination, WithoutUrlPagination;
 
     public int $expenseTabId;
+    public ?int $editingExpenseId = null;
 
     #[On('refresh-expense-tabs')]
     public function onRefreshExpenseTab($expenseTab)
@@ -33,6 +34,18 @@ class ExpensesTable extends Component
     public function updatedPaginators($page, $pageName)
     {
         $this->dispatch('expenses-table-page-updated', page: $page, tabId: $this->expenseTabId);
+    }
+
+    public function editExpense(int $expenseId)
+    {
+        $this->editingExpenseId = $expenseId;
+    }
+
+    #[On('expense-has-been-updated')]
+    #[On('cancel-edit-expense')]
+    public function stopEditing()
+    {
+        $this->editingExpenseId = null;
     }
 
     public function render()
