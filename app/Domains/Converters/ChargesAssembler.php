@@ -46,4 +46,12 @@ final class ChargesAssembler
         $this->chargesCollection = new ChargesCollection();
         return $this;
     }
+
+    public static function create(): static
+    {
+        return new self(
+            new BillToChargeConverter(),
+            new ExpenseToChargeConverter()
+        );
+    }
 }

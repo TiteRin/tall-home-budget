@@ -5,21 +5,19 @@ namespace App\Services\Movement;
 use App\Domains\Entities\JointAccount;
 use App\Domains\ValueObjects\Amount;
 use App\Domains\ValueObjects\Balance;
+use App\Domains\ValueObjects\ChargesCollection;
 use App\Enums\DistributionMethod;
 use App\Models\Member;
-use App\Services\Bill\BillsCollection;
-use App\Services\Expense\ExpensesCollection;
 use Illuminate\Support\Collection;
 
 class MovementsServiceCalculator
 {
 
     private function __construct(
-        protected Collection         $members,
-        protected BillsCollection    $bills,
-        protected ExpensesCollection $expenses,
-        protected array              $ratios,
-        protected ?JointAccount      $jointAccount
+        protected Collection        $members,
+        protected ChargesCollection $charges,
+        protected array             $ratios,
+        protected ?JointAccount     $jointAccount
     )
     {
         // Vérifier que bills et members sont synchronisés
@@ -82,25 +80,21 @@ class MovementsServiceCalculator
     }
 
     public static function compute(
-        Collection         $members,
-        BillsCollection    $bills,
-        ExpensesCollection $expenses,
-        array              $ratios,
-        ?JointAccount      $jointAccount
+        Collection        $members,
+        ChargesCollection $charges,
+        array             $ratios,
+        ?JointAccount     $jointAccount
     ): Collection
     {
-        $calculator = new self($members, $bills, $expenses, $ratios, $jointAccount);
+        $calculator = new self($members, $charges, $ratios, $jointAccount);
         return $calculator->toMovements();
     }
 
     private function getBalanceForJointAccount(): Balance
     {
-        $totalBillsJoint = $this->bills->getTotalForJointAccount();
-        $totalExpensesJoint = $this->expenses->getTotalForJointAccount();
-
         return new Balance(
             $this->jointAccount,
-            $totalBillsJoint->add($totalExpensesJoint)
+            $this->charges->getTotalAmountForJointAccount()
         );
     }
 
@@ -109,9 +103,7 @@ class MovementsServiceCalculator
         $nbMembers = count($this->members);
         $ratio = $this->ratios[$member->id];
 
-        $billsPaid = $this->bills->getTotalForMember($member);
-        $expensesPaid = $this->expenses->getTotalForMember($member);
-        $totalPaid = $billsPaid->add($expensesPaid);
+        $chargesPaid = $this->charges->getTotalAmountForMember($member);
 
         $owedEqual = new Amount($this->getTotalEqual()->toCents() / $nbMembers);
         $owedProrata = new Amount($this->getTotalProrata()->toCents() * $ratio);
@@ -119,23 +111,17 @@ class MovementsServiceCalculator
 
         return new Balance(
             $member,
-            $totalPaid->subtract($totalOwed)
+            $chargesPaid->subtract($totalOwed)
         );
     }
 
     private function getTotalEqual(): Amount
     {
-        $totalBillsEqual = $this->bills->getTotalForDistributionMethod(DistributionMethod::EQUAL);
-        $totalExpensesEqual = $this->expenses->getTotalForDistributionMethod(DistributionMethod::EQUAL);
-
-        return $totalBillsEqual->add($totalExpensesEqual);
+        return $this->charges->getTotalAmountForDistributionMethod(DistributionMethod::EQUAL);
     }
 
     private function getTotalProrata(): Amount
     {
-        $totalBillsProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
-        $totalExpenseProrata = $this->expenses->getTotalForDistributionMethod(DistributionMethod::PRORATA);
-
-        return $totalBillsProrata->add($totalExpenseProrata);
+        return $this->charges->getTotalAmountForDistributionMethod(DistributionMethod::PRORATA);
     }
 }

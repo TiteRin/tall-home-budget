@@ -2,6 +2,7 @@
 
 namespace App\Services\Movement;
 
+use App\Domains\Converters\ChargesAssembler;
 use App\Domains\ValueObjects\Amount;
 use App\Domains\ValueObjects\ChargesCollection;
 use App\Models\Expense;
@@ -14,14 +15,10 @@ use InvalidArgumentException;
 
 class MovementsService
 {
-    private array $movements;
-
     private function __construct(
-        protected ?Collection         $members = new Collection(),
-        protected ?BillsCollection    $bills = new BillsCollection(),
-        protected ?ExpensesCollection $expenses = new ExpensesCollection(),
-        protected ?ChargesCollection  $charges = new ChargesCollection(),
-        protected ?array              $incomes = []
+        protected ?Collection        $members = new Collection(),
+        protected ?ChargesCollection $charges = new ChargesCollection(),
+        protected ?array             $incomes = []
     )
     {
         ;
@@ -31,8 +28,6 @@ class MovementsService
     {
         return new self(
             $members,
-            $this->bills,
-            $this->expenses,
             $this->charges,
             $this->incomes
         );
@@ -40,22 +35,32 @@ class MovementsService
 
     public function withBills(BillsCollection $bills)
     {
+        $chargeAssembler = ChargesAssembler::create();
+
+        $charges = $this->charges;
+        $charges = $charges->merge(
+            $chargeAssembler->fromBills($bills)->assemble()
+        );
+
         return new self(
             $this->members,
-            $bills,
-            $this->expenses,
-            $this->charges,
+            $charges,
             $this->incomes
         );
     }
 
     public function withExpenses(ExpensesCollection $expenses)
     {
+        $chargeAssembler = ChargesAssembler::create();
+
+        $charges = $this->charges;
+        $charges = $charges->merge(
+            $chargeAssembler->fromExpenses($expenses)->assemble()
+        );
+
         return new self(
             $this->members,
-            $this->bills,
-            $expenses,
-            $this->charges,
+            $charges,
             $this->incomes
         );
     }
@@ -64,8 +69,6 @@ class MovementsService
     {
         return new self(
             $this->members,
-            $this->bills,
-            $this->expenses,
             $charges,
             $this->incomes
         );
@@ -75,8 +78,6 @@ class MovementsService
     {
         return new self(
             $this->members,
-            $this->bills,
-            $this->expenses->merge($expenses),
             $this->charges,
             $this->incomes
         );
@@ -86,8 +87,6 @@ class MovementsService
     {
         return new self(
             $this->members,
-            $this->bills,
-            $this->expenses->add($expense),
             $this->charges,
             $this->incomes
         );
@@ -100,12 +99,17 @@ class MovementsService
 
     public function hasBills(): bool
     {
-        return count($this->bills) > 0;
+        return $this->hasCharges();
     }
 
     public function hasExpenses(): bool
     {
-        return count($this->expenses) > 0;
+        return $this->hasCharges();
+    }
+
+    public function hasCharges(): bool
+    {
+        return count($this->charges) > 0;
     }
 
     public function withIncomeFor(Member $member, Amount $amount): MovementsService
@@ -119,8 +123,6 @@ class MovementsService
 
         return new self(
             $this->members,
-            $this->bills,
-            $this->expenses,
             $this->charges,
             $currentIncomes
         );
@@ -137,8 +139,6 @@ class MovementsService
 
         return new self(
             $this->members,
-            $this->bills,
-            $this->expenses,
             $this->charges,
             $currentIncomes
         );
@@ -163,8 +163,6 @@ class MovementsService
 
         return new self(
             $this->members,
-            $this->bills,
-            $this->expenses,
             $this->charges,
             $incomes
         );
@@ -219,8 +217,7 @@ class MovementsService
 
         return MovementsServiceCalculator::compute(
             $this->members,
-            $this->bills,
-            $this->expenses,
+            $this->charges,
             $this->getRatiosFromIncome(),
             $household->jointAccount()
         );

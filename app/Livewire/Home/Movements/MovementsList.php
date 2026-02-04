@@ -50,10 +50,7 @@ class MovementsList extends Component
         $service = MovementsService::create()
             ->withMembers($currentHousehold->members)
             ->withCharges($chargesAssembler->assemble())
-            ->withBills(new BillsCollection($currentHousehold->bills))
-            ->withExpenses($expensesCollection);
-
-        $service = $service->withIncomes($this->incomes);
+            ->withIncomes($this->incomes);
 
         return $service;
     }

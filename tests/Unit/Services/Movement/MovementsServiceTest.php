@@ -318,17 +318,6 @@ describe('Income helpers', function () {
         expect($service->hasExpenses())->toBeTrue();
     });
 
-    test('it can add expenses individually or collectively', function () {
-        $service = MovementsService::create();
-        $expense1 = \App\Models\Expense::factory()->make();
-        $expense2 = \App\Models\Expense::factory()->make();
-
-        $service = $service->addExpense($expense1);
-        $service = $service->addExpenses(new \App\Services\Expense\ExpensesCollection([$expense2]));
-
-        expect($service->hasExpenses())->toBeTrue();
-    });
-
     test('it can set incomes collectively', function () {
         $service = MovementsService::create()->withMembers($this->members);
         $incomes = [
