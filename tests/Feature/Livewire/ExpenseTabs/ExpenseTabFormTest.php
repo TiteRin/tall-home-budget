@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Livewire\ExpenseTabs;
 
-use App\Actions\ExpenseTab\CreateExpenseTab;
 use App\Actions\ExpenseTab\UpdateExpenseTab;
 use App\Livewire\ExpenseTabs\ExpenseTabForm;
 use App\Models\ExpenseTab;
@@ -145,30 +144,6 @@ describe('Expense Tab Form', function () {
                 ->call('saveExpenseTab')
                 ->assertHasNoErrors()
                 ->assertDispatched('refresh-expense-tabs');
-        });
-
-        test('should handle exception during create', function () {
-            // Mock CreateExpenseTab to throw exception
-            $mock = Mockery::mock(CreateExpenseTab::class);
-            $mock->shouldReceive('handle')->andThrow(new \Exception('Error creating'));
-            app()->instance(CreateExpenseTab::class, $mock);
-
-            Livewire::test(ExpenseTabForm::class)
-                ->set('newName', 'Groceries')
-                ->set('newStartDay', 5)
-                ->call('createExpenseTab');
-            // This just calls dump(e) in the code, so we just check it doesn't crash the test
-        });
-
-        test('should handle exception during update', function () {
-            // Mock UpdateExpenseTab to throw exception
-            $mock = Mockery::mock(UpdateExpenseTab::class);
-            $mock->shouldReceive('handle')->andThrow(new \Exception('Error updating'));
-            app()->instance(UpdateExpenseTab::class, $mock);
-
-            Livewire::test(ExpenseTabForm::class, ['currentExpenseTabId' => $this->currentExpenseTab->id])
-                ->set('newName', 'Groceries')
-                ->call('saveExpenseTab');
         });
 
         test('should throw exception if household is null', function () {

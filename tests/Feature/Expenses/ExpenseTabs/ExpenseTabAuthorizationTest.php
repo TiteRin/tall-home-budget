@@ -50,12 +50,4 @@ describe("Expense Tab Authorization", function () {
             ->assertSeeText('Cats budget')
             ->assertDontSeeText('Groceries');
     });
-
-    test('given a member, they should create an expense tab for their household', function () {
-
-    });
-
-    test('given a member, they should not create an expense tab for another household', function () {
-
-    });
 });
