@@ -11,7 +11,7 @@ use App\Support\Collections\TypedCollection;
 
 class ExpensesCollection extends TypedCollection
 {
-    public function forMonthlyPeriod(MonthlyPeriod $monthlyPeriod)
+    public function forMonthlyPeriod(?MonthlyPeriod $monthlyPeriod)
     {
         $this->monthlyPeriod = $monthlyPeriod;
         return $this

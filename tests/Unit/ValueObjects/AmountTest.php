@@ -185,4 +185,28 @@ describe("manipulation methods", function () {
         expect($amountA->opposite())->toEqual(new Amount(-1000))
             ->and($amountA->opposite()->opposite())->toEqual($amountA);
     });
+
+    test('should obtain a zero amount', function () {
+        expect(Amount::zero())->toEqual(new Amount(0));
+    });
+
+    test('should be able to format as currency', function () {
+        $amount = new Amount(123456);
+        expect($amount->toCurrency())->toBe("1 234,56 €");
+    });
+});
+
+describe('validation and creation edge cases', function () {
+    test('isValid returns false for null', function () {
+        expect(Amount::isValid(null))->toBeFalse();
+    });
+
+    test('extractThousandsSeparator returns same string if no match', function () {
+        // "123" ne correspond pas au regex qui attend au moins un séparateur suivi de 3 chiffres
+        expect(Amount::extractThousandsSeparator("123"))->toBe("123");
+    });
+
+    test('fromLivewire throws exception for invalid value', function () {
+        Amount::fromLivewire(['wrong_key' => 123]);
+    })->throws(InvalidArgumentException::class, "Cannot hydrate Amount from provided Livewire value");
 });

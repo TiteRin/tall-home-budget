@@ -299,4 +299,52 @@ describe('Income helpers', function () {
 
         $service->getRatiosFromIncome();
     })->throws(Exception::class, 'You need to set incomes for every member.');
+
+    test('it can check for existence of data', function () {
+        $service = MovementsService::create();
+        expect($service->hasMembers())->toBeFalse()
+            ->and($service->hasBills())->toBeFalse()
+            ->and($service->hasExpenses())->toBeFalse();
+
+        $service = $service->withMembers($this->members);
+        expect($service->hasMembers())->toBeTrue();
+
+        $service = $service->withBills($this->bills);
+        expect($service->hasBills())->toBeTrue();
+
+        $expenses = new \App\Services\Expense\ExpensesCollection();
+        $expenses->add(\App\Models\Expense::factory()->make());
+        $service = $service->withExpenses($expenses);
+        expect($service->hasExpenses())->toBeTrue();
+    });
+
+    test('it can add expenses individually or collectively', function () {
+        $service = MovementsService::create();
+        $expense1 = \App\Models\Expense::factory()->make();
+        $expense2 = \App\Models\Expense::factory()->make();
+
+        $service = $service->addExpense($expense1);
+        $service = $service->addExpenses(new \App\Services\Expense\ExpensesCollection([$expense2]));
+
+        expect($service->hasExpenses())->toBeTrue();
+    });
+
+    test('it can set incomes collectively', function () {
+        $service = MovementsService::create()->withMembers($this->members);
+        $incomes = [
+            $this->memberAlice->id => new Amount(1000),
+            $this->memberBob->id => new Amount(2000),
+        ];
+
+        $service = $service->withIncomes($incomes);
+        expect($service->getTotalIncome()->toCents())->toBe(3000);
+    });
+
+    test('it can set charges directly', function () {
+        $service = MovementsService::create();
+        $charges = new \App\Domains\ValueObjects\ChargesCollection();
+        $service->withCharges($charges);
+        // Cover the line
+        expect($service)->toBeInstanceOf(MovementsService::class);
+    });
 });

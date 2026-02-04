@@ -17,7 +17,7 @@ class CurrentHouseholdService implements CurrentHouseholdServiceContract
 
     public function getCurrentHousehold(): Household|null
     {
-        if (!Auth::check()) {
+        if (!Auth::check() || !Auth::user()->member) {
             return null;
         }
         $user = Auth::user();

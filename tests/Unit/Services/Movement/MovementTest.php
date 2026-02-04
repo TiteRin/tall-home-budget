@@ -45,4 +45,9 @@ describe("Initialization", function () {
             $this->amount
         );
     })->throws(Exception::class, "Members are not in the same household");
+
+    test("should return a unique ID", function () {
+        $movement = new Movement($this->memberAlice, $this->memberBob, $this->amount);
+        expect($movement->getId())->toBe("{$this->memberAlice->id}-{$this->memberBob->id}-35000");
+    });
 });

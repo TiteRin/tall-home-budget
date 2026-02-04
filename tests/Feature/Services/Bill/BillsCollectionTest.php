@@ -50,6 +50,9 @@ test("should not add a bill to the collection if it already exists", function ()
 describe("Summarization", function () {
 
     test("should obtain the total amount of the collection", function () {
+        $collection = new BillsCollection([]);
+        expect($collection->getTotal()->toCents())->toBe(0);
+
         $collection = new BillsCollection(
             [
                 bill_factory()->bill(['name' => 'Internet', 'amount' => 3000], $this->memberAlice, $this->household),

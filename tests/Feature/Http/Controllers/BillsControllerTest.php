@@ -1,13 +1,11 @@
 <?php
 
-namespace Tests\Http\Controllers;
-
+use App\Actions\Bills\CreateBill;
 use App\Enums\DistributionMethod;
 
-describe("when valid data are sent to the store API", function () {
+describe("BillsController", function () {
 
     beforeEach(function () {
-
         $context = test_factory()
             ->withHousehold()
             ->withMember()
@@ -28,19 +26,31 @@ describe("when valid data are sent to the store API", function () {
         ];
     });
 
-    it('should return a 201 response', function () {
+    it('should return a 201 response when valid data are sent to the store API', function () {
         $response = $this->postJson(route('bills.store'), $this->payload);
 
         $response->assertCreated();
         $response->assertJsonFragment(['message' => 'Bill created successfully']);
     });
 
-//    it('should save a new bill', function () {
-//
-//    });
-//
-//    it('should emit a notification', function () {
-//
-//    });
+    it('should return a 200 response for index', function () {
+        $response = $this->get(route('bills'));
+        $response->assertOk();
+    });
+
+    it('should return a 422 response for invalid data', function () {
+        $response = $this->postJson(route('bills.store'), []);
+        $response->assertStatus(422);
+    });
+
+    it('should return a 422 response when handle fails', function () {
+        $this->mock(CreateBill::class, function ($mock) {
+            $mock->shouldReceive('handle')->andThrow(new \Exception('Mocked error'));
+        });
+
+        $response = $this->postJson(route('bills.store'), $this->payload);
+        $response->assertStatus(422);
+        $response->assertJsonFragment(['message' => 'An error occurred while creating the bill']);
+    });
 });
 
