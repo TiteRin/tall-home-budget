@@ -156,6 +156,19 @@ describe('Expense Tab Form', function () {
             Livewire::test(ExpenseTabForm::class)
                 ->call('submitForm');
         });
+
+        test('should reset the form with the current tab info', function () {
+            $mock = Mockery::mock(UpdateExpenseTab::class);
+            $mock->shouldReceive('handle')->once()->andReturn(ExpenseTab::factory()->make());
+            app()->instance(UpdateExpenseTab::class, $mock);
+
+            Livewire::test(ExpenseTabForm::class, ['currentExpenseTabId' => $this->currentExpenseTab->id])
+                ->set('newName', 'New Name')
+                ->set('newStartDay', 3)
+                ->call('saveExpenseTab')
+                ->assertSet('newName', 'New Name')
+                ->assertSet('newStartDay', 3);
+        });
     });
 });
 

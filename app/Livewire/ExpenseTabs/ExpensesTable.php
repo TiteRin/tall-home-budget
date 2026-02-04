@@ -16,6 +16,14 @@ class ExpensesTable extends Component
 
     public int $expenseTabId;
 
+    #[On('refresh-expense-tabs')]
+    public function onRefreshExpenseTab($expenseTab)
+    {
+        if ($expenseTab['id'] == $this->expenseTabId) {
+            $this->resetPage();
+        }
+    }
+
     #[On('refresh-expenses-table')]
     public function refreshExpenses()
     {

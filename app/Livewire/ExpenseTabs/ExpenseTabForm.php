@@ -48,9 +48,9 @@ class ExpenseTabForm extends Component
             $this->saveExpenseTab(new UpdateExpenseTab());
         } else {
             $this->createExpenseTab(new CreateExpenseTab());
+            $this->reset(['newName', 'newStartDay']);
         }
 
-        $this->reset(['newName', 'newStartDay']);
     }
 
     public function createExpenseTab(CreateExpenseTab $createExpenseTab): void

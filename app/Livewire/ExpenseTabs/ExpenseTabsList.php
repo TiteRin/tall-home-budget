@@ -27,7 +27,7 @@ class ExpenseTabsList extends Component
     #[On('refresh-expense-tabs')]
     public function onRefreshExpenseTab($expenseTab)
     {
-        // No need to do anything, computed property will handle it
+        unset($this->expensesTabs);
     }
 
     #[Computed]
