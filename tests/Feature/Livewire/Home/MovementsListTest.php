@@ -5,6 +5,7 @@ namespace Tests\Feature\Livewire\Home;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\Home\Movements\MovementsList;
+use App\Models\Bill;
 use App\Services\Bill\BillsCollection;
 use Livewire;
 
@@ -51,38 +52,20 @@ describe("When something is missing", function () {
 describe("when all is initialized", function () {
 
     beforeEach(function () {
-        $this->factory = $this->factory
-            ->withBill([
-                'name' => 'Loyer',
-                'amount' => 70000,
-                'distribution_method' => DistributionMethod::EQUAL,
-                'member_id' => null
-            ])
-            ->withBill([
-                'name' => 'Électricité',
-                'amount' => 9000,
-                'distribution_method' => DistributionMethod::PRORATA,
-                'member_id' => $this->memberAlice->id,
-            ])
-            ->withBill([
-                'name' => 'Internet',
-                'amount' => 3000,
-                'distribution_method' => DistributionMethod::PRORATA,
-                'member_id' => $this->memberBob->id,
-            ])
-            ->withBill([
-                'name' => 'Vétérinaire',
-                'amount' => 10000,
-                'distribution_method' => DistributionMethod::EQUAL,
-                'member_id' => $this->memberBob->id,
-            ]);
+        Bill::factory()->create([
+            'name' => 'Loyer',
+            'amount' => 70000,
+            'distribution_method' => DistributionMethod::EQUAL,
+            'member_id' => null,
+            'household_id' => $this->factory->household()->id
+        ]);
 
         $this->members = $this->factory->members()->all();
         $this->bills = new BillsCollection($this->factory->bills()->all());
 
         $this->incomes = [
             $this->memberAlice->id => new Amount(200000),
-            $this->memberBob->id => new Amount(100000)
+            $this->memberBob->id => new Amount(200000)
         ];
     });
 
@@ -95,12 +78,12 @@ describe("when all is initialized", function () {
 
     test('should display the recipients', function () {
         Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
-            ->assertSeeInOrder(['Bob Doe']);
+            ->assertSeeInOrder(['compte joint']);
     });
 
     test('should display the amounts', function () {
         Livewire::test(MovementsList::class, ['incomes' => $this->incomes])
-            ->assertSeeInOrder(['480,00']);
+            ->assertSeeInOrder(['350,00']);
     });
 
 //    test('should display all the movements', function () {

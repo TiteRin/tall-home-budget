@@ -355,6 +355,48 @@ describe('Example.md scenarios (via toMovements only)', function () {
                 ->and($movements[2]->amount)->toEqual(new Amount(29000));
         });
     });
+
+
+    describe("Exemple 5 - Une seule dépense", function () {
+
+        beforeEach(function () {
+
+            $context = test_factory()
+                ->withHousehold(['name' => 'Example 5 - Une seule dépense', 'has_joint_account' => true])
+                ->withMember(['first_name' => 'Alice'])
+                ->withMember(['first_name' => 'Bob']);
+
+            $this->memberAlice = $context->members()->firstWhere('first_name', 'Alice');
+            $this->memberBob = $context->members()->firstWhere('first_name', 'Bob');
+
+            $context
+                ->withBill([
+                    'name' => 'Loyer',
+                    'amount' => 70000,
+                    'distribution_method' => DistributionMethod::EQUAL,
+                    'member_id' => null,
+                ]);
+
+            $this->movementService = MovementsService::create()
+                ->withMembers($context->members())
+                ->withBills(new BillsCollection($context->bills()))
+                ->withIncomeFor($this->memberAlice, new Amount(200000))
+                ->withIncomeFor($this->memberBob, new Amount(100000));
+        });
+
+        test('toMovements()', function () {
+            $movements = $this->movementService->toMovements();
+
+            expect($movements)->toBeInstanceOf(Collection::class)
+                ->and($movements)->toHaveCount(2)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBeInstanceOf(JointAccount::class)
+                ->and($movements[1]->memberFrom)->toBe($this->memberBob)
+                ->and($movements[1]->memberTo)->toBeInstanceOf(JointAccount::class)
+                ->and($movements[0]->amount)->toEqual(new Amount(35000))
+                ->and($movements[1]->amount)->toEqual(new Amount(35000));
+        });
+    });
 });
 
 describe('Income helpers', function () {
