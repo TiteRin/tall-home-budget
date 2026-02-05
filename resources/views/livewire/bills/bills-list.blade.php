@@ -50,7 +50,7 @@
                 @foreach($this->expenseTabs as $tab)
                     <tr>
                         <td>
-                            <a href="{{ route('expense-tabs.index', ['tab' => $tab->id]) }}">
+                            <a href="{{ route('expense-tabs.index', ['tab' => $tab->id]) }}" class="link link-primary">
                                 {{ $tab->name }}
                             </a>
                         </td>
