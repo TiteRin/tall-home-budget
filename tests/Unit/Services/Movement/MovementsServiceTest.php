@@ -5,9 +5,13 @@ namespace Tests\Unit\Services\Movement;
 use App\Domains\Entities\JointAccount;
 use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
+use App\Models\Expense;
+use App\Models\ExpenseTab;
 use App\Models\User;
 use App\Services\Bill\BillsCollection;
+use App\Services\Expense\ExpensesCollection;
 use App\Services\Movement\MovementsService;
+use Carbon\CarbonImmutable;
 use Exception;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
@@ -253,6 +257,102 @@ describe('Example.md scenarios (via toMovements only)', function () {
                 ->and($movements[2]->memberFrom)->toBe($this->memberBob)
                 ->and($movements[2]->memberTo)->toBeInstanceOf(JointAccount::class)
                 ->and($movements[2]->amount)->toEqual(new Amount(10000));
+        });
+    });
+
+    describe("Exemple 4 - Avec charges et dépenses ponctuelles", function () {
+
+        beforeEach(function () {
+
+            $context = test_factory()
+                ->withHousehold(['name' => 'Example 4', 'has_joint_account' => true])
+                ->withMember(['first_name' => 'Alice'])
+                ->withMember(['first_name' => 'Bob'])
+                ->withMember(['first_name' => 'Charlie']);
+
+            $this->memberAlice = $context->members()->firstWhere('first_name', 'Alice');
+            $this->memberBob = $context->members()->firstWhere('first_name', 'Bob');
+            $this->memberCharlie = $context->members()->firstWhere('first_name', 'Charlie');
+
+            $context
+                ->withBill([
+                    'name' => 'Loyer',
+                    'amount' => 70000,
+                    'distribution_method' => DistributionMethod::PRORATA,
+                    'member_id' => null,
+                ])
+                ->withBill([
+                    'name' => 'Électricité',
+                    'amount' => 9000,
+                    'distribution_method' => DistributionMethod::EQUAL,
+                    'member_id' => $this->memberAlice->id,
+                ])
+                ->withBill([
+                    'name' => 'Internet',
+                    'amount' => 3000,
+                    'distribution_method' => DistributionMethod::PRORATA,
+                    'member_id' => $this->memberBob->id,
+                ]);
+
+            $expenseTab = ExpenseTab::factory()->create([
+                'name' => 'Chats',
+                'from_day' => 5,
+                'household_id' => $context->household()->id,
+            ]);
+
+            $now = CarbonImmutable::create(2025, 2, 10);
+            CarbonImmutable::setTestNow($now);
+
+            $expenses = Expense::factory()->createMany([
+                [
+                    'name' => 'Vétérinaire',
+                    'amount' => 10000,
+                    'spent_on' => CarbonImmutable::create(2025, 2, 6),
+                    'member_id' => $this->memberCharlie->id,
+                    'expense_tab_id' => $expenseTab->id,
+                    'distribution_method' => DistributionMethod::PRORATA,
+                ],
+                [
+                    'name' => 'Pâtée',
+                    'amount' => 10000,
+                    'spent_on' => CarbonImmutable::create(2025, 2, 8),
+                    'member_id' => $this->memberAlice->id,
+                    'expense_tab_id' => $expenseTab->id,
+                    'distribution_method' => DistributionMethod::PRORATA,
+                ],
+                [
+                    'name' => 'Jouets',
+                    'amount' => 2000,
+                    'spent_on' => CarbonImmutable::create(2025, 2, 10),
+                    'member_id' => $this->memberCharlie->id,
+                    'expense_tab_id' => $expenseTab->id,
+                    'distribution_method' => DistributionMethod::PRORATA,
+                ],
+            ]);
+
+            $this->movementService = MovementsService::create()
+                ->withMembers($context->members())
+                ->withBills(new BillsCollection($context->bills()))
+                ->withExpenses(new ExpensesCollection($expenses))
+                ->withIncomeFor($this->memberAlice, new Amount(200000))
+                ->withIncomeFor($this->memberBob, new Amount(100000))
+                ->withIncomeFor($this->memberCharlie, new Amount(200000));
+        });
+
+        test('toMovements()', function () {
+            $movements = $this->movementService->toMovements();
+
+            expect($movements)->toBeInstanceOf(Collection::class)
+                ->and($movements)->toHaveCount(3)
+                ->and($movements[0]->memberFrom)->toBe($this->memberAlice)
+                ->and($movements[0]->memberTo)->toBeInstanceOf(JointAccount::class)
+                ->and($movements[1]->memberFrom)->toBe($this->memberBob)
+                ->and($movements[1]->memberTo)->toBeInstanceOf(JointAccount::class)
+                ->and($movements[2]->memberFrom)->toBe($this->memberCharlie)
+                ->and($movements[2]->memberTo)->toBeInstanceOf(JointAccount::class)
+                ->and($movements[0]->amount)->toEqual(new Amount(22000))
+                ->and($movements[1]->amount)->toEqual(new Amount(19000))
+                ->and($movements[2]->amount)->toEqual(new Amount(29000));
         });
     });
 });

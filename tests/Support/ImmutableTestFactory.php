@@ -6,6 +6,7 @@ use App\Models\Household;
 use App\Models\Member;
 use App\Models\User;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 final class ImmutableTestFactory
 {
@@ -74,8 +75,20 @@ final class ImmutableTestFactory
 
     public function withBill(array $overrides = []): self
     {
-        $member = $this->member
-            ?? $this->withMember()->member();
+
+        if (array_key_exists('member_id', $overrides)) {
+
+            if ($overrides['member_id'] === null) {
+                $member = null;
+            } else {
+                $member = $this->members->firstWhere('id', $overrides['member_id']);
+                if ($member === null) {
+                    throw new InvalidArgumentException("The member with id {$overrides['member_id']} does not exist.");
+                }
+            }
+        } else {
+            $member = $this->member ?? $this->withMember()->member();
+        }
 
         $bill = $this->factory->bill($overrides, $member);
 
