@@ -7,6 +7,7 @@ use App\Livewire\Bills\BillsList;
 use App\Models\Expense;
 use App\Models\ExpenseTab;
 use App\Services\Expense\ExpensesCollection;
+use Carbon\CarbonImmutable;
 use Livewire;
 
 test('should display the component', function () {
@@ -100,6 +101,9 @@ describe("When the household has expenses", function () {
             ->withUser();
 
         $this->actingAs($this->factory->user());
+
+        $now = CarbonImmutable::create(2026, 2, 10);
+        CarbonImmutable::setTestNow($now);
 
         $this->expenseTabGroceries = ExpenseTab::factory()->create([
             'household_id' => $this->factory->household()->id,
