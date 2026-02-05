@@ -1,23 +1,15 @@
 <?php
 
-namespace Tests\Feature\Auth;
-
 use App\Models\User;
-use Tests\TestCase;
-use Livewire\Livewire;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\URL;
+use Livewire\Livewire;
 
-class VerifyTest extends TestCase
-{
-    use RefreshDatabase;
+describe('Email Verification', function () {
 
-    /** @test */
-    public function can_view_verification_page()
-    {
+    it('can view verification page', function () {
         $user = User::factory()->create([
             'email_verified_at' => null,
         ]);
@@ -27,11 +19,9 @@ class VerifyTest extends TestCase
         $this->get(route('verification.notice'))
             ->assertSuccessful()
             ->assertSeeLivewire('auth.verify');
-    }
+    });
 
-    /** @test */
-    public function can_resend_verification_email()
-    {
+    it('can resend verification email', function () {
         $user = User::factory()->create();
 
         Livewire::actingAs($user);
@@ -39,11 +29,9 @@ class VerifyTest extends TestCase
         Livewire::test('auth.verify')
             ->call('resend')
             ->assertDispatched('resent');
-    }
+    });
 
-    /** @test */
-    public function can_verify()
-    {
+    it('can verify email', function () {
         $user = User::factory()->create([
             'email_verified_at' => null,
         ]);
@@ -59,5 +47,47 @@ class VerifyTest extends TestCase
             ->assertRedirect(route('home'));
 
         $this->assertTrue($user->hasVerifiedEmail());
-    }
-}
+    });
+
+    it('throws authorization exception if id does not match', function () {
+        $user = User::factory()->create(['email_verified_at' => null]);
+        $otherUser = User::factory()->create();
+
+        Auth::login($user);
+
+        $url = URL::temporarySignedRoute('verification.verify', Carbon::now()->addMinutes(60), [
+            'id' => $otherUser->getKey(),
+            'hash' => sha1($user->getEmailForVerification()),
+        ]);
+
+        $this->get($url)->assertStatus(403);
+    });
+
+    it('throws authorization exception if hash does not match', function () {
+        $user = User::factory()->create(['email_verified_at' => null]);
+
+        Auth::login($user);
+
+        $url = URL::temporarySignedRoute('verification.verify', Carbon::now()->addMinutes(60), [
+            'id' => $user->getKey(),
+            'hash' => 'invalid-hash',
+        ]);
+
+        $this->get($url)->assertStatus(403);
+    });
+
+    it('redirects to home if already verified', function () {
+        $user = User::factory()->create([
+            'email_verified_at' => now(),
+        ]);
+
+        Auth::login($user);
+
+        $url = URL::temporarySignedRoute('verification.verify', Carbon::now()->addMinutes(60), [
+            'id' => $user->getKey(),
+            'hash' => sha1($user->getEmailForVerification()),
+        ]);
+
+        $this->get($url)->assertRedirect(route('home'));
+    });
+});

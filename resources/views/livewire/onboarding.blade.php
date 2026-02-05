@@ -25,11 +25,11 @@
                               d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                               clip-rule="evenodd"/>
                     </svg>
-                    <span class="line-through text-base-content/50">Ajouter des dépenses</span>
+                    <span class="line-through text-base-content/50">Ajouter des charges</span>
                 @else
                     <div class="h-5 w-5 border-2 border-base-300 rounded mr-2"></div>
                     <a href="{{ route('bills') }}" class="link link-primary no-underline hover:underline">Ajouter des
-                        dépenses</a>
+                        charges</a>
                 @endif
             </li>
         </ul>

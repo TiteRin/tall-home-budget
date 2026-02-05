@@ -48,6 +48,6 @@ test("le membre connecté ne peut pas modifier les informations d'un autre utili
     $this->actingAs($myUser);
 
     Livewire::test(HouseholdManager::class)
-        ->call('editMember', 1) // Index de l'autre membre
+        ->call('editMember', $otherMember->id) // Index de l'autre membre
         ->assertSet('editingMemberId', null);
 });

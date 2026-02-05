@@ -2,31 +2,94 @@
 
 namespace App\Services\Movement;
 
+use App\Domains\Converters\ChargesAssembler;
 use App\Domains\ValueObjects\Amount;
-use App\Domains\ValueObjects\Balance;
-use App\Enums\DistributionMethod;
+use App\Domains\ValueObjects\ChargesCollection;
+use App\Models\Expense;
 use App\Models\Member;
 use App\Services\Bill\BillsCollection;
-use App\Services\Household\CurrentHouseholdService;
+use App\Services\Expense\ExpensesCollection;
 use Exception;
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 
 class MovementsService
 {
-    private BillsCollection $bills;
-    private array $incomes;
-    private array $members;
-
-    public function __construct(
-        array  $members,
-        BillsCollection $bills,
-        ?array $incomes = [],
+    private function __construct(
+        protected ?Collection        $members = new Collection(),
+        protected ?ChargesCollection $charges = new ChargesCollection(),
+        protected ?array             $incomes = []
     )
     {
-        $this->bills = $bills;
-        $this->incomes = $incomes;
-        $this->members = $members;
+        ;
+    }
+
+    public function withMembers(Collection $members)
+    {
+        return new self(
+            $members,
+            $this->charges,
+            $this->incomes
+        );
+    }
+
+    public function withBills(BillsCollection $bills)
+    {
+        $chargeAssembler = ChargesAssembler::create();
+
+        $charges = $this->charges;
+        $charges = $charges->merge(
+            $chargeAssembler->fromBills($bills)->assemble()
+        );
+
+        return new self(
+            $this->members,
+            $charges,
+            $this->incomes
+        );
+    }
+
+    public function withExpenses(ExpensesCollection $expenses)
+    {
+        $chargeAssembler = ChargesAssembler::create();
+
+        $charges = $this->charges;
+        $charges = $charges->merge(
+            $chargeAssembler->fromExpenses($expenses)->assemble()
+        );
+
+        return new self(
+            $this->members,
+            $charges,
+            $this->incomes
+        );
+    }
+
+    public function withCharges(ChargesCollection $charges)
+    {
+        return new self(
+            $this->members,
+            $charges,
+            $this->incomes
+        );
+    }
+
+    public function addExpenses(ExpensesCollection $expenses)
+    {
+        return new self(
+            $this->members,
+            $this->charges,
+            $this->incomes
+        );
+    }
+
+    public function addExpense(Expense $expense)
+    {
+        return new self(
+            $this->members,
+            $this->charges,
+            $this->incomes
+        );
     }
 
     public function hasMembers(): bool
@@ -36,12 +99,54 @@ class MovementsService
 
     public function hasBills(): bool
     {
-        return count($this->bills) > 0;
+        return $this->hasCharges();
     }
 
-
-    public function setIncomes(array $incomes): static
+    public function hasExpenses(): bool
     {
+        return $this->hasCharges();
+    }
+
+    public function hasCharges(): bool
+    {
+        return count($this->charges) > 0;
+    }
+
+    public function withIncomeFor(Member $member, Amount $amount): MovementsService
+    {
+        if (!$this->members->contains('id', $member->id)) {
+            throw new InvalidArgumentException();
+        }
+
+        $currentIncomes = $this->incomes;
+        $currentIncomes[$member->id] = $amount;
+
+        return new self(
+            $this->members,
+            $this->charges,
+            $currentIncomes
+        );
+    }
+
+    public function removeIncomeFor(Member $member)
+    {
+        if (!$this->members->contains('id', $member->id)) {
+            throw new InvalidArgumentException();
+        }
+
+        $currentIncomes = $this->incomes;
+        unset($currentIncomes[$member->id]);
+
+        return new self(
+            $this->members,
+            $this->charges,
+            $currentIncomes
+        );
+    }
+
+    public function withIncomes(array $incomes): MovementsService
+    {
+
         foreach ($incomes as $member_id => $income) {
 
             if ($income === null) {
@@ -49,32 +154,18 @@ class MovementsService
                 continue;
             }
 
-            if (!array_any($this->members, function (Member $m) use ($member_id) {
+            if (!array_any($this->members->all(), function (Member $m) use ($member_id) {
                 return $m->id === $member_id;
             })) {
                 throw new InvalidArgumentException("The Member [$member_id] is not a part of the service.");
             }
         }
 
-        $this->incomes = $incomes;
-        return $this;
-    }
-
-    public function setIncomeFor(Member $member, Amount $amount): static
-    {
-        $currentIncomes = $this->incomes;
-        $currentIncomes[$member->id] = $amount;
-        $this->setIncomes($currentIncomes);
-        return $this;
-    }
-
-    public function getTotalsAmount(): array
-    {
-        $totals = array_map(function (DistributionMethod $method) {
-            return [$method->value => $this->bills->getTotalForDistributionMethod($method)];
-        }, DistributionMethod::cases());
-
-        return array_merge(['total' => $this->bills->getTotal()], ...$totals);
+        return new self(
+            $this->members,
+            $this->charges,
+            $incomes
+        );
     }
 
     public function getTotalIncome(): Amount
@@ -93,135 +184,49 @@ class MovementsService
      */
     public function getRatiosFromIncome(): array
     {
-        $totalIncome = $this->getTotalIncome();
-
         if (count($this->incomes) !== count($this->members)) {
-            throw new Exception("You need to set income for every member.");
+            throw new Exception("You need to set incomes for every member.");
         }
+
+        $totalIncome = $this->getTotalIncome();
 
         return array_combine(
             array_map(
                 function (Member $member) {
                     return $member->id;
                 },
-                $this->members
+                $this->members->all()
             ),
             array_map(
                 function (Member $member) use ($totalIncome) {
                     return $this->incomes[$member->id]->toCents() / $totalIncome->toCents();
                 },
-                $this->members
+                $this->members->all()
             )
         );
     }
 
-    /**
-     * @throws Exception
-     */
-    public function computeBalances(): Collection
-    {
-        if (count($this->incomes) !== count($this->members)) {
-            throw new Exception("You need to set income for every member.");
-        }
-
-        $totalEqual = $this->bills->getTotalForDistributionMethod(DistributionMethod::EQUAL);
-        $totalProrata = $this->bills->getTotalForDistributionMethod(DistributionMethod::PRORATA);
-        $ratios = $this->getRatiosFromIncome();
-
-        $balances = new BalancesCollection();
-
-        foreach ($this->members as $member) {
-            $paid = $this->bills->getTotalForMember($member);
-            $owedEqual = new Amount($totalEqual->toCents() / count($this->members));
-            $owedProrata = new Amount($totalProrata->toCents() * $ratios[$member->id]);
-            $owed = $owedEqual->add($owedProrata);
-
-            $balances->push(
-                new Balance(
-                    $member,
-                    $paid->subtract($owed)
-                )
-            );
-        }
-
-        $joint = $this->members[0]->household->jointAccount();
-        if ($joint) {
-            $balances->push(
-                new Balance(
-                    $joint,
-                    $this->bills->getTotalForJointAccount()
-                )
-            );
-        }
-
-        return $balances;
-    }
-
-    /**
-     * @throws Exception
-     */
     public function toMovements(): Collection
     {
-        $movements = collect();
-
-        if (!$this->hasMembers() || !$this->hasBills()) {
-            return $movements;
-        }
-
         if (count($this->incomes) !== count($this->members)) {
-            return $movements;
+            return collect();
         }
 
-        $balances = $this->computeBalances();
-        $creditors = $balances->getCreditors();
-        $debitors = $balances->getDebitors();
+        $member = $this->members->first();
+        $household = $member->household;
 
-        $creditor = $creditors->shift();
-        $debitor = $debitors->shift();
-
-        while ($creditor !== null && $debitor !== null) {
-
-            $amount = new Amount(min(
-                $creditor->abs()->toCents(),
-                $debitor->abs()->toCents(),
-            ));
-
-            $movements->push(
-                new Movement(
-                    memberFrom: $debitor->member,
-                    memberTo: $creditor->member,
-                    amount: $amount
-                )
-            );
-
-            $creditor->amount = $creditor->amount->subtract($amount);
-            $debitor->amount = $debitor->amount->add($amount);
-
-            if ($creditor->amount->toCents() === 0) {
-                $creditor = $creditors->shift();
-            }
-
-            if ($debitor->amount->toCents() === 0) {
-                $debitor = $debitors->shift();
-            }
-        }
-
-        return $movements;
+        return MovementsServiceCalculator::compute(
+            $this->members,
+            $this->charges,
+            $this->getRatiosFromIncome(),
+            $household->jointAccount()
+        );
     }
+
+    // Income => (Member, Amount) ??
 
     public static function create(): MovementsService
     {
-        $householdService = new CurrentHouseholdService();
-        $currentHousehold = $householdService->getCurrentHousehold();
-
-        if ($currentHousehold === null) {
-            throw new Exception("Aucun foyer courant.");
-        }
-
-
-        $members = $currentHousehold->members->all();
-        $bills = new BillsCollection($currentHousehold->bills);
-
-        return new self($members, $bills);
+        return new self();
     }
 }

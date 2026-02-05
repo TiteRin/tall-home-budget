@@ -12,8 +12,13 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+RUN pecl install pcov
+RUN docker-php-ext-enable pcov
+
 # ✅ Create sail user (required!)
 RUN groupadd --force -g ${WWWGROUP} sail \
     && useradd -ms /bin/bash --no-user-group -g ${WWWGROUP} -u ${WWWUSER} sail
+
+
 
 WORKDIR /var/www/html

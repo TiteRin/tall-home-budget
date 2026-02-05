@@ -2,8 +2,16 @@
 
 namespace App\Livewire\Home\Movements;
 
+use App\Domains\Converters\BillToChargeConverter;
+use App\Domains\Converters\ChargesAssembler;
+use App\Domains\Converters\ExpenseToChargeConverter;
+use App\Services\Bill\BillsCollection;
+use App\Services\Expense\ExpensesCollection;
+use App\Services\Expense\ExpenseTabResolver;
+use App\Services\Household\CurrentHouseholdServiceContract;
 use App\Services\Movement\MovementsService;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Collection;
 use Livewire\Attributes\Reactive;
 use Livewire\Component;
 
@@ -12,30 +20,54 @@ class MovementsList extends Component
     #[Reactive]
     public array $incomes = [];
 
-    private MovementsService $service;
-
-    public function boot(): void
+    private function buildService(): MovementsService
     {
-        $this->service = MovementsService::create();
+        $currentHousehold = app(CurrentHouseholdServiceContract::class)->getCurrentHousehold();
+        $chargesAssembler = new ChargesAssembler(
+            new BillToChargeConverter(),
+            new ExpenseToChargeConverter()
+        );
+
+        $expensesCollection = new ExpensesCollection();
+
+        foreach ($currentHousehold->expenseTabs() as $expenseTab) {
+            $expenseTabResolver = new ExpenseTabResolver($expenseTab);
+            $monthlyPeriod = $expenseTabResolver->getCurrentMonthlyPeriod();
+
+            $expensesCollection->push(
+                $expenseTab->expenses()->whereBetween('spent_on', [
+                    $monthlyPeriod->start,
+                    $monthlyPeriod->end
+                ])
+            );
+        }
+
+        $chargesAssembler
+            ->fromBills(new BillsCollection($currentHousehold->bills))
+            ->fromExpenses(new ExpensesCollection($expensesCollection));
+
+
+        $service = MovementsService::create()
+            ->withMembers($currentHousehold->members)
+            ->withCharges($chargesAssembler->assemble())
+            ->withIncomes($this->incomes);
+
+        return $service;
+    }
+
+    public function getMovementsProperty(): Collection
+    {
+        return $this->buildService()->toMovements();
     }
 
     public function render(): View
     {
-        if (!$this->service->hasMembers()) {
+        if ($this->movements->isEmpty()) {
             return view('livewire.home.movements.movements-list-empty');
         }
 
-        if (!$this->service->hasBills()) {
-            return view('livewire.home.movements.movements-list-empty');
-        }
-
-        $this->service->setIncomes($this->incomes);
-        $movements = $this->service->toMovements();
-
-        if ($movements->isEmpty()) {
-            return view('livewire.home.movements.movements-list-empty');
-        }
-
-        return view('livewire.home.movements.movements-list', compact('movements'));
+        return view('livewire.home.movements.movements-list', [
+            'movements' => $this->movements,
+        ]);
     }
 }

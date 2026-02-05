@@ -98,6 +98,6 @@ abstract class TypedCollection extends Collection
      */
     public function map(callable $callback): Collection
     {
-        return parent::map($callback);
+        return new Collection(array_map($callback, $this->items));
     }
 }

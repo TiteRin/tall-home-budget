@@ -181,7 +181,7 @@
                 <div class="alert alert-warning shadow-sm mb-4 py-2">
                     <div class="flex items-center gap-2">
                         <x-heroicon-o-exclamation-triangle class="h-6 w-6 flex-shrink-0"/>
-                        <span>Ce membre a <strong>{{ $impactedBillsCount }}</strong> {{ $impactedBillsCount > 1 ? 'dépenses associées' : 'dépense associée' }}.</span>
+                        <span>Ce membre a <strong>{{ $impactedBillsCount }}</strong> {{ $impactedBillsCount > 1 ? 'charges associées' : 'dépense associée' }}.</span>
                     </div>
                 </div>
 
@@ -189,11 +189,11 @@
                     <label class="label cursor-pointer justify-start gap-4">
                         <input type="radio" wire:model="deleteAction" value="reassign" class="radio radio-primary"/>
                         <span
-                            class="label-text">Réaffecter les dépenses au <strong>{{ $reassignmentTarget }}</strong></span>
+                            class="label-text">Réaffecter les charges au <strong>{{ $reassignmentTarget }}</strong></span>
                     </label>
                     <label class="label cursor-pointer justify-start gap-4">
                         <input type="radio" wire:model="deleteAction" value="delete_bills" class="radio radio-error"/>
-                        <span class="label-text">Supprimer également toutes les dépenses associées</span>
+                        <span class="label-text">Supprimer également toutes les charges associées</span>
                     </label>
                 </div>
             @endif

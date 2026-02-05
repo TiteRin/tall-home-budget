@@ -1,11 +1,8 @@
 <?php
 
-use App\Domains\ValueObjects\Amount;
 use App\Enums\DistributionMethod;
 use App\Livewire\BillsManager;
 use App\Models\User;
-use App\Services\Bill\BillsCollection;
-use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Livewire\Livewire;
 
@@ -23,7 +20,7 @@ beforeEach(function () {
 test('should display an empty table if no bills', function () {
 
     Livewire::test(BillsManager::class)
-        ->assertSeeText('Aucune dépense');
+        ->assertSeeText('Aucune charge');
 });
 
 test('should use the BillForm component to add a bill', function () {
@@ -54,7 +51,7 @@ describe('when there’s a list of 5 bills', function () {
 
         Livewire::test(BillsManager::class)
             ->dispatch('billDeleted', billId: $bill->id)
-            ->assertDontSee('Aucune dépense')
+            ->assertDontSee('Aucune charge')
             ->assertDontSee('Électricité');
     });
 });
@@ -66,11 +63,11 @@ test('should refresh bills collection when refreshBills is triggered', function 
 
     $component = Livewire::test(BillsManager::class);
 
-    $newBill = bill_factory()->bill(['name' => 'Nouvelle dépense'], $member, $this->household);
+    $newBill = bill_factory()->bill(['name' => 'Nouvelle charge'], $member, $this->household);
 
     $component
         ->dispatch('refreshBills')
-        ->assertSee('Nouvelle dépense');
+        ->assertSee('Nouvelle charge');
 });
 
 test('should handle complete workflow: add bill, then delete it', function () {
@@ -78,23 +75,23 @@ test('should handle complete workflow: add bill, then delete it', function () {
 
     $component = Livewire::test(BillsManager::class);
 
-    // État initial - pas de dépenses
-    $component->assertSee('Aucune dépense');
+    // État initial - pas de charges
+    $component->assertSee('Aucune charge');
 
-    // Ajouter une dépense via un événement (simulant BillForm)
+    // Ajouter une charge via un événement (simulant BillForm)
     $bill = bill_factory()->bill(['name' => 'Facture test'], $member, $this->household);
     $component->dispatch('refreshBills');
 
-    // Vérifier que la dépense est affichée
+    // Vérifier que la charge est affichée
     $component->assertSee('Facture test');
-    $component->assertDontSee('Aucune dépense');
+    $component->assertDontSee('Aucune charge');
 
-    // Supprimer la dépense
+    // Supprimer la charge
     $component->dispatch('billDeleted', billId: $bill->id);
 
-    // Vérifier que la dépense n'est plus affichée
+    // Vérifier que la charge n'est plus affichée
     $component->assertDontSee('Facture test');
-    $component->assertSee('Aucune dépense');
+    $component->assertSee('Aucune charge');
 });
 
 
@@ -137,7 +134,7 @@ test('should handle large number of bills efficiently', function () {
 test('should handle bill deletion when bill does not exist', function () {
     $component = Livewire::test(BillsManager::class);
 
-    // Essayer de supprimer une dépense inexistante
+    // Essayer de supprimer une charge inexistante
     expect(fn() => $component->dispatch('billDeleted', billId: 99999))
         ->toThrow(ModelNotFoundException::class);
 });
@@ -146,9 +143,9 @@ test('should handle bill deletion when bill does not exist', function () {
 test('should maintain correct bills after deletion', function () {
     $member = bill_factory()->member([], $this->household);
     $bills = collect([
-        bill_factory()->bill(['name' => 'Première dépense'], $member, $this->household),
-        bill_factory()->bill(['name' => 'Deuxième dépense'], $member, $this->household),
-        bill_factory()->bill(['name' => 'Troisième dépense'], $member, $this->household),
+        bill_factory()->bill(['name' => 'Première charge'], $member, $this->household),
+        bill_factory()->bill(['name' => 'Deuxième charge'], $member, $this->household),
+        bill_factory()->bill(['name' => 'Troisième charge'], $member, $this->household),
     ]);
 
     $component = Livewire::test(BillsManager::class);
@@ -157,9 +154,9 @@ test('should maintain correct bills after deletion', function () {
     expect($component->get('bills'))->toHaveCount(3);
 
     $initialBillNames = $component->get('bills')->pluck('name')->toArray();
-    expect($initialBillNames)->toContain('Première dépense', 'Deuxième dépense', 'Troisième dépense');
+    expect($initialBillNames)->toContain('Première charge', 'Deuxième charge', 'Troisième charge');
 
-    // Supprimer la deuxième dépense
+    // Supprimer la deuxième charge
     $component->dispatch('billDeleted', billId: $bills[1]->id);
 
     // Vérifier l'état après suppression
@@ -167,17 +164,17 @@ test('should maintain correct bills after deletion', function () {
 
     $remainingBillNames = $component->get('bills')->pluck('name')->toArray();
     expect($remainingBillNames)
-        ->toContain('Première dépense', 'Troisième dépense')
+        ->toContain('Première charge', 'Troisième charge')
         ->and($remainingBillNames)
-        ->not->toContain('Deuxième dépense');
+        ->not->toContain('Deuxième charge');
 
     // Vérifier que l'ordre est maintenu (première avant troisième)
-    $firstIndex = array_search('Première dépense', $remainingBillNames);
-    $thirdIndex = array_search('Troisième dépense', $remainingBillNames);
+    $firstIndex = array_search('Première charge', $remainingBillNames);
+    $thirdIndex = array_search('Troisième charge', $remainingBillNames);
     expect($firstIndex)->toBeLessThan($thirdIndex);
 });
 
-describe('Édition de dépense', function () {
+describe('Édition de charge', function () {
     beforeEach(function () {
         $this->member = bill_factory()->member([], $this->household);
         $this->bill = bill_factory()->bill(['name' => 'Facture test'], $this->member, $this->household);

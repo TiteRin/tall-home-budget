@@ -32,8 +32,8 @@ it("getDebitors should return a BalancesCollection", function () {
         ]
     );
 
-    expect($collection->getDebitors())->toBeInstanceOf(BalancesCollection::class)
-        ->and($collection->getDebitors())->toHaveCount(2);
+    expect($collection->getDebtors())->toBeInstanceOf(BalancesCollection::class)
+        ->and($collection->getDebtors())->toHaveCount(2);
 });
 
 
