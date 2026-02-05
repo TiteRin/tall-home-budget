@@ -115,7 +115,7 @@ describe("When the household has expenses", function () {
             ->create([
                 'expense_tab_id' => $this->expenseTabGroceries->id,
                 'member_id' => $this->factory->members()->random()->id,
-                'spent_on' => now()->subDays(random_int(0, 10)),
+                'spent_on' => now(),
                 'amount' => new Amount(1000)
             ]);
 
