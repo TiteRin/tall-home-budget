@@ -1,4 +1,4 @@
-<section class="card bg-base-100 shadow-xl w-full">
+<section class="card bg-base-100 shadow-xl w-full md:w-1/2">
     <div class="card-body">
         <h2 class="card-title">
             Mouvements

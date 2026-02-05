@@ -55,6 +55,11 @@ class Amount implements Wireable
         return str_replace(",", ".", $amount);
     }
 
+    public static function zero(): Amount
+    {
+        return new Amount(0);
+    }
+
     public function value(): int
     {
         return $this->amount;
@@ -167,10 +172,11 @@ class Amount implements Wireable
             return new static((int)$value['cents']);
         }
 
-        if (self::isValid($value)) {
+        if (is_string($value) && self::isValid($value)) {
             return self::from($value);
         }
 
-        throw new InvalidArgumentException("Cannot hydrate Amount from provided Livewire value [$value].");
+        $displayValue = is_array($value) ? json_encode($value) : (string)$value;
+        throw new InvalidArgumentException("Cannot hydrate Amount from provided Livewire value [$displayValue].");
     }
 }

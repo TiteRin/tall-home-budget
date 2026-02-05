@@ -1,44 +1,32 @@
 <?php
 
-namespace Tests\Feature\Auth\Passwords;
-
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
-use Tests\TestCase;
 
-class EmailTest extends TestCase
-{
-    use RefreshDatabase;
+uses(RefreshDatabase::class);
 
-    /** @test */
-    public function can_view_password_request_page()
-    {
+describe('Password reset email', function () {
+    test('can view password request page', function () {
         $this->get(route('password.request'))
             ->assertSuccessful()
             ->assertSeeLivewire('auth.passwords.email');
-    }
+    });
 
-    /** @test */
-    public function a_user_must_enter_an_email_address()
-    {
+    test('a user must enter an email address', function () {
         Livewire::test('auth.passwords.email')
             ->call('sendResetPasswordLink')
             ->assertHasErrors(['email' => 'required']);
-    }
+    });
 
-    /** @test */
-    public function a_user_must_enter_a_valid_email_address()
-    {
+    test('a user must enter a valid email address', function () {
         Livewire::test('auth.passwords.email')
             ->set('email', 'email')
             ->call('sendResetPasswordLink')
             ->assertHasErrors(['email' => 'email']);
-    }
+    });
 
-    /** @test */
-    public function a_user_who_enters_a_valid_email_address_will_get_sent_an_email()
-    {
+    test('a user who enters a valid email address will get sent an email', function () {
         $user = User::factory()->create();
 
         Livewire::test('auth.passwords.email')
@@ -49,5 +37,5 @@ class EmailTest extends TestCase
         $this->assertDatabaseHas('password_reset_tokens', [
             'email' => $user->email,
         ]);
-    }
-}
+    });
+});

@@ -9,7 +9,7 @@
                     {{ config('app.name') }}
                 </h1>
                 <p class="text-xl text-base-content/70 text-center mb-8">
-                    Gérez votre budget domestique en toute simplicité. Ajoutez vos dépenses mensuelles une seule fois,
+                    Gérez votre budget domestique en toute simplicité. Ajoutez vos charges mensuelles une seule fois,
                     puis chaque mois, renseignez vos revenus pour savoir qui paie quoi.
                 </p>
 
@@ -28,9 +28,9 @@
             <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="card bg-base-100 shadow-xl">
                     <div class="card-body">
-                        <h3 class="card-title text-lg font-semibold text-base-content mb-2">Suivi des dépenses</h3>
+                        <h3 class="card-title text-lg font-semibold text-base-content mb-2">Suivi des charges</h3>
                         <p class="text-base-content/70">
-                            Enregistrez vos dépenses fixes mensuelles, plus besoin d’y toucher.
+                            Enregistrez vos charges fixes mensuelles, plus besoin d’y toucher.
                         </p>
                     </div>
                 </div>
@@ -38,7 +38,7 @@
                     <div class="card-body">
                         <h3 class="card-title text-lg font-semibold text-base-content mb-2">Gestion du foyer</h3>
                         <p class="text-base-content/70">
-                            Gerez les finances partagées avec les membres de votre foyer en toute transparence.
+                            Gérez les finances partagées avec les membres de votre foyer en toute transparence.
                         </p>
                     </div>
                 </div>

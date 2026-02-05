@@ -29,7 +29,7 @@ class BalancesCollection extends TypedCollection
         });
     }
 
-    public function getDebitors(): BalancesCollection
+    public function getDebtors(): BalancesCollection
     {
         return $this->filter(function (Balance $balance) {
             return $balance->isDebitor();

@@ -154,7 +154,7 @@ describe("when the form is correctly parametered", function () {
                 ->assertHasErrors([
                     'newName' => 'required'
                 ])
-                ->assertSee('Le champ "Nouvelle dépense" est requis.');
+                ->assertSee('Le champ "Nouvelle charge" est requis.');
         });
 
         test('newAmount and formattedAmount should be numerical representation', function () {

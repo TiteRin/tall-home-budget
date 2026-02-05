@@ -35,6 +35,6 @@ class Movement
 
     public function getId(): string
     {
-        return "$this->memberFrom->id-$this->memberTo->id-$this->amount->toCents()";
+        return "{$this->memberFrom->id}-{$this->memberTo->id}-{$this->amount->toCents()}";
     }
 }

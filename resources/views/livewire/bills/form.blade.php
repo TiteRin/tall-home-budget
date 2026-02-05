@@ -2,7 +2,7 @@
     <td>
         <input type="text"
                wire:model="newName"
-               placeholder="Nouvelle dépense"
+               placeholder="Nouvelle charge"
                class="input input-bordered input-sm w-full"
         />
         @error('newName')

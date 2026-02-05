@@ -18,7 +18,10 @@
                     <a href="{{ route('household.settings') }}">Paramétrage</a>
                 </li>
                 <li>
-                    <a href="{{ route('bills') }}">Dépenses</a>
+                    <a href="{{ route('bills') }}">Charges</a>
+                </li>
+                <li>
+                    <a href="{{ route('expense-tabs.index') }}">Dépenses ponctuelles</a>
                 </li>
                 <li>
                     <a href="{{ route('profile') }}">Mon profil</a>

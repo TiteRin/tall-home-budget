@@ -1,78 +1,74 @@
 ##############################
-# Dépendances PHP (composer) #
+# Stage 1 — Composer vendor  #
 ##############################
-FROM dunglas/frankenphp AS vendor
+FROM dunglas/frankenphp:php8.4-alpine AS vendor
 
-# Dépendances système pour intl
 RUN apk add --no-cache \
-    icu-dev \
-    zip \
-    unzip \
-    git \
-    curl \
-    && docker-php-ext-install intl
+    git unzip zip curl \
+    icu-dev libpq-dev oniguruma-dev libzip-dev \
+    && docker-php-ext-install \
+        intl pdo_pgsql mbstring zip
 
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /app
 COPY composer.json composer.lock ./
 
+# ✅ No scripts here (artisan not available yet)
 RUN composer install \
     --no-dev \
     --prefer-dist \
     --no-interaction \
-    --no-progress \
     --optimize-autoloader \
     --no-scripts
 
 
 ##############################
-# Build Vite                 #
+# Stage 2 — Frontend build   #
 ##############################
-FROM node:25-alpine AS frontend
+FROM node:20-alpine AS frontend
 
 WORKDIR /app
 
-# Cache NPM
-COPY package.json ./
-COPY package-lock.json ./
-
-RUN npm install
+COPY package.json package-lock.json ./
 RUN npm ci
 
-# Code frontend uniquement
 COPY resources ./resources
+COPY public ./public
 COPY vite.config.* ./
+COPY tailwind.config.* ./
+COPY postcss.config.* ./
 
-# Build assets
 RUN npm run build
 
+
 ##############################
-# Run-time PHP               #
+# Stage 3 — Runtime FrankenPHP
 ##############################
-FROM php:8.4-fpm-alpine AS runtime
+FROM dunglas/frankenphp:php8.4-alpine AS runtime
 
 RUN apk add --no-cache \
-    icu-dev \
-    libpq-dev \
-    oniguruma-dev \
-    zip \
-    unzip \
+    icu-dev libpq-dev oniguruma-dev libzip-dev \
     && docker-php-ext-install \
-        intl \
-        pdo_pgsql \
-        mbstring \
-        opcache \
-    && rm -rf /var/cache/apk/*
+        intl pdo_pgsql mbstring opcache zip
 
-RUN rm -rf bootstrap/cache/*
 WORKDIR /var/www/html
+
+# Copy full Laravel app
 COPY . .
+
+# Inject vendor + assets
 COPY --from=vendor /app/vendor ./vendor
 COPY --from=frontend /app/public/build ./public/build
 
-RUN chown -R www-data:www-data \
-    storage bootstrap/cache
+# Config Caddy
+COPY docker/frankenphp/Caddyfile.prod /etc/frankenphp/Caddyfile
 
-EXPOSE 9000
-CMD ["php-fpm"]
+# ✅ Now artisan exists → safe to run scripts
+RUN php artisan package:discover --ansi
+
+RUN chown -R www-data:www-data storage bootstrap/cache
+
+EXPOSE 80 443
+
+CMD ["frankenphp", "run", "--config", "/etc/frankenphp/Caddyfile"]

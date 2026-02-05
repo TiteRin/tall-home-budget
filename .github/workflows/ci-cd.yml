@@ -16,7 +16,8 @@ jobs:
     needs: tests
     if: |
       github.event_name == 'pull_request' ||
-      github.ref == 'refs/heads/main'
+      github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/frankenphp'
     uses: ./.github/workflows/build.yml
   deploy:
     needs: build_and_push
@@ -24,5 +25,6 @@ jobs:
       SSH_HOST: ${{ secrets.SSH_HOST }}
       SSH_USER: ${{ secrets.SSH_USER }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' ||
+      github.ref == 'refs/heads/feat/frankenphp'
     uses: ./.github/workflows/deploy.yml

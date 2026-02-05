@@ -1,14 +1,14 @@
-<section class="card bg-base-100 shadow-xl grow w-1/3">
+<section class="card bg-base-100 shadow-xl grow w-full$">
     <div class="card-body">
         <h2 class="card-title mb-4">
-            Dépenses
+            Charges et Dépenses
         </h2>
         <div class="grow">
-            <p class="alert alert-info alert-soft">Aucune dépense</p>
+            <p class="alert alert-info alert-soft">Aucune charge</p>
         </div>
         <div class="card-actions justify-end">
             <a href="{{ route('bills.settings') }}" class="btn btn-primary">
-                Paramétrer les dépenses
+                Paramétrer les charges
             </a>
         </div>
     </div>

@@ -2,7 +2,12 @@
 
 namespace Tests\Feature\Livewire\Home;
 
+use App\Domains\ValueObjects\Amount;
 use App\Livewire\Bills\BillsList;
+use App\Models\Expense;
+use App\Models\ExpenseTab;
+use App\Services\Expense\ExpensesCollection;
+use Carbon\CarbonImmutable;
 use Livewire;
 
 test('should display the component', function () {
@@ -13,12 +18,12 @@ test('should display the component', function () {
 describe("no bills are passed", function () {
     test('should display a message', function () {
         Livewire::test(BillsList::class)
-            ->assertSee("Aucune dépense");
+            ->assertSee("Aucune charge");
     });
 
     test('should display a link to the bills manager', function () {
         Livewire::test(BillsList::class)
-            ->assertSee("Paramétrer les dépenses")
+            ->assertSee("Paramétrer les charges")
             ->assertSeeHtml('href="' . route('bills.settings') . '"');
     });
 });
@@ -85,3 +90,57 @@ describe('When the component has bills', function () {
     });
 });
 
+
+describe("When the household has expenses", function () {
+
+    beforeEach(function () {
+        $this->factory = test_factory()
+            ->withHousehold(['name' => 'Duck'])
+            ->withMember(['first_name' => 'Daisy'])
+            ->withMember(['first_name' => 'Donald'])
+            ->withUser();
+
+        $this->actingAs($this->factory->user());
+
+        $now = CarbonImmutable::create(2026, 2, 10);
+        CarbonImmutable::setTestNow($now);
+
+        $this->expenseTabGroceries = ExpenseTab::factory()->create([
+            'household_id' => $this->factory->household()->id,
+            'name' => 'Groceries',
+            'from_day' => 5
+        ]);
+
+        $this->expenses = Expense::factory()->count(10)
+            ->create([
+                'expense_tab_id' => $this->expenseTabGroceries->id,
+                'member_id' => $this->factory->members()->random()->id,
+                'spent_on' => now(),
+                'amount' => new Amount(1000)
+            ]);
+
+        $this->totalAmount = ExpensesCollection::from($this->expenses)->getTotal();
+
+        $this->props = ['expenseTabs' => [$this->expenseTabGroceries]];
+    });
+
+    test("should display the Expense Tab in the bills list", function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSee('Groceries');
+    });
+
+    test('should display the Expense Tab as a link', function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSeeHtmlInOrder([">", "Groceries", "</a>"]);
+    });
+
+    test('should link to the ExpenseTab index with the correct tab ID', function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSeeHtml('href="' . route('expense-tabs.index', ['tab' => $this->expenseTabGroceries->id]) . '"');
+    });
+
+    test('should display the total for the current monthly period', function () {
+        Livewire::test(BillsList::class, $this->props)
+            ->assertSee("100,00 €");
+    });
+});

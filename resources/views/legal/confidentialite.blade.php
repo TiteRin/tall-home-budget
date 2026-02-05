@@ -58,7 +58,7 @@
                     </p>
 
                     <ul>
-                        <li>Des catégories de dépenses</li>
+                        <li>Des catégories de charges et de dépenses</li>
                         <li>Des montants associés</li>
                     </ul>
 
@@ -90,7 +90,7 @@
                     <ul>
                         <li>Créer et gérer un compte utilisateur</li>
                         <li>Permettre l’accès sécurisé à l’application</li>
-                        <li>Enregistrer les dépenses et catégories</li>
+                        <li>Enregistrer les charges, les dépenses et catégories</li>
                         <li>Assurer le bon fonctionnement du service</li>
                     </ul>
 

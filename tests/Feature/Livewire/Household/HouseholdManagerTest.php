@@ -155,6 +155,7 @@ describe('Member management', function () {
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
+                ->call('refreshMembers')
                 ->call('removeMember', 1) // Index 1 car index 0 est $this->member
                 ->assertSet('memberIdToDelete', $member->id)
                 ->assertDispatched('open-modal', 'confirm-delete-member');
@@ -167,6 +168,7 @@ describe('Member management', function () {
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
+                ->call('refreshMembers')
                 ->call('removeMember', 1)
                 ->call('performDelete')
                 ->assertSet('memberIdToDelete', null)
@@ -225,6 +227,7 @@ describe('Member management', function () {
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
+                ->call('refreshMembers')
                 ->call('removeMember', 1)
                 ->assertSet('reassignmentTarget', $this->member->full_name)
                 ->call('performDelete');
@@ -245,6 +248,7 @@ describe('Member management', function () {
 
             Livewire::test(HouseholdManager::class)
                 ->set('householdId', $this->household->id)
+                ->call('refreshMembers')
                 ->call('removeMember', 1)
                 ->set('deleteAction', 'delete_bills')
                 ->call('performDelete');
