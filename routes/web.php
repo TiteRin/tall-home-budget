@@ -24,19 +24,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::controller(App\Http\Controllers\BillsController::class)->group(function() {
-    Route::get('/bills', 'index')->name('bills');
-    Route::get('/bills/settings', 'settings')->name('bills.settings');
-    Route::post('/bills', 'store')->name('bills.store');
+Route::middleware('auth')->group(function () {
+    Route::controller(App\Http\Controllers\BillsController::class)->group(function () {
+        Route::get('/bills', 'index')->name('bills');
+        Route::get('/bills/settings', 'settings')->name('bills.settings');
+        Route::post('/bills', 'store')->name('bills.store');
+    });
 });
-
-Route::controller(App\Http\Controllers\ExpenseTabsController::class)->group(function () {
-    Route::get('/expense-tabs', 'index')->name('expense-tabs.index');
-});
-
-Route::get('/household/settings', function() {
-    return view('household');
-})->name('household.settings');
 
 Route::middleware('guest')->group(function () {
     Route::get('login', Login::class)
@@ -72,19 +66,34 @@ Route::middleware('auth')->group(function () {
     Route::get('/profile', function () {
         return view('profile');
     })->name('profile');
+
+    Route::controller(App\Http\Controllers\ExpenseTabsController::class)->group(function () {
+        Route::get('/expense-tabs', 'index')->name('expense-tabs.index');
+    });
+
+    Route::get('/household/settings', function () {
+        return view('household');
+    })->name('household.settings');
 });
 
-Route::get('/mentions-legales', function () {
-    return view('legal.mentions-legales');
-})->name('mentions-legales');
+Route::group([], function () {
 
-Route::get('/cgu', function () {
-    return view('legal.cgu');
-})->name('cgu');
+    Route::get('/modes-de-partage', function () {
+        return view('distribution-method');
+    })->name('distribution-method');
 
-Route::get('/confidentialite', function () {
-    return view('legal.confidentialite');
-})->name('confidentialite');
+    Route::get('/mentions-legales', function () {
+        return view('legal.mentions-legales');
+    })->name('mentions-legales');
+
+    Route::get('/cgu', function () {
+        return view('legal.cgu');
+    })->name('cgu');
+
+    Route::get('/confidentialite', function () {
+        return view('legal.confidentialite');
+    })->name('confidentialite');
+});
 
 Route::middleware('admin.auth')->group(function () {
     Route::get('/admin', AdminDashboard::class)->name('admin.dashboard');
