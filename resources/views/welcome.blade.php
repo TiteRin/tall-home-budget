@@ -29,8 +29,9 @@
             <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div class="card bg-base-100 card-lg shadow-xl">
                     <div class="card-body">
-                        <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">Créez votre
-                            foyer</h3>
+                        <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">
+                            Créez votre foyer
+                        </h3>
                         <p class="text-base-content/70">
                             Ajoutez et invitez les membres de votre foyer à l’application. <br/>
                             Est-ce que vous êtes plutôt 50/50 ou partage au prorata ?
