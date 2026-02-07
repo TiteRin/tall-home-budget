@@ -11,7 +11,8 @@ Histoire d’avoir une interface un peu plus sympa qu’une feuille excel, et da
 - Afficher les mouvements financiers nécessaires pour équilibrer la balance.
 
 ## MVP
-- Application destinée à être hébergée en local sur un serveur privé, car aucune authenfication
+
+- Application destinée à être hébergée en local sur un serveur privé, car aucune authentification
 - Création des membres du foyer
 - CRUD des dépenses
 - Calcul des mouvements
@@ -20,8 +21,8 @@ Histoire d’avoir une interface un peu plus sympa qu’une feuille excel, et da
 
 - [x] Ajouter l’authentification
 - [x] Ajouter la possibilité de créer plusieurs foyers
-- [ ] Ajouter des dépenses ponctuelles (e.g. les courses)
-- [ ] Version mobile
+- [x] Ajouter des dépenses ponctuelles (e.g. les courses)
+- [x] Version mobile
 - [ ] Meilleure UI
 
 ## Stack

@@ -7,18 +7,18 @@ partagent les membres du foyer.
 
 ## Tâches
 
-- [ ] CRUD un onglet de dépenses (expenses_tab)
+- [x] CRUD un onglet de dépenses (expenses_tab)
     - Nom
     - Plage mensuelle => e.g. du 5 au 5 du mois
     - Mode de répartition par défaut (nullable)
     - Membre du foyer responsable des dépenses par défaut (nullable)
-- [ ] Affichage des onglets
+- [x] Affichage des onglets
     - Affichage principal
     - Onglets de dépenses
-- [ ] CRUD dépenses (expenses)
+- [x] CRUD dépenses (expenses)
 - [ ] Affichage : affichage par mois
-- [ ] Calcul du total : par mois
-- [ ] Intégration dans les charges
+- [x] Calcul du total : par mois
+- [x] Intégration dans les charges
 
 ## Draft
 
