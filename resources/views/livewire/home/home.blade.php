@@ -3,7 +3,8 @@
         @livewire('home.accounts-list', ['members' => $members])
         @livewire('home.movements.movements-list', ['incomes' => $incomes], key('movements-list'))
     </div>
-
-    @livewire('bills.bills-list', ['bills' => $bills, 'expenseTabs' => $expenseTabs, 'members' => $members])
-    @livewire('home.general-information', ['household' => $household])
+    <div class="flex-col gap-4 hidden md:flex">
+        @livewire('bills.bills-list', ['bills' => $bills, 'expenseTabs' => $expenseTabs, 'members' => $members])
+        @livewire('home.general-information', ['household' => $household])
+    </div>
 </div>

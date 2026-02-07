@@ -21,8 +21,8 @@
          }"
 >
     <div class="card-body">
-        <h2 class="card-title">
-            Membres
+        <h2 class="card-title font-cursive text-3xl">
+            Revenus
         </h2>
         <table class="table table-zebra">
             <thead>

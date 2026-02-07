@@ -7,7 +7,7 @@ test('welcome page displays app content and navigation buttons', function () {
 
     $response->assertStatus(200);
     $response->assertSee(config('app.name'));
-    $response->assertSee('Gérez votre budget domestique en toute simplicité');
+    $response->assertSee('En couple ? En colocation ? Gérez votre budget domestique en tout simplicité !');
     $response->assertSee('Créer un compte');
     $response->assertSee('Se connecter');
     $response->assertSee(route('register'));
