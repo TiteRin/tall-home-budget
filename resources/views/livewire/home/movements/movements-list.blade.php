@@ -1,6 +1,6 @@
 <section class="card bg-base-100 shadow-xl w-full md:w-1/2">
     <div class="card-body">
-        <h2 class="card-title">
+        <h2 class="card-title font-cursive text-3xl">
             Mouvements
         </h2>
         <ul class="list">

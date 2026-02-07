@@ -15,7 +15,10 @@
             <ul class="dropdown-content menu bg-base-100 rounded-box z-1 w-48 sm:w-52 text-sm sm:text-base"
                 x-show="open">
                 <li>
-                    <a href="{{ route('household.settings') }}">Paramétrage</a>
+                    <a href="{{ route('profile') }}">Mon profil</a>
+                </li>
+                <li>
+                    <a href="{{ route('household.settings') }}">Mon foyer</a>
                 </li>
                 <li>
                     <a href="{{ route('bills') }}">Charges</a>
@@ -23,9 +26,7 @@
                 <li>
                     <a href="{{ route('expense-tabs.index') }}">Dépenses ponctuelles</a>
                 </li>
-                <li>
-                    <a href="{{ route('profile') }}">Mon profil</a>
-                </li>
+
                 <li>
                     <form method="POST" action="{{ route('logout') }}" id="logout-form">
                         @csrf

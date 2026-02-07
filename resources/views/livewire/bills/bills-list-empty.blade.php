@@ -1,6 +1,6 @@
 <section class="card bg-base-100 shadow-xl grow w-full$">
     <div class="card-body">
-        <h2 class="card-title mb-4">
+        <h2 class="card-title mb-4 font-cursive text-3xl">
             Charges et Dépenses
         </h2>
         <div class="grow">

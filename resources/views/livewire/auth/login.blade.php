@@ -1,4 +1,4 @@
-@section('title', 'Sign in to your account')
+@section('title', 'Se connecter')
 
 <div>
     <div class="sm:mx-auto sm:w-full sm:max-w-md">
@@ -7,14 +7,14 @@
         </a>
 
         <h2 class="mt-6 text-3xl font-extrabold text-center leading-9">
-            Sign in to your account
+            Se connecter
         </h2>
         @if (Route::has('register'))
             <p class="mt-2 text-sm text-center text-base-content/60 leading-5 max-w">
-                Or
+                Ou
                 <a href="{{ route('register') }}"
                    class="font-medium text-primary hover:text-primary-focus focus:outline-none focus:underline transition ease-in-out duration-150">
-                    create a new account
+                    créer un nouveau compte
                 </a>
             </p>
         @endif
@@ -26,7 +26,7 @@
                 <form wire:submit.prevent="authenticate">
                     <div class="form-control">
                         <label for="email" class="label">
-                            <span class="label-text">Email address</span>
+                            <span class="label-text">Adresse e-mail</span>
                         </label>
 
                         <input wire:model.lazy="email" id="email" name="email" type="email" required autofocus
@@ -41,7 +41,7 @@
 
                     <div class="form-control mt-4">
                         <label for="password" class="label">
-                            <span class="label-text">Password</span>
+                            <span class="label-text">Mot de passe</span>
                         </label>
 
                         <input wire:model.lazy="password" id="password" type="password" required
@@ -59,21 +59,21 @@
                             <input wire:model.lazy="remember" id="remember" type="checkbox"
                                    class="checkbox checkbox-primary checkbox-sm"/>
                             <label for="remember" class="ml-2 label cursor-pointer">
-                                <span class="label-text">Remember</span>
+                                <span class="label-text">Se souvenir de moi</span>
                             </label>
                         </div>
 
                         <div class="text-sm leading-5">
                             <a href="{{ route('password.request') }}"
                                class="link link-primary font-medium transition ease-in-out duration-150">
-                                Forgot your password?
+                                Mot de passe oublié ?
                             </a>
                         </div>
                     </div>
 
                     <div class="mt-6">
                         <button type="submit" class="btn btn-primary w-full">
-                            Sign in
+                            Se connecter
                         </button>
                     </div>
                 </form>
