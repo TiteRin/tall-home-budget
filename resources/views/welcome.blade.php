@@ -26,43 +26,53 @@
                 </div>
             </div>
 
-            <div class="mt-16 grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="card bg-base-100 card-lg shadow-xl">
-                    <div class="card-body">
-                        <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">
-                            Créez votre foyer
-                        </h3>
-                        <p class="text-base-content/70">
-                            Ajoutez et invitez les membres de votre foyer à l’application. <br/>
-                            Est-ce que vous êtes plutôt 50/50 ou partage au prorata ?
-                        </p>
-                        <p class="text-base-content/70">
-                            <a href="{{ route('distribution-method') }}" class="link link-primary">Cliquez ici pour en
-                                savoir plus sur les modes de partages</a>
-                        </p>
+            <div
+                class="lg:mt-[-90px] lg:pt-[170px] lg:bg-[url(/public/assets/img/scene.png)] lg:bg-no-repeat lg:min-w-[1011px] lg:min-h-[792px]">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="card bg-base-100 card-lg shadow-xl relative">
+                        <div class="card-body">
+                            <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">
+                                Créez votre foyer
+                            </h3>
+                            <p class="text-base-content/70">
+                                Ajoutez et invitez les membres de votre foyer à l’application. <br/>
+                                Est-ce que vous êtes plutôt 50/50 ou partage au prorata ? <br/>
+                                <br/>
+                                <a href="{{ route('distribution-method') }}" class="link link-primary">Cliquez ici pour
+                                    en
+                                    savoir plus sur les modes de partages</a>
+                            </p>
+                            <img src="/assets/img/humaan-a.png" alt=""
+                                 class="hidden lg:absolute lg:block bottom-[-370px] right-[-130px]"/>
+                        </div>
                     </div>
-                </div>
-                <div class="card bg-base-100 card-lg shadow-xl">
-                    <div class="card-body">
-                        <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">Ajoutez vos
-                            charges</h3>
-                        <p class="text-base-content/70">
-                            Le loyer, l’électricité, Internet… Ces dépenses fixes qui tombent tous les mois à la même
-                            date, ajoutez les <strong>une seule fois</strong>.<br/>
-                            Associez à chaque charge un membre et un mode de partage, et c’est réglé !
+                    <div class="card bg-base-100 card-lg shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">Ajoutez
+                                vos
+                                charges</h3>
+                            <p class="text-base-content/70">
+                                Le loyer, l’électricité, Internet… Ces dépenses fixes qui tombent tous les mois à la
+                                même
+                                date, ajoutez les <strong>une seule fois</strong>.<br/>
+                                Associez à chaque charge un membre et un mode de partage, et c’est réglé !
 
-                        </p>
+                            </p>
+                            <img src="/assets/img/humaan-b.png" alt=""
+                                 class="hidden lg:absolute lg:block bottom-[-370px] left-[30px]"/>
+                        </div>
                     </div>
-                </div>
-                <div class="card bg-base-100 card-lg shadow-xl">
-                    <div class="card-body">
-                        <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">Saisissez vos
-                            revenus</h3>
-                        <p class="text-base-content/70">
-                            Revenez chaque mois dans l’application pour renseigner les revenus de chacun. <br/>
-                            Immédiatement, obtenez la répartition des montants. Plus besoin de faire de calculs
-                            compliqués !
-                        </p>
+                    <div class="card bg-base-100 card-lg shadow-xl">
+                        <div class="card-body">
+                            <h3 class="card-title text-3xl font-semibold text-base-content mb-2 font-cursive">Saisissez
+                                vos
+                                revenus</h3>
+                            <p class="text-base-content/70">
+                                Revenez chaque mois dans l’application pour renseigner les revenus de chacun. <br/>
+                                Immédiatement, obtenez la répartition des montants. Plus besoin de faire de calculs
+                                compliqués !
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
