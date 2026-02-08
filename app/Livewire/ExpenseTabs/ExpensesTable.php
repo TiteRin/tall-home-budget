@@ -16,6 +16,7 @@ class ExpensesTable extends Component
 
     public int $expenseTabId;
     public ?int $editingExpenseId = null;
+    public bool $isCreating = false;
 
     #[On('refresh-expense-tabs')]
     public function onRefreshExpenseTab($expenseTab)
@@ -39,6 +40,13 @@ class ExpensesTable extends Component
     public function editExpense(int $expenseId)
     {
         $this->editingExpenseId = $expenseId;
+        $this->isCreating = false;
+    }
+
+    public function create()
+    {
+        $this->isCreating = true;
+        $this->editingExpenseId = null;
     }
 
     #[On('expense-has-been-updated')]
@@ -46,6 +54,7 @@ class ExpensesTable extends Component
     public function stopEditing()
     {
         $this->editingExpenseId = null;
+        $this->isCreating = false;
     }
 
     public function render()
