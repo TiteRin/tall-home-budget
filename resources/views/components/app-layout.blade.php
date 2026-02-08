@@ -10,7 +10,7 @@
     @vite('resources/css/app.css')
     @livewireStyles
 </head>
-<body class="min-h-screen antialiased bg-base-100">
+<body class="min-h-screen antialiased bg-base-200">
 
 <header class="shadow px-4 py-3 sticky top-0 z-10 bg-base-100 hidden md:block">
     <div class="max-w-7xl mx-auto">

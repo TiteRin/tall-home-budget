@@ -1,4 +1,7 @@
 <div>
+    <h1 class="text-2xl font-bold mb-4 bg-primary-content/10 p-4 rounded-lg font-cursive text-center md:text-left">
+        Dépenses ponctuelles
+    </h1>
     <div class="hidden md:flex tabs tabs-lift tabs-xl" role="tablist">
         <label class="tab">
             <input type="radio" name="tabs-expense-tabs" wire:model.live="activeTab" value="new"/>
