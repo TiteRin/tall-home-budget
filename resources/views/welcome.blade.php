@@ -27,7 +27,7 @@
             </div>
 
             <div
-                class="lg:mt-[-90px] lg:pt-[170px] lg:bg-[url(/public/assets/img/scene.png)] lg:bg-no-repeat lg:min-w-[1011px] lg:min-h-[792px]">
+                class="mt-[30px] lg:mt-[-90px] lg:pt-[170px] lg:bg-[url(/public/assets/img/scene.png)] lg:bg-no-repeat lg:min-w-[1011px] lg:min-h-[792px]">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
                     <div class="card bg-base-100 card-lg shadow-xl relative">
                         <div class="card-body">
