@@ -23,8 +23,11 @@ test('should display an empty table if no bills', function () {
         ->assertSeeText('Aucune charge');
 });
 
-test('should use the BillForm component to add a bill', function () {
+test('should use the BillForm component in a modal for adding/editing a bill', function () {
     Livewire::test(BillsManager::class)
+        ->assertDontSeeHtml('modal-open')
+        ->call('create')
+        ->assertSeeHtml('modal-open')
         ->assertSeeLivewire('bills.bill-form');
 });
 
@@ -224,6 +227,27 @@ describe('Édition de charge', function () {
         $component = Livewire::test(BillsManager::class);
         $component->dispatch('editBill', billId: $this->bill->id);
         $component->assertSeeLivewire('bills.bill-form');
+    });
+
+    test('should show modal when editing or creating', function () {
+        $component = Livewire::test(BillsManager::class);
+
+        // Au début, pas de modale
+        $component->assertDontSeeHtml('modal-open');
+
+        // On lance l'édition
+        $component->dispatch('editBill', billId: $this->bill->id);
+        $component->assertSeeHtml('modal-open');
+        $component->assertSee('Modifier la charge');
+
+        // On annule
+        $component->dispatch('cancelEditBill');
+        $component->assertDontSeeHtml('modal-open');
+
+        // On lance la création
+        $component->call('create');
+        $component->assertSeeHtml('modal-open');
+        $component->assertSee('Nouvelle charge');
     });
 });
 

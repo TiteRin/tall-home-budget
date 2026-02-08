@@ -4,6 +4,11 @@
     </h1>
 
     <div class="hidden md:block">
+        <div class="flex justify-end mb-4">
+            <button class="btn btn-primary" wire:click="create">
+                Ajouter une charge
+            </button>
+        </div>
         <table class="table">
             <thead>
             <tr>
@@ -16,35 +21,25 @@
             </thead>
             <tbody>
             @forelse($bills as $index => $bill)
-                @if ($bill->id === $this->editingBillId && $this->isEditing === true)
-                    @livewire('bills.bill-form', [
-                        'householdMembers' => $this->householdMembers,
-                        'hasJointAccount' => $this->hasHouseholdJointAccount,
-                        'defaultDistributionMethod' => $this->defaultDistributionMethod,
-                        'bill' => $bill
-                    ])
-                @else
-                    @livewire('bills.row', ['bill' => $bill], key($bill->id))
-                @endif
+                @livewire('bills.row', ['bill' => $bill], key($bill->id))
             @empty
                 <tr>
-                    <td colspan="6">
+                    <td colspan="5">
                         Aucune charge
                     </td>
                 </tr>
             @endforelse
             </tbody>
-            <tfoot>
-            @livewire('bills.bill-form', [
-                'householdMembers' => $this->householdMembers,
-                'hasJointAccount' => $this->hasHouseholdJointAccount,
-                'defaultDistributionMethod' => $this->defaultDistributionMethod
-            ])
-            </tfoot>
         </table>
     </div>
     <div class="md:hidden flex flex-col gap-4">
-        @foreach($bills as $bill)
+        <div class="flex justify-center">
+            <button class="btn btn-primary" wire:click="create">
+                Ajouter une charge
+            </button>
+        </div>
+
+    @foreach($bills as $bill)
             <div class="card bg-base-100 shadow-sm">
                 <div class="card-body p-4">
                     <div class="flex justify-between items-center">
@@ -75,4 +70,23 @@
 
         @endforeach
     </div>
+
+    @if($isEditing || $isCreating)
+        <div class="modal modal-open">
+            <div class="modal-box relative">
+                <button wire:click="cancelEditBill" class="btn btn-sm btn-circle absolute right-2 top-2">✕</button>
+                <h3 class="text-lg font-bold mb-4 font-cursive">
+                    {{ $isEditing ? 'Modifier la charge' : 'Nouvelle charge' }}
+                </h3>
+
+                @livewire('bills.bill-form', [
+                    'householdMembers' => $this->householdMembers,
+                    'hasJointAccount' => $this->hasHouseholdJointAccount,
+                    'defaultDistributionMethod' => $this->defaultDistributionMethod,
+                    'bill' => $isEditing ? $bills->firstWhere('id', $editingBillId) : null,
+                ], key($isEditing ? 'edit-'.$editingBillId : 'create'))
+            </div>
+            <div class="modal-backdrop bg-black/50" wire:click="cancelEditBill"></div>
+        </div>
+    @endif
 </div>
