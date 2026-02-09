@@ -3,6 +3,7 @@
         <label class="label"><span class="label-text">Nom de la charge</span></label>
         <input type="text"
                wire:model="newName"
+               value="{{ $newName }}"
                placeholder="Nouvelle charge"
                class="input input-bordered w-full"
         />
@@ -15,6 +16,7 @@
         <label class="label"><span class="label-text">Montant</span></label>
         <input type="text"
                wire:model.blur="formattedNewAmount"
+               value="{{ $formattedNewAmount }}"
                placeholder="Montant"
                class="input input-bordered w-full"
         />
