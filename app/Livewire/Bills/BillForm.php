@@ -138,10 +138,10 @@ class BillForm extends Component
 
             // Dispatch events to refresh the bills table and show notification
             $this->dispatch('refreshBills');
-//            $this->dispatch('notify', [
-//                'message' => 'Dépense ajoutée avec succès',
-//                'type' => 'success'
-//            ]);
+            $this->dispatch('notify', [
+                'message' => 'Dépense ajoutée avec succès',
+                'type' => 'success'
+            ]);
         } catch (Exception $e) {
             // Handle exception and show notification
             $this->dispatch('notify', type: 'error', message: 'Une erreur est survenue.', details: $e->getMessage());

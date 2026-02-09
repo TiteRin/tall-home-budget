@@ -132,7 +132,7 @@ describe("when the form is correctly parametered", function () {
             ->set('formattedNewAmount', '799,41')
             ->assertSet('newAmount', 79941)
             ->assertSet('formattedNewAmount', '799,41 €')
-            ->assertSeeHtml('value="799,41 €');
+            ->assertSeeHtml('value="799,41 €"');
     });
 
     describe("when the form is submitted with errors", function () {

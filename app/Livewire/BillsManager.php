@@ -20,6 +20,7 @@ class BillsManager extends Component
     public Collection $bills;
 
     public bool $isEditing = false;
+    public bool $isCreating = false;
     public ?int $editingBillId = null;
 
     public function boot(CurrentHouseholdService $householdService, BillService $billService): void
@@ -94,14 +95,23 @@ class BillsManager extends Component
             throw new ModelNotFoundException();
         }
 
+        $this->isCreating = false;
         $this->isEditing = true;
         $this->editingBillId = $billId;
+    }
+
+    public function create(): void
+    {
+        $this->isEditing = false;
+        $this->editingBillId = null;
+        $this->isCreating = true;
     }
 
     #[On('cancelEditBill')]
     public function cancelEditBill(): void
     {
         $this->isEditing = false;
+        $this->isCreating = false;
         $this->editingBillId = null;
     }
 

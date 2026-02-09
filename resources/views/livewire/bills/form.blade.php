@@ -1,47 +1,45 @@
-<tr>
-    <td>
+<div class="flex flex-col gap-4">
+    <div class="form-control">
+        <label class="label"><span class="label-text">Nom de la charge</span></label>
         <input type="text"
                wire:model="newName"
+               value="{{ $newName }}"
                placeholder="Nouvelle charge"
-               class="input input-bordered input-sm w-full"
+               class="input input-bordered w-full"
         />
         @error('newName')
-        <br/>
-        <span class="text-error text-sm">
-                    {{ $message  }}
-                </span>
+        <span class="text-error text-sm">{{ $message }}</span>
         @enderror
-    </td>
-    <td class="relative">
+    </div>
+
+    <div class="form-control">
+        <label class="label"><span class="label-text">Montant</span></label>
         <input type="text"
                wire:model.blur="formattedNewAmount"
                value="{{ $formattedNewAmount }}"
                placeholder="Montant"
-               class="input input-bordered input-sm"
+               class="input input-bordered w-full"
         />
         @error('newAmount')
-        <br/>
-        <span class="text-error text-sm">
-            {{ $message  }}
-        </span>
+        <span class="text-error text-sm">{{ $message }}</span>
         @enderror
-    </td>
-    <td>
-        <select class="select select-bordered" wire:model="newDistributionMethod">
+    </div>
+
+    <div class="form-control">
+        <label class="label"><span class="label-text">Méthode de distribution</span></label>
+        <select class="select select-bordered w-full" wire:model="newDistributionMethod">
             @foreach ($this->distributionMethodOptions as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
             @endforeach
         </select>
         @error('newDistributionMethod')
-        <br/>
-        <span class="text-error text-sm">
-            {{ $message  }}
-        </span>
+        <span class="text-error text-sm">{{ $message }}</span>
         @enderror
+    </div>
 
-    </td>
-    <td>
-        <select class="select select-bordered" wire:model="newMemberId">
+    <div class="form-control">
+        <label class="label"><span class="label-text">Qui paie ?</span></label>
+        <select class="select select-bordered w-full" wire:model="newMemberId">
             <option value="" selected hidden>Membre du foyer</option>
             @foreach ($this->householdMemberOptions as $value => $label)
                 <option value="{{ $value }}">{{ $label }}</option>
@@ -50,20 +48,17 @@
                 <option value="-1">Compte joint</option>
             @endif
         </select>
-
         @error('newMemberId')
-        <br/>
-        <span class="text-error text-sm">
-            {{ $message  }}
-        </span>
+        <span class="text-error text-sm">{{ $message }}</span>
         @enderror
-    </td>
-    <td>
+    </div>
+
+    <div class="mt-4 flex flex-col gap-2">
         @if ($this->bill)
             <button class="btn btn-primary w-full" wire:click.prevent="saveBill" type="button">Sauvegarder</button>
             <button class="btn w-full" wire:click.prevent="cancelEdition" type="button">Annuler</button>
         @else
             <button class="btn btn-primary w-full" wire:click.prevent="addBill" type="button">Ajouter</button>
         @endif
-    </td>
-</tr>
+    </div>
+</div>
