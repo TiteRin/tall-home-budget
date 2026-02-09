@@ -48,7 +48,7 @@
                                 {{ $bill->name }}
                             </p>
                             <p>
-                                Payée par : {{ $bill->member->full_name }}
+                                Payée par : {{ $bill->member?->full_name ?? 'Compte joint' }}
                             </p>
                             <p class="text-sm opacity-70">
                                 Montant : {{ $bill->amount->toCurrency() }}
