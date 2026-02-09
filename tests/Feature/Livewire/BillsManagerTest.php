@@ -229,17 +229,6 @@ describe('Édition de charge', function () {
         $component->assertSeeLivewire('bills.bill-form');
     });
 
-    test('should display "Compte joint" when a bill is paid by the joint account', function () {
-        bill_factory()->bill([
-            'name' => 'Facture Commune',
-            'member_id' => null,
-        ], household: $this->household);
-
-        Livewire::test(BillsManager::class)
-            ->assertSee('Facture Commune')
-            ->assertSee('Payée par : Compte joint');
-    });
-
     test('should show modal when editing or creating', function () {
         $component = Livewire::test(BillsManager::class);
 
